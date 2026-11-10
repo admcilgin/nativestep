@@ -1,0 +1,22 @@
+[versions]
+agp = "9.1.0"
+kotlin = "2.4.0"
+compose-bom = "2026.09.00"
+activity-compose = "1.13.0"
+coroutines = "1.11.0"
+nativestep-kit = "0.1.0"
+
+[libraries]
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+nativestep-kit-core = { module = "dev.nativestep:nativestep-kit-core", version.ref = "nativestep-kit" }
+nativestep-kit-host = { module = "dev.nativestep:nativestep-kit-host", version.ref = "nativestep-kit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

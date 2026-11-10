@@ -1,0 +1,14 @@
+name: nativestep_binding
+description: Binds the Sample Flutter app to nativestep. Written for this project only (COMPONENTS.md §5).
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  nativestep_adapter:
+    path: ../../../../kits/flutter
+  flutter_sample:
+    path: ../../../../../flutter-sample

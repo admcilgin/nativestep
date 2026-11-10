@@ -1,0 +1,7 @@
+{
+  "name": "nativestep",
+  "version": "0.1.0",
+  "description": "The nativestep command-line tool (COMPONENTS.md §1)",
+  "type": "module",
+  "bin": { "nativestep": "src/main.ts" }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@nativestep/test",
+  "version": "0.1.0",
+  "description": "Behavior test SDK for nativestep targets (PROTOCOL.md)",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "test": "bun test ./test"
+  }
+}

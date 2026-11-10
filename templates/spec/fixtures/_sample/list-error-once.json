@@ -1,0 +1,9 @@
+{
+  "services": {
+    "SampleService": {
+      "list": [
+        { "args": { "page": 1 }, "error": { "code": "unavailable", "message": "Try again later" }, "times": 1 }
+      ]
+    }
+  }
+}

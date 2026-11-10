@@ -1,0 +1,14 @@
+{
+  "services": {
+    "SampleService": {
+      "list": [
+        { "args": { "page": 2 }, "result": { "items": [] } },
+        {
+          "args": { "page": 1 },
+          "result": { "items": [{ "id": "a", "title": "Alpha" }, { "id": "b", "title": "Beta" }] },
+          "delayMs": 200
+        }
+      ]
+    }
+  }
+}

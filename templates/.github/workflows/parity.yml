@@ -1,0 +1,23 @@
+# The behavior contract on every PR: the same tests on iOS and Android (COMPONENTS.md §6).
+name: parity
+on:
+  pull_request:
+
+jobs:
+  parity:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      # shortcut: nativestep has no release yet; until M8 the CLI comes from the repo in the NATIVESTEP_REPO variable.
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.NATIVESTEP_REPO }}
+          path: .nativestep/cli
+      # `nativestep lint` joins this job in M4.
+      - name: Behavior tests
+        run: bun .nativestep/cli/cli/src/main.ts test --target ios,android

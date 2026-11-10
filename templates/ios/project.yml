@@ -1,0 +1,35 @@
+name: __APP_NAME__
+options:
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  Core:
+    path: Core
+  NativeStepKit:
+    path: ../kits/ios
+targets:
+  __APP_NAME__:
+    type: application
+    platform: iOS
+    sources: [App]
+    scheme: {}
+    dependencies:
+      - package: Core
+        product: Core
+      - package: Core
+        product: CoreHost
+      - package: NativeStepKit
+        product: NativeStepKit
+      - package: NativeStepKit
+        product: NativeStepHostKit
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: __APP_NAME__
+        UILaunchScreen: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: __IOS_BUNDLE_ID__
+        SWIFT_VERSION: "6.0"
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
