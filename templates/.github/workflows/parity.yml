@@ -13,11 +13,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      # shortcut: nativestep has no release yet; until M8 the CLI comes from the repo in the NATIVESTEP_REPO variable.
+      # shortcut: nativestep has no release yet; until M8 the CLI comes from GitHub (NATIVESTEP_REPO overrides the repo).
       - uses: actions/checkout@v4
         with:
-          repository: ${{ vars.NATIVESTEP_REPO }}
+          repository: ${{ vars.NATIVESTEP_REPO || 'admcilgin/nativestep' }}
           path: .nativestep/cli
-      # `nativestep lint` joins this job in M4.
+      - name: Architecture rules
+        run: bun .nativestep/cli/cli/src/main.ts lint
       - name: Behavior tests
         run: bun .nativestep/cli/cli/src/main.ts test --target ios,android

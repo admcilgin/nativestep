@@ -84,11 +84,11 @@ Makine kurulumu: XcodeGen (`brew install xcodegen`; Command Line Tools güncelle
 
 Şablon kökü projenin köküne bire bir eşleniyor (`ios/`, `android/`, `spec/`, `nativestep.json`, `.gitignore`, `.github/workflows/parity.yml`). Android'e version catalog eklendi. `init` hiçbir dosya silmiyor ve symlink'in içine yazmayı reddediyor.
 
-Doğrulanmayan: CI dosyaları (`.github/workflows/ci.yml`, şablondaki `parity.yml`) GitHub'da hiç koşmadı; repo henüz git deposu değil. Adımları yerelde aynı komutlarla koştum. `parity.yml`, M8'e kadar CLI'yi `NATIVESTEP_REPO` değişkenindeki repodan alıyor.
+CI ilk kez GitHub'da (github.com/admcilgin/nativestep) 5 dk 17 sn'de yeşil koştu. Şablondaki `parity.yml` henüz bir projede koşmadı; M8'e kadar CLI'yi bu repodan alıyor (`NATIVESTEP_REPO` değişkeni başka bir repoya çevirir).
 
 Sonraya kalanlar: `parity.yml`'a `nativestep lint` (M4), kit'lerin güncellenmesi (`nativestep kits update`, M8).
 
-## M4 · `nativestep lint`, `nativestep scan`, `nativestep status`
+## M4 · `nativestep lint`, `nativestep scan`, `nativestep status` ✓
 
 - Lint: ARCHITECTURE.md'deki *lint* etiketli kurallar (R1, R5'teki adlar, R6, R10, R12, R17, R20). R5 ve R12 iki platformu karşılaştıran parity kontrolleridir.
 - Scan: COMPONENTS.md §1'deki ham gerçekler.
@@ -97,6 +97,12 @@ Sonraya kalanlar: `parity.yml`'a `nativestep lint` (M4), kit'lerin güncellenmes
 **Bitti:**
 - Her lint kuralı, kasıtlı ihlal içeren bir örnek projede yakalanıyor; temiz projede yanlış alarm yok.
 - `nativestep scan` farklı state yönetimi kullanan iki Flutter projesinde geçerli bir `raw` bölümü üretiyor.
+
+**Sonuç (2026-11-10):** `lint` yedi kuralın hepsini denetliyor. Testte bir projeye 16 kasıtlı ihlal konuyor ve hepsi doğru kural, dosya ve satırla yakalanıyor. Temiz projede hiçbir şey çıkmıyor; yorumlardaki ve string'lerdeki `Date()` sayılmıyor. İlk çalıştırmada şablonun kendisinde dört gerçek ihlal buldu: üç iOS node'u ayrı `+Introspection.swift` dosyasında değildi, Android'de `ui/` bir feature değildi. Şablon düzeltildi: node'lar kendi dosyalarında, ekranlar ve gerçek servis `Sample/` ve `About/` feature klasörlerinde. Android release build'i de derleniyor (R20).
+
+`scan` dört Flutter projesinde geçerli bir `raw` bölümü üretti: `flutter-sample` (ChangeNotifier) ve repoda olmayan üç yerel uygulama (`provider`; `flutter_bloc` ve `get`; `flutter_riverpod`; 25 ile 172 arası Dart dosyası, 139 ile 232 arası paket). Channel sayıları elle sayımla aynı çıktı. Tarama her projede 100 ms'nin altında. `status`, envanteri ve son test sonuçlarını özetliyor.
+
+Sonraya kalanlar: Dart tarafındaki channel adları (`scan` şimdilik yalnızca native tarafa bakıyor), state alanlarının iki platformda karşılaştırılması (şimdilik testler kapsıyor).
 
 ## M5 · Göç skill'leri ve örnek uygulamalar
 
@@ -152,6 +158,7 @@ Sonraya kalanlar: `parity.yml`'a `nativestep lint` (M4), kit'lerin güncellenmes
 | Kit dağıtımı | v1'de `init` kit'leri projenin `kits/` klasörüne kopyalıyor; SwiftPM, Maven ve pub kaydı sonra | Proje kendi başına derleniyor; kit sürümü `nativestep.json`'da. | 2026-11-10 |
 | En düşük platform sürümleri | iOS 17, Android minSdk 26 | `@Observable` iOS 17 istiyor; minSdk 26 cihazların büyük çoğunluğunu kapsıyor. | 2026-11-10 |
 | Şablonun yapısı | `templates/` projenin köküne bire bir eşleniyor; `examples/native-sample` bundan üretiliyor | Tek kaynak: şablonla örnek arasında kayma olmuyor. | 2026-11-10 |
+| Lint yöntemi | Yorumları boşaltılmış kaynakta metin kalıpları; Swift ve Kotlin parser'ı yok | Kurallar ad, import, çağrı ve klasör düzeyinde; parser iki platform için ağır bir bağımlılık olurdu. Tip gerektiren bir kural gelirse yeniden bakılır. | 2026-11-10 |
 | Modal ve sekme ağacı | Bir navigator'ın çocuğu ekrandaki dal: yığının tepesi, seçili sekme ya da açık modal | Modal açıkken altındaki sekmelerin ve yığınların ödünç action'ları kullanılamıyor; ekranda olanla protokolde görünen aynı. | 2026-11-10 |
 
 ## Açık kararlar

@@ -25,8 +25,15 @@ jobs:
         working-directory: kits/test-sdk
         run: bun test
 
+      - name: CLI tests (lint rules, scan, status)
+        working-directory: cli
+        run: bun test
+
       - name: nativestep init
         run: bun cli/src/main.ts init "$DEMO" --app Demo --ios-bundle-id com.demo.app --android-package com.demo.app
+
+      - name: Lint the new project
+        run: cd "$DEMO" && bun "$GITHUB_WORKSPACE/cli/src/main.ts" lint
 
       - name: Conformance tests, headless
         run: cd "$DEMO" && bun "$GITHUB_WORKSPACE/cli/src/main.ts" test _sample --target ios,android

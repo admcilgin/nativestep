@@ -13,6 +13,8 @@ export interface DeviceConfig {
 
 export interface Target {
   role?: string;
+  /** The Flutter project, relative to nativestep.json; `nativestep scan` reads it. */
+  path?: string;
   build?: string;
   headless?: string;
   device?: DeviceConfig;
@@ -21,7 +23,7 @@ export interface Target {
 export interface Config {
   protocol: number;
   kits: string;
-  app: { name: string };
+  app: { name: string; iosBundleId: string; androidPackage: string };
   paths?: { tests?: string; fixtures?: string };
   targets: Record<string, Target>;
 }

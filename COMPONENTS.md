@@ -36,19 +36,20 @@ The single command through which agents and engineers talk to the toolkit. It ma
 | Command | What it does |
 |---|---|
 | `nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]` | Sets up the native repo from the templates, copies the kits into `kits/`, writes `nativestep.json`. `--reference` adds the Flutter app as the `flutter` target. A non-empty directory needs `--force`, which writes over the template's files and deletes nothing. |
-| `nativestep scan [<flutter-path>]` | Writes the raw facts that look the same in every Flutter project to the `raw` section of `spec/inventory.json`: packages from `pubspec.lock`, Dart file count, assets, and the native code and MethodChannels under `ios/` and `android/`. The import graph goes to `.nativestep/scan/imports.json`. |
+| `nativestep scan [<flutter-path>] [--json]` | Writes the raw facts that look the same in every Flutter project to the `raw` section of `spec/inventory.json`: packages from `pubspec.lock`, the number of Dart files under `lib/`, the asset and font files in `pubspec.yaml`, and the native code and platform channels under `ios/` and `android/` (generated and vendored code such as `Pods/` and `GeneratedPluginRegistrant` is skipped). The import graph of `lib/` goes to `.nativestep/scan/imports.json`. Without a path it reads `targets.flutter.path`. It never writes to the Flutter project. |
 | `nativestep session start --target <t> [--device] [--fixtures a,b] [--route <url>]` · `nativestep session stop [--target <t>]` | Starts a background session on the target, headless or (with `--device`) on the simulator or emulator; `ls` and `do` use this session. On a running session it sends a new `start`. |
 | `nativestep ls [--target <t>]` | The focused node: name, state, actions |
 | `nativestep do <action> [json] [--target <t>] [--no-wait]` | Runs an action and waits until `busy` is `false`; `--no-wait` returns the state right after the action |
 | `nativestep test [filter] [--target a,b] [--device]` | Runs `bun test` under `spec/` for each target and writes the results to `.nativestep/results/` |
-| `nativestep lint` | Checks the rules tagged *lint* in ARCHITECTURE.md |
+| `nativestep lint [--json]` | Checks the rules tagged *lint* in ARCHITECTURE.md (R1, R5, R6, R10, R12, R17, R20) and prints one line per violation: rule, file and line, message |
 | `nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>]` | Replays the test on device targets and takes a screenshot at the test's final state |
-| `nativestep status [--screens \| --features]` | Progress from `inventory.json` and the latest test results |
+| `nativestep status [--screens \| --features] [--json]` | Progress from `inventory.json` and the latest test results in `.nativestep/results/`. A feature counts as done when all its checkpoints are done. |
 
 Shared behavior:
 
 - Output is plain text for people by default; `--json` gives JSON for machines. No TUI, colors or spinners.
 - Exit codes: `0` success, `1` a test, lint rule or gate failed, `2` usage or configuration error.
+- `lint` reads source text with comments blanked out; it does not parse Swift or Kotlin. That is enough for names, imports, calls and folders; a rule that needs types will need a parser.
 - `.nativestep/` is the runtime directory (session sockets, results, screenshots, scan output) and stays out of git.
 - A session is a background process that holds one connection to the target and listens on `.nativestep/sessions/<target>.sock`; its log is next to the socket.
 - `shot` runs the test with `NATIVESTEP_SHOT_CMD` and `NATIVESTEP_SHOT_OUT` set. After each test the SDK waits until `busy` is `false`, then `NATIVESTEP_SHOT_SETTLE_MS` (800 ms by default) for animations, and runs the target's `device.screenshot`. Files are named `<file>[-<test>]-<target>.png` under `.nativestep/shots/`.
@@ -138,7 +139,7 @@ The compilable projects that `nativestep init` sets up. The template decides the
 | `templates/ios` | `project.yml` (XcodeGen), `Core/Package.swift` (the Core library, the `CoreHost` fixture library, the `nativestep-host` executable, a dependency on `../kits/ios`), `App/`, the `Sample` and `About` features |
 | `templates/android` | `settings.gradle.kts`, version catalog (`gradle/libs.versions.toml`), Gradle wrapper, `:core` (JVM), `:host` (JVM library and application), `:app` (Compose), `includeBuild` for `../kits/android`, the `sample` and `about` features |
 | `templates/spec` | `package.json`, `tests/_sample/`, `fixtures/_sample/`, empty `inventory.json` and `memory.md`. `nativestep test` links `@nativestep/test` to `kits/test-sdk`. |
-| `templates/.github/workflows/parity.yml` | `nativestep test --target ios,android` on every PR; `nativestep lint` joins in M4 |
+| `templates/.github/workflows/parity.yml` | `nativestep lint` and `nativestep test --target ios,android` on every PR |
 | `templates/nativestep.json`, `templates/.gitignore` | The `ios` and `android` targets (§8) |
 
 The templates map one to one onto the project root. The placeholders are `__APP_NAME__`, `__IOS_BUNDLE_ID__` and `__ANDROID_PACKAGE__`. They are filled by plain text replacement in file names and in text files; in paths, `__ANDROID_PACKAGE__` becomes directories (`com/basket/app`). The `Sample` and `About` screens are the conformance screens; a migrated app keeps them until the migration ends.
@@ -211,6 +212,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
   "targets": {
     "flutter": {
       "role": "reference",
+      "path": "../basket-flutter",
       "device": {
         "build": "cd ../basket-flutter && flutter build ios --simulator --debug --dart-define=NATIVESTEP=true && xcrun simctl install booted build/ios/iphonesimulator/Runner.app",
         "setup": "xcrun simctl launch --terminate-running-process booted com.basket.flutter",
@@ -245,6 +247,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
 | Field | Meaning |
 |---|---|
 | `role` | `reference` makes the target the source of behavior (G0). The target is removed when the migration is done. |
+| `path` | The reference Flutter project, relative to `nativestep.json`; `nativestep scan` reads it. `init --reference` writes it. |
 | `build` | Build command that runs once before the tests |
 | `headless` | Command that starts the host speaking the protocol over stdio. It calls the compiled binary so that build tools do not pollute stdout. |
 | `device.build` | Builds and installs the debug app; runs once before device tests, in place of `build` |

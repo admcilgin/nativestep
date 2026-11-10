@@ -1,10 +1,8 @@
-package __ANDROID_PACKAGE__
+package __ANDROID_PACKAGE__.sample
 
 import dev.nativestep.kit.AppError
 import dev.nativestep.kit.AppException
 import dev.nativestep.kit.NodeJson
-import __ANDROID_PACKAGE__.sample.SampleList
-import __ANDROID_PACKAGE__.sample.SampleService
 import java.net.HttpURLConnection
 import java.net.URI
 import kotlinx.coroutines.Dispatchers

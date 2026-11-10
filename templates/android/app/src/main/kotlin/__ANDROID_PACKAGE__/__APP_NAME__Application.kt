@@ -3,6 +3,7 @@ package __ANDROID_PACKAGE__
 import android.app.Application
 import __ANDROID_PACKAGE__.app.AppCore
 import __ANDROID_PACKAGE__.app.Services
+import __ANDROID_PACKAGE__.sample.HttpSampleService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 

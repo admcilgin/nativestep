@@ -1,7 +1,9 @@
 #!/usr/bin/env bun
-// shortcut: scan, lint and status arrive in M4.
 import { parseArgs, UsageError } from "./config.ts";
 import { init } from "./init.ts";
+import { lint } from "./lint.ts";
+import { scan } from "./scan.ts";
+import { status } from "./status.ts";
 import { daemon, doAction, ls, sessionStart, sessionStop } from "./session.ts";
 import { shot, test } from "./test.ts";
 
@@ -11,10 +13,13 @@ const USAGE = `usage:
   nativestep session stop [--target <t>]
   nativestep ls [--target <t>] [--json]
   nativestep do <action> [json] [--target <t>] [--no-wait] [--json]
+  nativestep lint [--json]
+  nativestep scan [<flutter-path>] [--json]
+  nativestep status [--screens | --features] [--json]
   nativestep test [filter] [--target a,b] [--device]
   nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>]`;
 
-const BOOLEANS = ["device", "json", "no-wait", "force"];
+const BOOLEANS = ["device", "json", "no-wait", "force", "screens", "features"];
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
@@ -31,6 +36,12 @@ async function main(argv: string[]): Promise<number> {
   switch (command) {
     case "init":
       return init(args);
+    case "lint":
+      return lint(args);
+    case "scan":
+      return scan(args);
+    case "status":
+      return status(args);
     case "ls":
       return ls(args);
     case "do":

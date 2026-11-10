@@ -36,7 +36,7 @@ Mobile → Core and Host → Core. Core knows neither Mobile nor Host.
 Network, storage, Keychain, feature flags, analytics, location, push, payments. No singletons and no DI framework. Real implementations live in Mobile, fixture implementations in Host.
 
 **R5 · Services have the same shape on both platforms.** *lint · test*
-Service names, method names and parameter names are identical on both platforms, and fixtures match on these names (PROTOCOL.md §7). The JSON shape of service results and domain models is the same in the fixtures and on both platforms.
+Service names, method names and parameter names are identical on both platforms, and fixtures match on these names (PROTOCOL.md §7). The JSON shape of service results and domain models is the same in the fixtures and on both platforms. Lint compares the fields of `Services` and, for each service, its methods and parameter names; the tests cover the JSON shapes.
 
 **R6 · Time, randomness and id generation are services too.** *lint*
 Core does not call `Date()`, `UUID()`, `.random`, `System.currentTimeMillis()` or `Instant.now()` directly; it uses the `Clock` and `IdGenerator` services. This way the same fixtures always produce the same state.
@@ -255,7 +255,7 @@ URL → `Route` → navigator state. The protocol's `start` command can begin wi
 ## 6. Features
 
 **R17 · Every feature has its own folder.** *lint*
-`ios/Core/Sources/<Feature>/`, `ios/App/<Feature>/`, `android/core/src/main/kotlin/<package>/<feature>/`, `android/app/src/main/kotlin/<package>/<feature>/`. Shared code lives under `Shared/`.
+`ios/Core/Sources/<Feature>/`, `ios/App/<Feature>/`, `android/core/src/main/kotlin/<package>/<feature>/`, `android/app/src/main/kotlin/<package>/<feature>/`. Shared code lives under `Shared/`. Lint checks that every Core file is in a feature folder, that both platforms have the same feature folders, and that every App folder is a Core feature or `Shared`. The app's entry point and root view stay at the top of the App module.
 
 **R18 · Features do not construct each other's ViewModels.** *review*
 Moving between features goes through `Route`; shared use goes through `Shared/` and service protocols. Parallel agents not touching the same files depends on this rule.

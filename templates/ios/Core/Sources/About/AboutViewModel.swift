@@ -23,31 +23,3 @@ public final class AboutViewModel {
         }
     }
 }
-
-extension AboutViewModel: IntrospectionNodeProviding {
-    public var introspectionNode: IntrospectionNode {
-        IntrospectionNode(name: "About", state: state, actions: [
-            NodeAction("openLicense", title: "Show license") { [weak self] in self?.send(.openLicense) },
-        ])
-    }
-}
-
-/// Presented by the modal navigator; `dismiss` is lent by it.
-@MainActor @Observable
-public final class LicenseViewModel {
-    public struct State: Codable, Equatable, Sendable {}
-
-    public enum Action: Equatable, Sendable {}
-
-    public private(set) var state = State()
-
-    public init() {}
-
-    public func send(_ action: Action) {}
-}
-
-extension LicenseViewModel: IntrospectionNodeProviding {
-    public var introspectionNode: IntrospectionNode {
-        IntrospectionNode(name: "License", state: state)
-    }
-}

@@ -18,9 +18,3 @@ public final class SampleDetailViewModel {
 
     public func send(_ action: Action) {}
 }
-
-extension SampleDetailViewModel: IntrospectionNodeProviding {
-    public var introspectionNode: IntrospectionNode {
-        IntrospectionNode(name: "SampleDetail", state: state)
-    }
-}

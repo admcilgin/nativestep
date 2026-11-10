@@ -91,6 +91,7 @@ function addReference(dir: string, reference: string) {
   config.targets = {
     flutter: {
       role: "reference",
+      path: relative(dir, reference),
       device: {
         build: `cd ${path} && flutter build ios --simulator --debug --dart-define=NATIVESTEP=true && xcrun simctl install booted build/ios/iphonesimulator/Runner.app`,
         setup: `xcrun simctl launch --terminate-running-process booted ${bundleId}`,

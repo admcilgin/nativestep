@@ -39,7 +39,7 @@ nativestep/
 
 ## Status
 
-M3 is done: `nativestep init` creates a project from the templates that builds on iOS and Android and passes the 15 conformance tests. The interactive CLI (`session`, `ls`, `do`, `shot`) from M2 works on all three targets. Next is M4: `nativestep lint`, `scan` and `status` ([PLAN.md](PLAN.md)).
+M4 is done: `nativestep lint` checks the architecture rules on both platforms, `nativestep scan` reads a Flutter project, and `nativestep status` reports progress. `nativestep init` (M3) creates a project that builds on iOS and Android, passes lint and the 15 conformance tests; the interactive CLI (`session`, `ls`, `do`, `shot`) works on all three targets. Next is M5: the migration skills and sample apps ([PLAN.md](PLAN.md)).
 
 ```bash
 NS=$PWD
