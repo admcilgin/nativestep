@@ -1,0 +1,45 @@
+{
+  "protocol": 1,
+  "kits": "0.1.0",
+  "app": {
+    "name": "Basket",
+    "iosBundleId": "dev.nativestep.basket",
+    "androidPackage": "dev.nativestep.basket"
+  },
+  "paths": {
+    "tests": "spec/tests",
+    "fixtures": "spec/fixtures"
+  },
+  "targets": {
+    "flutter": {
+      "role": "reference",
+      "path": "../flutter-riverpod",
+      "device": {
+        "build": "cd '../flutter-riverpod' && flutter build ios --simulator --debug --dart-define=NATIVESTEP=true && xcrun simctl install booted build/ios/iphonesimulator/Runner.app",
+        "setup": "xcrun simctl launch --terminate-running-process booted dev.nativestep.examples.basket",
+        "connect": "tcp://127.0.0.1:7357",
+        "screenshot": "xcrun simctl io booted screenshot {out}"
+      }
+    },
+    "ios": {
+      "build": "swift build --package-path ios/Core --product nativestep-host",
+      "headless": "ios/Core/.build/debug/nativestep-host",
+      "device": {
+        "build": "cd ios && xcodegen generate --quiet && xcodebuild -project Basket.xcodeproj -scheme Basket -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath build -quiet build && xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/Basket.app",
+        "setup": "xcrun simctl launch --terminate-running-process booted dev.nativestep.basket",
+        "connect": "tcp://127.0.0.1:7358",
+        "screenshot": "xcrun simctl io booted screenshot {out}"
+      }
+    },
+    "android": {
+      "build": "android/gradlew -p android -q :host:installDist",
+      "headless": "android/host/build/install/host/bin/host",
+      "device": {
+        "build": "android/gradlew -p android -q :app:installDebug",
+        "setup": "adb forward tcp:7359 tcp:7359 && adb shell am start -S -W -n dev.nativestep.basket/.MainActivity",
+        "connect": "tcp://127.0.0.1:7359",
+        "screenshot": "adb exec-out screencap -p > {out}"
+      }
+    }
+  }
+}

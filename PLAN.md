@@ -110,6 +110,8 @@ Sonraya kalanlar: Dart tarafındaki channel adları (`scan` şimdilik yalnızca 
 - İkinci girdi: farklı bir state yönetimi kullanan açık kaynak bir Flutter uygulaması (aday seçimi açık karar).
 - Skill'ler: `step-adopt`, `step-reference`, `step-plan`.
 
+**Ara durum (2026-11-20):** Üç skill yazıldı. Basket (`examples/flutter-riverpod`) üzerinde uçtan uca koşuldu: `examples/native-basket` init edildi, `_sample` iOS ve Android'de yeşil, scan çalıştı; `spec/profile.md`, beş ekranlı `screens`, binding, `spec/fixtures/reference/` ve 4 feature / 12 checkpoint'lik taslak plan yazıldı. Simülatörde `ls`/`do` ile beş ekranın hepsi `driven` doğrulandı. Skill'lerin öngörmediği bir şey çıkmadı; profilde öne çıkan karar Riverpod 3'ün varsayılan otomatik retry'ının kapatılması (hata ekranı ~30 sn spinner'dan sonra geliyordu). Kalan: ikinci girdi uygulaması (aday seçimi açık karar) ve onda skill'lerin değişmeden çalıştığının gösterilmesi; mühendisin profil ve plan onayı (iki açık soru: sepet çıkışta kalıyor mu, checkout hatası satırlar değişince kalıyor mu).
+
 **Bitti:**
 - İki uygulamada da `profile.md`, `inventory.json` ve feature planı üretiliyor, binding yazılıyor ve `nativestep ls --target flutter` çalışıyor.
 - İki uygulama arasında skill'lerde değişiklik gerekmiyor. Gerekiyorsa skill'e projeye özel bilgi sızmış demektir.

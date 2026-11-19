@@ -1,0 +1,14 @@
+{
+  "services": {
+    "AuthService": {
+      "signIn": [{ "args": { "password": "wrong" }, "error": { "code": "unauthorized" } }]
+    },
+    "ProductService": {
+      "list": [{ "error": { "code": "network" }, "times": 1 }],
+      "detail": [{ "args": { "id": "mug" }, "error": { "code": "not_found" } }]
+    },
+    "OrderService": {
+      "place": [{ "error": { "code": "out_of_stock" }, "times": 1 }]
+    }
+  }
+}

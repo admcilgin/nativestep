@@ -1,0 +1,95 @@
+# Binding shape
+
+The binding is a Dart package at `spec/adapters/flutter/nativestep_binding/`. Only the parts marked `<…>` depend on the project; how they are filled comes from `spec/profile.md`.
+
+```yaml
+# pubspec.yaml
+name: nativestep_binding
+description: Binds <App> to nativestep. Written for this project only (COMPONENTS.md §5).
+publish_to: none
+
+environment:
+  sdk: <the Flutter app's constraint>
+
+dependencies:
+  flutter:
+    sdk: flutter
+  nativestep_adapter:
+    path: ../../../../kits/flutter
+  <flutter app package name>:
+    path: <relative path to the Flutter app>
+  # Every package the binding imports, with the app's constraint.
+```
+
+```dart
+// lib/nativestep_binding.dart
+/// Binds <App> to nativestep (COMPONENTS.md §5). The name mapping is in spec/profile.md.
+library;
+
+import 'package:flutter/widgets.dart';
+import 'package:nativestep_adapter/nativestep_adapter.dart';
+
+/// Called from the app's main in debug builds with --dart-define=NATIVESTEP=true.
+void startNativeStep() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const Center(child: Text('Waiting for nativestep…', textDirection: TextDirection.ltr)));
+  StepServer(app: '<App>', start: _start, settle: _settle).listen();
+}
+
+/// Lets the UI catch up; frames can be throttled while the simulator window is hidden, so never wait long.
+Future<void> _settle() =>
+    WidgetsBinding.instance.endOfFrame.timeout(const Duration(milliseconds: 200), onTimeout: () {});
+
+Future<StepNode> _start(FixtureStore fixtures, String? route) async {
+  // 1. Build the app from scratch with fixture services at the injection point, under a new key.
+  // 2. await _settle();
+  // 3. Open `route` with the app's own navigation; an unknown route throws ProtocolError('bad_request', …).
+  // 4. Return the root node, which reads everything live: never cache state in a node.
+}
+
+/// One per service in the profile's service table.
+class _<Source>Fixture implements <Source> {
+  _<Source>Fixture(this.fixtures);
+
+  final FixtureStore fixtures;
+
+  @override
+  Future<<SourceModel>> <sourceMethod>(<source parameters>) async {
+    try {
+      final json = await fixtures.call('<TargetService>', '<targetMethod>', {'<targetParam>': <value>});
+      return <SourceModel from json>;
+    } on FixtureError catch (e) {
+      throw <the source error for e.code, as the profile maps it>;
+    }
+  }
+}
+
+class _AppNode extends StepNode {
+  @override
+  String get name => 'App';
+  @override
+  Map<String, Object?> get state => const {};
+  @override
+  StepNode get child => <the top navigator node>;
+}
+
+/// A screen: state in target names and shapes, actions doing what the widgets do.
+class _<Screen>Node extends StepNode {
+  @override
+  String get name => '<Screen>';
+  @override
+  Map<String, Object?> get state => {
+        '<field>': <value read from the app's state>,
+        if (<error> != null) 'error': {'code': <code>},
+      };
+  @override
+  List<StepAction> get actions => [
+        StepAction('<action>', '<Title>', (input) => <the call the widget makes>,
+            input: const InputSchema.object({'<param>': InputSchema.string(minLength: 1)})),
+      ];
+}
+```
+
+Navigator nodes follow PROTOCOL.md §4: `Modal` has `{ presented }` and lends `dismiss` while something is presented; `Tabs` has `{ selected }` and lends `selectTab` with an `enum` of tab ids; `Stack` has `{ depth }` and lends `goBack` above its root. Each one's `child` is the branch on screen.
+
+When the app does not expose a navigator's stack, a `NavigatorObserver` can mirror it, but only if the app lets the binding pass one in at start-up; otherwise read it from the router's own state or from the state that opens the route (a dialog shown while a state value is set, for example).

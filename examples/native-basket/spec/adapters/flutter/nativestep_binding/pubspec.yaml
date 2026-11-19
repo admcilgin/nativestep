@@ -1,0 +1,16 @@
+name: nativestep_binding
+description: Binds the Basket Flutter app to nativestep. Written for this project only (COMPONENTS.md §5).
+publish_to: none
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  nativestep_adapter:
+    path: ../../../../kits/flutter
+  basket:
+    path: ../../../../../flutter-riverpod
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.1.1
