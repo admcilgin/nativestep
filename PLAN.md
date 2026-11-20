@@ -278,6 +278,11 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 - İlerleme: port paylaşımı. Aynı simülatörde iki projenin uygulaması aynı portu tutuyordu; proje değiştirmek her seferinde elle uygulama kapatmayı gerektiriyordu. Artık yalnızca öndeki uygulama dinliyor: iOS kit'i sahne arka plana geçince portu bırakıyor, öne gelince alıyor; Flutter'da binding `AppLifecycleListener` ile `close`/`listen` çağırıyor; Android'de launcher, başlamış bir activity varken dinliyor. Bind 10 sn boyunca yeniden deneniyor; test SDK'sı devir sırasında başka bir uygulamanın `hello`'sunu yeniden deniyor ve sıfırlanan soket hatasını yakalıyor (önceden bir sonraki testi düşürüyordu). native-sample ile movie-tracker arasında elle bir şey kapatmadan gidip gelindi: iOS 4/4, Flutter 10/10, Android 4/4; Basket üç hedefte, taze bir `init` iOS ve Android cihazda geçiyor. Kit'ler 0.2.2; step-reference'ın binding örneği ve üç binding güncellendi.
 
+- İlerleme: rehber, `flutter create` ile açılmış temiz bir uygulamada ilk checkpoint'e kadar izlendi (üçüncü uygulama, Counter). step-adopt (profil, ekran listesi), step-reference (binding; `ls`/`do` ile 0→1→2), step-plan (tek feature `foundation`, iki checkpoint), step-feature cp1: G0 3/3 flutter; G1 headless 18/18 ve cihazda üç hedef; G2 temiz, release derleniyor; G3 notlarla geçti, buton iki cihazda da elle denendi; G4 tek koşu, ilk sonuç R8 yüzünden "changes" (state `send`'de değişiyordu), düzeltilip onaylandı; G5 atlandı (otonom). Proje scratchpad'de, git dışında. Skill'lere dönenler:
+  1. Sayaç state'i widget içinde (`setState`), yani profil şablonuna göre `read-only` olacaktı ve G0 mühendis onayı isterdi. Binding element ağacından okuyup sürebiliyor; step-reference'ın binding rehberine "State kept inside widgets" bölümü eklendi.
+  2. Android şablonunda ikon kütüphanesi yok; step-screen tek ikon için bağımlılık yerine `ImageVector` öneriyor.
+  3. Her göçün `foundation` adımında şablon kabuğu `Sample/SampleCore`'a elle taşınıyor (Basket, movie-tracker, Counter: üçünde de aynı dosyalar). Şablonun bunu baştan ayrı getirmesi sonraki iş.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

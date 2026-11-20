@@ -96,3 +96,32 @@ class _<Screen>Node extends StepNode {
 Navigator nodes follow PROTOCOL.md §4: `Modal` has `{ presented }` and lends `dismiss` while something is presented; `Tabs` has `{ selected }` and lends `selectTab` with an `enum` of tab ids; `Stack` has `{ depth }` and lends `goBack` above its root. Each one's `child` is the branch on screen.
 
 When the app does not expose a navigator's stack, a `NavigatorObserver` can mirror it, but only if the app lets the binding pass one in at start-up; otherwise read it from the router's own state or from the state that opens the route (a dialog shown while a state value is set, for example).
+
+## State kept inside widgets
+
+When a screen's state lives in a library-private `State` (a `StatefulWidget` with `setState`), nothing outside the widget tree holds it, but the element tree still shows it. Read and drive the screen there before calling it `read-only`:
+
+```dart
+/// Every widget on screen, parents first.
+Iterable<Widget> _widgets() sync* {
+  final root = WidgetsBinding.instance.rootElement;
+  if (root == null) return;
+  final stack = <Element>[root];
+  while (stack.isNotEmpty) {
+    final element = stack.removeLast();
+    yield element.widget;
+    element.visitChildElements(stack.add);
+  }
+}
+
+// state: what the screen shows, read from public widget fields
+'count': _widgets().whereType<Text>().map((t) => int.tryParse(t.data ?? '')).whereType<int>().single,
+// action: the callback a tap calls
+StepAction('increment', 'Increment', (_) => _widgets().whereType<FloatingActionButton>().single.onPressed!()),
+```
+
+- Find widgets by public types and fields: `Text.data`, `TextField.controller`, `Switch.value`, `onPressed`, `onChanged`. A `Key` the app already sets narrows the search; never add one to the app.
+- Each lookup must match exactly one widget (`single`), so a layout change fails loudly instead of reading the wrong value.
+- A new key on the app's root widget (`MyApp(key: UniqueKey())`) gives fresh `State` objects for each session.
+- Write in the profile which widget each field and action comes from. If the value is not on screen in a form the binding can read, the screen is `read-only`.
+

@@ -56,7 +56,7 @@ Repeat until both are green. When a test fails:
 Only now write what the user sees. Mobile is not covered by G1, so keep it thin.
 
 - **Real services** (R4): the HTTP or platform implementation of each service protocol, in the app's feature folder. Error mapping to the codes in the profile's service table.
-- **Views** read the ViewModel's state and send its actions, nothing else (R9). Texts and formatting come from the reference.
+- **Views** read the ViewModel's state and send its actions, nothing else (R9). Texts and formatting come from the reference. The Android template has no icon library: draw the few icons a screen needs as an `ImageVector` from the icon's path rather than adding `material-icons` for them.
 - **Root** draws the navigators' state (R14) and keeps no navigation state of its own.
 - Build the app in debug and release. Release must not contain the protocol server (R20); lint checks this.
 

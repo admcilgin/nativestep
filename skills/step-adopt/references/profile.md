@@ -16,7 +16,7 @@ How the source app works and how it maps to the target. Written by step-adopt, c
 - Where does a screen's state live, and what type holds it?
 - How does a user action reach the state: which call does the widget make, and what does that call do?
 - How can code outside the widget tree read the current state and call those operations? This is what the binding will use.
-- Is any visible state kept only inside widgets (text fields, toggles, scroll position, local flags)? Which screens? Those screens are `read-only` unless the binding can reach it.
+- Is any visible state kept only inside widgets (text fields, toggles, scroll position, local flags)? Which screens? Those screens are `read-only` unless the binding can reach it; often it can, through the element tree (step-reference, references/binding.md, "State kept inside widgets").
 - What does the state library do on its own: retry failed loads, cache, dispose unused state, deduplicate, debounce? `Decision:` for each one, whether the native app reproduces it.
 
 ## Dependency wiring
