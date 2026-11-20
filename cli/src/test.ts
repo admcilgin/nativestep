@@ -68,12 +68,16 @@ export function test(args: Args): number {
   const filters = args.positional;
   return runAll(
     project,
-    targets(project, args).map((name) => ({
-      name,
-      mode: modeFor(target(project, name), args.flags.device === true),
-      bunArgs: [...filters, "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
-      report: "",
-    })),
+    targets(project, args).map((name) => {
+      const reference = target(project, name).role === "reference";
+      return {
+        name,
+        mode: modeFor(target(project, name), args.flags.device === true),
+        // The conformance tests check the native kits' Sample screen, which the reference app does not have.
+        bunArgs: [...filters, ...(reference ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
+        report: reference ? " (_sample skipped: reference)" : "",
+      };
+    }),
   );
 }
 
