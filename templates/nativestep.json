@@ -1,6 +1,6 @@
 {
   "protocol": 1,
-  "kits": "0.1.0",
+  "kits": "0.2.0",
   "app": {
     "name": "__APP_NAME__",
     "iosBundleId": "__IOS_BUNDLE_ID__",

@@ -27,7 +27,7 @@ skills ───calls──────► nativestep CLI ──reads/writes─�
 | 8 | Project files | — | `nativestep.json`, `spec/` | JSON, Markdown |
 | 9 | Gates | `skills/step-feature/` | — | — |
 
-In v1 the kits are copied into the target project. The version of the copy is recorded in the `kits` field of `nativestep.json`.
+In v1 the kits are copied into the target project. The version of the copy is recorded in the `kits` field of `nativestep.json`; this repo's version is in `kits/VERSION`, and `nativestep kits update` brings a copy up to it.
 
 ## 1. nativestep CLI
 
@@ -36,6 +36,7 @@ The single command through which agents and engineers talk to the toolkit. It ma
 | Command | What it does |
 |---|---|
 | `nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]` | Sets up the native repo from the templates, copies the kits into `kits/`, writes `nativestep.json`. `--reference` adds the Flutter app as the `flutter` target. A non-empty directory needs `--force`, which writes over the template's files and deletes nothing. |
+| `nativestep kits update [--dry-run]` | Makes the project's `kits/` equal to this repo's kits: adds, updates and removes files (build output such as `.build/` is left alone), prints one line per file, and sets the `kits` field to `kits/VERSION`. Local edits in `kits/` are overwritten; a fix belongs in this repo. `--dry-run` only prints. A `kits/` that is a symlink is refused: it has no copy to update. |
 | `nativestep scan [<flutter-path>] [--json]` | Writes the raw facts that look the same in every Flutter project to the `raw` section of `spec/inventory.json`: packages from `pubspec.lock`, the number of Dart files under `lib/`, the asset and font files in `pubspec.yaml`, and the native code and platform channels under `ios/` and `android/` (generated and vendored code such as `Pods/` and `GeneratedPluginRegistrant` is skipped). The import graph of `lib/` goes to `.nativestep/scan/imports.json`. Without a path it reads `targets.flutter.path`. It never writes to the Flutter project. |
 | `nativestep session start --target <t> [--device] [--fixtures a,b] [--route <url>]` · `nativestep session stop [--target <t>]` | Starts a background session on the target, headless or (with `--device`) on the simulator or emulator; `ls` and `do` use this session. On a running session it sends a new `start`. |
 | `nativestep ls [--target <t>]` | The focused node: name, state, actions |
@@ -198,7 +199,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
 | `spec/memory.md` | Engineer feedback and project decisions | `step-feature`, `step-plan` | Permanent |
 | `spec/tests/`, `spec/fixtures/` | The behavior contract | `step-test` | Permanent |
 | `spec/evidence/<feature>-<cp>/` | UI reviews, test results, reviewer verdicts | `step-feature` | Permanent |
-| `kits/` | Kit copies | `nativestep init` | Permanent |
+| `kits/` | Kit copies | `nativestep init`, `nativestep kits update` | Permanent |
 | `.nativestep/` | Sessions, results, screenshots, scan output | `nativestep` | Outside git |
 
 ### `nativestep.json`
@@ -206,7 +207,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
 ```json
 {
   "protocol": 1,
-  "kits": "0.1.0",
+  "kits": "0.2.0",
   "app": { "name": "Basket", "iosBundleId": "com.basket.app", "androidPackage": "com.basket.app" },
   "paths": { "tests": "spec/tests", "fixtures": "spec/fixtures" },
   "targets": {

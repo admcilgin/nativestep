@@ -261,6 +261,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - Kit sürümleme ve `nativestep kits update`
 - Kullanıcı rehberi: kurulum ve ilk göç
 
+- İlerleme: `nativestep kits update [--dry-run]` geldi. Repo'nun kit sürümü `kits/VERSION`'da (0.2.0: tamsayı şemalarında `oneOf`); `init` bunu `nativestep.json`'a yazar, `kits update` kopyayı repo'yla eşitler, build çıktısına dokunmaz, sürümü ilerletir. movie-tracker 0.1.0'dan 0.2.0'a geçti (dosyalar zaten aynıydı). Basket'in `kits/`'i repo'ya symlink; komut onu reddeder.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

@@ -3,10 +3,10 @@ import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync,
 import { join, relative, resolve } from "node:path";
 import { type Args, flag, UsageError } from "./config.ts";
 
-const REPO = resolve(import.meta.dir, "../..");
-const KITS = ["ios", "android", "flutter", "test-sdk"];
+export const REPO = resolve(import.meta.dir, "../..");
+export const KITS = ["ios", "android", "flutter", "test-sdk"];
 // Build output and machine state never leave the nativestep repo.
-const SKIP = new Set([".build", "build", ".gradle", ".kotlin", ".swiftpm", ".dart_tool", "node_modules", ".DS_Store", "local.properties"]);
+export const SKIP = new Set([".build", "build", ".gradle", ".kotlin", ".swiftpm", ".dart_tool", "node_modules", ".DS_Store", "local.properties"]);
 const USAGE =
   "usage: nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]";
 
@@ -43,6 +43,7 @@ export function init(args: Args): number {
   copyTree(join(REPO, "templates"), dir, fill);
   refuseSymlink(join(dir, "kits"));
   for (const kit of KITS) copyTree(join(REPO, "kits", kit), join(dir, "kits", kit));
+  setKitsVersion(dir);
   if (reference) addReference(dir, resolve(reference));
 
   console.log(`created ${app} in ${dir}`);
@@ -73,8 +74,16 @@ function copyTree(src: string, dest: string, fill?: (text: string, path: boolean
 }
 
 /** Writing through a symlink would change files outside the project (an old `kits -> ../../kits` link, say). */
-function refuseSymlink(path: string) {
+export function refuseSymlink(path: string) {
   if (existsSync(path) && lstatSync(path).isSymbolicLink()) throw new UsageError(`${path} is a symlink; remove it first`);
+}
+
+/** Records the copied kits' version (`kits/VERSION`), which `nativestep kits update` moves forward. */
+function setKitsVersion(dir: string) {
+  const file = join(dir, "nativestep.json");
+  const config = JSON.parse(readFileSync(file, "utf8"));
+  config.kits = readFileSync(join(REPO, "kits/VERSION"), "utf8").trim();
+  writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
 }
 
 /** The app's bundle id: the one in the build settings of the Runner target, not of tests or app extensions. */
