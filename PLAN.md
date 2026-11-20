@@ -188,7 +188,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 Android durum çubuğu step-fix ile düzeltildi. Tür: yalnızca görünüm. `enableEdgeToEdge()` eklendi, kanıt shot ile alındı. step-ui-review'e durum çubuğu satırı eklendi. Bu, M6'nın step-fix ölçütünü gerçek bir hatayla karşılıyor.
 
-Sıradaki adım: `basket` cp4 (sipariş hataları ve "placing" durumu).
+`basket` cp4 (sipariş hataları ve "placing" durumu) kapandı; 11/12 checkpoint. Profildeki açık soru ("hata, satırlar değişince kalır mı") geçici olarak referanstaki gibi uygulandı; kararı `memory.md`'de mühendisi bekliyor.
+
+Sıradaki adım: `basket` cp5 (sekme çubuğunda sepet sayısı rozeti).
 
 ## M7 · Pilot göç
 

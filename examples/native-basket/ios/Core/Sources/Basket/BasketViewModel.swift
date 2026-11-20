@@ -32,6 +32,8 @@ public final class BasketViewModel {
     }
 
     public private(set) var state = State()
+    /// The last failed order's error. It outlives the lines, as on the reference, but shows only while there are lines.
+    private var orderError: AppError?
     @ObservationIgnored let effects = EffectRunner()
     private let orders: any OrderService
     private unowned let router: any Router
@@ -49,11 +51,12 @@ public final class BasketViewModel {
         }
     }
 
-    /// State changes only here (R8). Count and total follow the lines after every message.
+    /// State changes only here (R8). Count, total and the shown error follow the lines after every message.
     private func update(_ message: Message) -> [Effect<Message>] {
         defer {
             state.count = state.lines.reduce(0) { $0 + $1.quantity }
             state.totalCents = state.lines.reduce(0) { $0 + $1.priceCents * $1.quantity }
+            state.error = state.lines.isEmpty ? nil : orderError
         }
         switch message {
         case .action(.add(let productId, let name, let priceCents)):
@@ -80,13 +83,13 @@ public final class BasketViewModel {
             return [{ [orders] in .placed(await orders.place(items: items)) }]
         case .placed(.success(let order)):
             state.placing = false
-            state.error = nil
+            orderError = nil
             state.lines = []
             router.orderPlaced(id: order.id)
             return []
         case .placed(.failure(let error)):
             state.placing = false
-            state.error = error
+            orderError = error
             return []
         }
     }

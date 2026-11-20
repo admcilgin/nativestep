@@ -41,6 +41,9 @@ class BasketViewModel(
     }
 
     private val _state = MutableStateFlow(State())
+
+    /** The last failed order's error. It outlives the lines, as on the reference, but shows only while there are lines. */
+    private var orderError: AppError? = null
     val state: StateFlow<State> = _state.asStateFlow()
 
     fun send(action: Action) = handle(Message.Act(action))
@@ -86,17 +89,27 @@ class BasketViewModel(
         is Message.Placed -> {
             message.result
                 .onSuccess { order ->
-                    _state.update { it.copy(placing = false, error = null) }
+                    orderError = null
+                    _state.update { it.copy(placing = false) }
                     setLines(emptyList())
                     router.orderPlaced(order.id)
                 }
-                .onFailure { e -> _state.update { it.copy(placing = false, error = AppError.from(e)) } }
+                .onFailure { e ->
+                    orderError = AppError.from(e)
+                    _state.update { it.copy(placing = false) }
+                    setLines(_state.value.lines)
+                }
             emptyList()
         }
     }
 
-    /** Count and total follow the lines. */
+    /** Count, total and the shown error follow the lines. */
     private fun setLines(lines: List<Line>) = _state.update {
-        it.copy(lines = lines, count = lines.sumOf { l -> l.quantity }, totalCents = lines.sumOf { l -> l.priceCents * l.quantity })
+        it.copy(
+            lines = lines,
+            count = lines.sumOf { l -> l.quantity },
+            totalCents = lines.sumOf { l -> l.priceCents * l.quantity },
+            error = if (lines.isEmpty()) null else orderError,
+        )
     }
 }

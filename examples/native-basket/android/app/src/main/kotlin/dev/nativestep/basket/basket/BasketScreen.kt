@@ -26,9 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.nativestep.basket.shared.Minus
+import dev.nativestep.basket.shared.errorMessage
 import dev.nativestep.basket.shared.formatPrice
 
-/** Lines with add one and remove one, the total and Place order. The order error comes with basket cp4. */
+/** Lines with add one and remove one, the order error, the total and Place order. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasketScreen(vm: BasketViewModel) {
@@ -57,6 +58,7 @@ fun BasketScreen(vm: BasketViewModel) {
                 }
             }
             Column(Modifier.fillMaxWidth().padding(16.dp)) {
+                state.error?.let { Text(errorMessage(it), color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 8.dp)) }
                 Text("Total ${formatPrice(state.totalCents)}", style = MaterialTheme.typography.titleMedium)
                 Button(
                     onClick = { vm.send(BasketViewModel.Action.PlaceOrder) },

@@ -20,3 +20,13 @@ Engineer feedback and project decisions that depart from the defaults (ARCHITECT
 
 - The basket survives sign-out on both platforms, as on the reference: AppCore keeps one `BasketViewModel` for its lifetime.
 - Provisional until the engineer answers the profile's open question (keep it for the next user, or clear it on sign-out). Clearing would be one line in `AppCore.signOut` plus a test in `catalog/sign-out.test.ts`.
+
+## 2026-11-20 · Order error after the lines change (step-feature, basket cp4, provisional)
+
+- A failed order's error stays on the Basket after the lines change, as on the reference.
+  - Emptying the basket hides it.
+  - Adding a product shows it again.
+  - Placing again keeps it until the answer.
+- Both platforms keep it as `orderError` beside the lines and derive `error` in `update`.
+- Tested in `basket/checkout-errors.test.ts`.
+- Provisional until the engineer answers the profile's open question (reproduce it, or clear the error when the lines change). Clearing it would be one line in each platform's `update`, and the last test would change.

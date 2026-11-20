@@ -1,0 +1,1 @@
+{ "services": { "OrderService": { "place": [{ "error": { "code": "out_of_stock" }, "times": 1 }, { "result": { "id": "o2" }, "delayMs": 3000 }] } } }

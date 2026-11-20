@@ -1,7 +1,7 @@
 import Core
 import SwiftUI
 
-/// Lines with add one and remove one, the total and Place order. The order error comes with basket cp4.
+/// Lines with add one and remove one, the order error, the total and Place order.
 struct BasketView: View {
     let vm: BasketViewModel
 
@@ -26,6 +26,9 @@ struct BasketView: View {
                     }
                     .safeAreaInset(edge: .bottom) {
                         VStack(alignment: .leading, spacing: 8) {
+                            if let error = vm.state.error {
+                                Text(errorMessage(error)).foregroundStyle(.red)
+                            }
                             Text("Total \(formatPrice(vm.state.totalCents))").font(.headline)
                             Button { vm.send(.placeOrder) } label: {
                                 Text("Place order").frame(maxWidth: .infinity)
