@@ -246,7 +246,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - movies cp4 bitti: yükleme hataları ve yeniden deneme; ilk trend sayfasının çevrimdışı kopyası gerçek serviste, iki platformda birim testleriyle.
 - movies cp5 bitti: film ayrıntısı sekmelerin üstünde, geri dönüşte ızgara olduğu gibi.
 - Kit'te eksik: tamsayı şemasında izin verilen değerler (`enum`) yok; referans ekranda olmayan bir film kimliğine `invalid_input` diyor, native uygulamalar yok sayıyor.
-- Kalan: movies cp6 ve watchlist; mühendisli bir koşu.
+- movies cp6 bitti: sekmelerden çıkış girişe dönüyor; TMDB oturumu silinmeye çalışılıyor, yerel kimlik her durumda siliniyor. movies feature'ı tamam (6/6, cihazda 37/37).
+- Kalan: watchlist; mühendisli bir koşu.
 
 ## M8 · Paketleme
 
