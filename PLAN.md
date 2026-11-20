@@ -190,6 +190,8 @@ Android durum çubuğu step-fix ile düzeltildi. Tür: yalnızca görünüm. `en
 
 `basket` cp4 (sipariş hataları ve "placing" durumu) kapandı; 11/12 checkpoint. Profildeki açık soru ("hata, satırlar değişince kalır mı") geçici olarak referanstaki gibi uygulandı; kararı `memory.md`'de mühendisi bekliyor.
 
+İkinci step-fix: iOS cihazında "geri git ve hemen sekme değiştir" yarış durumu. Bulunduğu yer: cp5'in G1 cihaz koşusu. Kök neden: cihaz host'u yanıtı UI geçişi bitmeden veriyordu. Düzeltme: `NativeStepHostKit` artık navigasyon geçişini bekliyor (en çok 1 s). Regresyon testi: `catalog/tab-switch`.
+
 Sıradaki adım: `basket` cp5 (sekme çubuğunda sepet sayısı rozeti).
 
 ## M7 · Pilot göç

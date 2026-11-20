@@ -8,7 +8,7 @@ The conformance tests live in `templates/spec/tests/_sample/`, and every target 
 
 - Messages are UTF-8 JSON, one message per line (NDJSON).
 - **Headless target**: the CLI starts the host process, writes requests to its stdin and reads responses from its stdout. The host writes nothing but protocol messages to stdout; logs go to stderr. One host process can run several sessions in a row.
-- **Device target**: the running debug app listens on a TCP port. Default ports: flutter 7357, ios 7358, android 7359. On Android the port is opened with `adb forward`.
+- **Device target**: the running debug app listens on a TCP port. Default ports: flutter 7357, ios 7358, android 7359. On Android the port is opened with `adb forward`. A device target answers a request once the navigation transition the request started has ended (at most 1 s), so the next request meets the screen a user would see.
 - Every request gets exactly one response. Responses arrive in request order; the client does not send a new request before it has received the previous response.
 
 ## 2. Envelope

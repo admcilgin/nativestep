@@ -87,7 +87,8 @@ public final class NativeStepHost {
                 while let newline = buffer.firstIndex(of: 0x0A) {
                     let line = String(decoding: buffer[buffer.startIndex..<newline], as: UTF8.self)
                     buffer = Data(buffer[buffer.index(after: newline)...])
-                    connection.send(content: self.respond(to: line) + Data("\n".utf8), completion: .contentProcessed { _ in })
+                    let response = self.respond(to: line) + Data("\n".utf8)
+                    whenNavigationSettles { connection.send(content: response, completion: .contentProcessed { _ in }) }
                 }
                 if isComplete || error != nil {
                     connection.cancel()
@@ -223,3 +224,40 @@ public final class NativeStepHost {
         ]
     }
 }
+
+#if canImport(UIKit)
+import UIKit
+
+/// Device mode: answers once no navigation transition (push, pop, presentation) is running, at most after 1 s, as a
+/// user waits for the screen. Answering at once let a test pop and switch tabs mid-animation; UIKit then finished
+/// the pop when the tab showed again and undid the next push.
+@MainActor
+func whenNavigationSettles(_ done: @escaping @MainActor () -> Void, deadline: Date = .now + 1) {
+    // One frame first, so the state change that the request made has reached the views.
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(16)) {
+        MainActor.assumeIsolated {
+            if Date.now < deadline, isTransitioning() {
+                whenNavigationSettles(done, deadline: deadline)
+            } else {
+                done()
+            }
+        }
+    }
+}
+
+@MainActor
+private func isTransitioning() -> Bool {
+    func busy(_ vc: UIViewController) -> Bool {
+        vc.transitionCoordinator != nil || vc.isBeingPresented || vc.isBeingDismissed
+            || vc.children.contains(where: busy) || vc.presentedViewController.map(busy) == true
+    }
+    return UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap(\.windows)
+        .compactMap(\.rootViewController)
+        .contains(where: busy)
+}
+#else
+@MainActor
+func whenNavigationSettles(_ done: @escaping @MainActor () -> Void) { done() }
+#endif
