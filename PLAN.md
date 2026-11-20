@@ -267,6 +267,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 - İlerleme: binary'ler geldi. `bun cli/release.ts` her platform için `dist/nativestep-<target>.tar.gz` üretiyor: `bin/nativestep` (`bun build --compile`) ve yanında commit'li `kits/` ile `templates/`. Binary kit'leri ve şablonları kendi yanında arıyor; oturum daemon'u kendini binary olarak yeniden başlatıyor. darwin-arm64 arşivi repo dışında denendi: `init`, `kits update`, `lint`, `_sample` testleri (iOS ve Android 15/15), `session start/ls/stop`. `v*` etiketi CI'da arşivleri bir GitHub release'e ekliyor (`release.yml`); ilk etiketi atmak mühendisin işi. Release çıkınca şablondaki `parity.yml` CLI'yi checkout yerine release'ten alabilir.
 
+- İlerleme: kullanıcı rehberi `GUIDE.md` yazıldı (makine, plugin ve CLI kurulumu, skill sırası, gate'ler, kit güncelleme); README'deki doküman tablosunun başında. Komutları CLI'ye ve gate tanımlarını COMPONENTS.md §9'a göre kontrol edildi. M8'in bitti koşulu henüz denenmedi: temiz bir makinede rehberi izleyen biri ve yayınlanmış ilk release gerekiyor; ikisi de mühendisin işi.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

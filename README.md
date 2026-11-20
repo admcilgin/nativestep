@@ -15,6 +15,7 @@ The approach is adapted from Shopify's [Reflex](https://shopify.engineering/refl
 
 | File | Contents |
 |---|---|
+| [GUIDE.md](GUIDE.md) | Install, and a first migration: the machine, the plugin and CLI, the skills in order, the gates. Start here. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The target native architecture and its numbered rules (R1–R20). `nativestep lint` and the reviewer agents report against these numbers. |
 | [PROTOCOL.md](PROTOCOL.md) | The JSON protocol spoken with every target, and the fixture format. The only interface the three platforms share. |
 | [COMPONENTS.md](COMPONENTS.md) | The components: CLI, test SDK, kits, Flutter adapter, templates, skills, project files and gates. |
