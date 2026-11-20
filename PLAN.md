@@ -166,7 +166,11 @@ Açık işler:
 - Basket'in 8 testi Android emülatöründe de yeşil.
 - G4 tek tur ve inline koşuldu. İzole iki tur için subagent gerekiyor; skill bu durumu kanıta yazdırıyor.
 
-Sıradaki adımlar: `auth` cp1–cp2 için G3, G4 ve kapanış (kod ve testler hazır), ardından `catalog` cp1. `step-fix` henüz yazılmadı.
+`auth` cp1 ve cp2 de kapandı: 2/4 feature ve 3/12 checkpoint tamam, Login `migrated`. Kanıtı `spec/evidence/auth-cp1-cp2/` altında.
+
+Açık bir boşluk var: `nativestep shot` çekimden önce uçuştaki çağrıların bitmesini bekliyor. Bu yüzden loading durumlarının ekran görüntüsü alınamıyor. Çözüm, `shot`'a "beklemeden çek" seçeneği eklemek.
+
+Sıradaki adımlar: `catalog` cp1 ve bu boşluk. `step-fix` henüz yazılmadı.
 
 ## M7 · Pilot göç
 

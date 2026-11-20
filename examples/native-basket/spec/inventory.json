@@ -259,7 +259,7 @@
         "lib/auth/auth_controller.dart",
         "lib/auth/auth_repository.dart"
       ],
-      "status": "in_progress"
+      "status": "migrated"
     },
     {
       "name": "ProductList",
@@ -325,12 +325,12 @@
         {
           "id": "cp1",
           "title": "Sign in with email and password and land on the products tab",
-          "status": "in_progress"
+          "status": "done"
         },
         {
           "id": "cp2",
           "title": "Sign-in loading, wrong password and network errors",
-          "status": "in_progress"
+          "status": "done"
         }
       ]
     },
