@@ -280,7 +280,7 @@
         "lib/products/product_detail_screen.dart",
         "lib/products/product_repository.dart"
       ],
-      "status": "in_progress"
+      "status": "migrated"
     },
     {
       "name": "Basket",
@@ -372,7 +372,7 @@
         {
           "id": "cp1",
           "title": "Add a product to the basket from its detail; lines, count and total",
-          "status": "planned"
+          "status": "done"
         },
         {
           "id": "cp2",

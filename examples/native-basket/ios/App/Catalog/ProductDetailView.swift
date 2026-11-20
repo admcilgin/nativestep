@@ -11,6 +11,12 @@ struct ProductDetailView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(formatPrice(product.priceCents)).font(.title2)
                         Text(product.description)
+                        Button { vm.send(.addToBasket) } label: {
+                            Label("Add to basket", systemImage: "cart.badge.plus").frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .padding(.top, 12)
                     }
                     .padding(24)
                     .frame(maxWidth: .infinity, alignment: .leading)

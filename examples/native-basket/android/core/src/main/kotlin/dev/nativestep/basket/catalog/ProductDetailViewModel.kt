@@ -1,5 +1,6 @@
 package dev.nativestep.basket.catalog
 
+import dev.nativestep.basket.app.Router
 import dev.nativestep.kit.AppError
 import dev.nativestep.kit.Effect
 import dev.nativestep.kit.EffectRunner
@@ -13,6 +14,7 @@ import kotlinx.serialization.Serializable
 class ProductDetailViewModel(
     id: String,
     private val products: ProductService,
+    private val router: Router,
     internal val effects: EffectRunner,
 ) {
     @Serializable
@@ -23,6 +25,7 @@ class ProductDetailViewModel(
 
     sealed interface Action {
         data object Load : Action
+        data object AddToBasket : Action
     }
 
     private sealed interface Message {
@@ -45,12 +48,19 @@ class ProductDetailViewModel(
 
     /** State changes only here (R8). */
     private fun update(message: Message): List<Effect<Message>> = when (message) {
-        is Message.Act ->
-            if (_state.value.loading) emptyList() else {
-                _state.update { it.copy(loading = true, error = null) }
-                val id = _state.value.id
-                listOf(suspend { Message.Loaded(products.detail(id)) })
+        is Message.Act -> when (message.action) {
+            // The reference also shows a snackbar; it is not state (profile: State).
+            Action.AddToBasket -> {
+                _state.value.product?.let { router.addToBasket(Product(it.id, it.name, it.priceCents, it.description)) }
+                emptyList()
             }
+            Action.Load ->
+                if (_state.value.loading) emptyList() else {
+                    _state.update { it.copy(loading = true, error = null) }
+                    val id = _state.value.id
+                    listOf(suspend { Message.Loaded(products.detail(id)) })
+                }
+        }
         is Message.Loaded -> {
             message.result
                 // The source reads a missing description as "".

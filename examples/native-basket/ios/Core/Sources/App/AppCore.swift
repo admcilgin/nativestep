@@ -23,6 +23,8 @@ public protocol Router: AnyObject {
     func signedIn(_ user: User)
     func signOut()
     func go(_ route: Route)
+    /// Catalog hands a product to the basket through the shell, so catalog does not depend on basket.
+    func addToBasket(_ product: Product)
 }
 
 /// The single entry point (R3): `AppCore(services:)` builds everything and is the root node.
@@ -39,7 +41,7 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     /// providers do (profile: Caching): signing in again shows them without fetching again.
     private var details: [String: ProductDetailViewModel] = [:]
     private var productList: ProductListViewModel?
-    private var basket: BasketViewModel?
+    private let basket = BasketViewModel()
 
     public init(services: Services) {
         self.services = services
@@ -51,9 +53,7 @@ public final class AppCore: Router, IntrospectionNodeProviding {
         self.user = user
         login = nil
         let list = productList ?? ProductListViewModel(products: services.products, router: self)
-        let basket = basket ?? BasketViewModel()
         productList = list
-        self.basket = basket
         products.reset(to: [list])
         tabs.reset(to: [("products", products), ("basket", basket)])
     }
@@ -67,10 +67,14 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     public func go(_ route: Route) {
         switch route {
         case .product(let id):
-            let detail = details[id] ?? ProductDetailViewModel(id: id, products: services.products)
+            let detail = details[id] ?? ProductDetailViewModel(id: id, products: services.products, router: self)
             details[id] = detail
             products.push(detail)
         }
+    }
+
+    public func addToBasket(_ product: Product) {
+        basket.send(.add(productId: product.id, name: product.name, priceCents: product.priceCents))
     }
 
     public var introspectionNode: IntrospectionNode {

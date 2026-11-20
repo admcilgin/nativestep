@@ -15,3 +15,8 @@ Engineer feedback and project decisions that depart from the defaults (ARCHITECT
 - Sign-out (catalog cp4) must give both platforms a fresh `LoginViewModel`. Its tests check that the form is empty and shows no error after sign-out.
 - Resolved in catalog cp4 (2026-11-20): `signOut` builds a fresh `LoginViewModel` on both platforms; tested in `catalog/sign-out.test.ts`.
 - ProductDetail stays `in_progress` after catalog is done: its `addToBasket` comes with basket cp1.
+
+## 2026-11-20 · Basket across sign-out (step-feature, basket cp1, provisional)
+
+- The basket survives sign-out on both platforms, as on the reference: AppCore keeps one `BasketViewModel` for its lifetime.
+- Provisional until the engineer answers the profile's open question (keep it for the next user, or clear it on sign-out). Clearing would be one line in `AppCore.signOut` plus a test in `catalog/sign-out.test.ts`.

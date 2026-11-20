@@ -180,7 +180,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `catalog` cp4 (çıkış) ile `catalog` feature'ı tamamlandı: 3/4 feature, 7/12 checkpoint; ProductList `migrated`. Login ViewModel notu da uygulandı. Sepetin çıkıştan sonra kalıp kalmayacağı hâlâ mühendisin vereceği açık bir karar.
 
-Sıradaki adım: `basket` cp1 (detaydan sepete ekleme).
+`basket` cp1 (detaydan sepete ekleme) kapandı; 8/12 checkpoint, ProductDetail `migrated`. Sepetin çıkıştan sonra kalması geçici olarak referanstaki gibi bırakıldı (`memory.md`).
+
+Sıradaki adım: `basket` cp2 (sepette bir ekle, bir çıkar).
 
 ## M7 · Pilot göç
 

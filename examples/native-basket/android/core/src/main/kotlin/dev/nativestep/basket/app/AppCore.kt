@@ -6,6 +6,7 @@ import dev.nativestep.basket.auth.LoginViewModel
 import dev.nativestep.basket.auth.User
 import dev.nativestep.basket.basket.BasketNode
 import dev.nativestep.basket.basket.BasketViewModel
+import dev.nativestep.basket.catalog.Product
 import dev.nativestep.basket.catalog.ProductDetailNode
 import dev.nativestep.basket.catalog.ProductDetailViewModel
 import dev.nativestep.basket.catalog.ProductListNode
@@ -35,6 +36,9 @@ interface Router {
     fun signedIn(user: User)
     fun signOut()
     fun go(route: Route)
+
+    /** Catalog hands a product to the basket through the shell, so catalog does not depend on basket. */
+    fun addToBasket(product: Product)
 }
 
 /**
@@ -55,7 +59,7 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
      */
     private val details = mutableMapOf<String, ProductDetailNode>()
     private val productList by lazy { ProductListNode(ProductListViewModel(services.products, this, EffectRunner(scope))) }
-    private val basket by lazy { BasketNode(BasketViewModel()) }
+    private val basket = BasketNode(BasketViewModel())
     val modal = ModalNavigator(base = tabs)
 
     override fun signedIn(user: User) {
@@ -75,9 +79,13 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
     override fun go(route: Route) {
         when (route) {
             is Route.Product -> products.push(
-                details.getOrPut(route.id) { ProductDetailNode(ProductDetailViewModel(route.id, services.products, EffectRunner(scope))) },
+                details.getOrPut(route.id) { ProductDetailNode(ProductDetailViewModel(route.id, services.products, this, EffectRunner(scope))) },
             )
         }
+    }
+
+    override fun addToBasket(product: Product) {
+        basket.vm.send(BasketViewModel.Action.Add(product.id, product.name, product.priceCents))
     }
 
     override val name = "App"

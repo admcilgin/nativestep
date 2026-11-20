@@ -20,6 +20,7 @@ public final class ProductDetailViewModel {
 
     public enum Action: Equatable, Sendable {
         case load
+        case addToBasket
     }
 
     enum Message: Sendable {
@@ -30,10 +31,12 @@ public final class ProductDetailViewModel {
     public private(set) var state: State
     @ObservationIgnored let effects = EffectRunner()
     private let products: any ProductService
+    private unowned let router: any Router
 
-    public init(id: String, products: any ProductService) {
+    public init(id: String, products: any ProductService, router: any Router) {
         state = State(id: id)
         self.products = products
+        self.router = router
         send(.load)
     }
 
@@ -48,6 +51,11 @@ public final class ProductDetailViewModel {
     /// State changes only here (R8).
     private func update(_ message: Message) -> [Effect<Message>] {
         switch message {
+        case .action(.addToBasket):
+            // The reference also shows a snackbar; it is not state (profile: State).
+            guard let p = state.product else { return [] }
+            router.addToBasket(Product(id: p.id, name: p.name, priceCents: p.priceCents, description: p.description))
+            return []
         case .action(.load):
             guard !state.loading else { return [] }
             state.loading = true

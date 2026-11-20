@@ -1,7 +1,7 @@
 import NativeStepKit
 import Observation
 
-/// The basket tab. Empty until the basket feature fills it.
+/// The basket tab. AppCore keeps one for its lifetime; the basket survives sign-out as on the reference (memory.md).
 @MainActor @Observable
 public final class BasketViewModel {
     public struct State: Codable, Equatable, Sendable {
@@ -18,11 +18,27 @@ public final class BasketViewModel {
         public var quantity: Int
     }
 
-    public enum Action: Equatable, Sendable {}
+    public enum Action: Equatable, Sendable {
+        case add(productId: String, name: String, priceCents: Int)
+    }
 
     public private(set) var state = State()
 
     public init() {}
 
-    public func send(_ action: Action) {}
+    public func send(_ action: Action) { update(action) }
+
+    /// State changes only here (R8). No effects yet: placing an order (basket cp3) adds the first.
+    private func update(_ action: Action) {
+        switch action {
+        case .add(let productId, let name, let priceCents):
+            if let i = state.lines.firstIndex(where: { $0.productId == productId }) {
+                state.lines[i].quantity += 1
+            } else {
+                state.lines.append(Line(productId: productId, name: name, priceCents: priceCents, quantity: 1))
+            }
+        }
+        state.count = state.lines.reduce(0) { $0 + $1.quantity }
+        state.totalCents = state.lines.reduce(0) { $0 + $1.priceCents * $1.quantity }
+    }
 }
