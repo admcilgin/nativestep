@@ -26,6 +26,8 @@ class ProductListViewModel(
 
     sealed interface Action {
         data object Load : Action
+        data object Refresh : Action
+        data object Retry : Action
     }
 
     private sealed interface Message {
@@ -35,6 +37,10 @@ class ProductListViewModel(
 
     private val _state = MutableStateFlow(State())
     val state: StateFlow<State> = _state.asStateFlow()
+
+    /** True while a loaded list is on screen, empty or not, refreshing or not. Decides `refresh` against no action. */
+    var listShown = false
+        private set
 
     init {
         send(Action.Load)
@@ -48,19 +54,23 @@ class ProductListViewModel(
 
     /** State changes only here (R8). */
     private fun update(message: Message): List<Effect<Message>> = when (message) {
-        is Message.Act -> when (message.action) {
-            Action.Load ->
+        // Load (on creation), Refresh (list shown, keeps it) and Retry (after an error) all reload.
+        is Message.Act ->
                 if (_state.value.loading) emptyList() else {
                     _state.update { it.copy(loading = true, error = null) }
                     listOf(suspend { Message.Loaded(products.list()) })
                 }
-        }
         is Message.Loaded -> {
             message.result
                 .onSuccess { list ->
+                    listShown = true
                     _state.update { s -> s.copy(loading = false, products = list.map { Item(it.id, it.name, it.priceCents) }) }
                 }
-                .onFailure { e -> _state.update { it.copy(loading = false, error = AppError.from(e)) } }
+                // The reference shows the error alone, also when a refresh fails.
+                .onFailure { e ->
+                    listShown = false
+                    _state.update { it.copy(loading = false, error = AppError.from(e), products = emptyList()) }
+                }
             emptyList()
         }
     }

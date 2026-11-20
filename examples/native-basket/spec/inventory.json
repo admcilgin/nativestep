@@ -348,7 +348,7 @@
         {
           "id": "cp2",
           "title": "Product list error with retry, and pull to refresh",
-          "status": "planned"
+          "status": "done"
         },
         {
           "id": "cp3",

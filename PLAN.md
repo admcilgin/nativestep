@@ -172,7 +172,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `catalog` cp1 de kapandı: 3 yeni test, G3'te iki minor düzeltme yapıldı, kanıtı `spec/evidence/catalog-cp1/` altında. `nativestep status` 4/12 checkpoint gösteriyor.
 
-Sıradaki adımlar: `catalog` cp2 (hata, retry, refresh) ve `step-fix`.
+`catalog` cp2 (hata, retry, refresh) da kapandı; `nativestep status` 5/12 checkpoint gösteriyor.
+
+Sıradaki adımlar: `catalog` cp3 (ürün detayı) ve `step-fix`.
 
 ## M7 · Pilot göç
 

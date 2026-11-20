@@ -17,7 +17,7 @@ public final class ProductListViewModel {
     }
 
     public enum Action: Equatable, Sendable {
-        case load
+        case load, refresh, retry
     }
 
     enum Message: Sendable {
@@ -26,6 +26,8 @@ public final class ProductListViewModel {
     }
 
     public private(set) var state = State()
+    /// True while a loaded list is on screen, empty or not, refreshing or not. Decides `refresh` against no action.
+    public private(set) var listShown = false
     @ObservationIgnored let effects = EffectRunner()
     private let products: any ProductService
 
@@ -45,7 +47,8 @@ public final class ProductListViewModel {
     /// State changes only here (R8).
     private func update(_ message: Message) -> [Effect<Message>] {
         switch message {
-        case .action(.load):
+        case .action:
+            // load (on creation), refresh (list shown, keeps it) and retry (after an error) all reload.
             guard !state.loading else { return [] }
             state.loading = true
             state.error = nil
@@ -53,10 +56,14 @@ public final class ProductListViewModel {
         case .loaded(.success(let list)):
             state.loading = false
             state.products = list.map { Item(id: $0.id, name: $0.name, priceCents: $0.priceCents) }
+            listShown = true
             return []
         case .loaded(.failure(let error)):
+            // The reference shows the error alone, also when a refresh fails.
             state.loading = false
             state.error = error
+            state.products = []
+            listShown = false
             return []
         }
     }
