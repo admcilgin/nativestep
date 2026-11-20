@@ -7,6 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -42,11 +44,17 @@ fun Root(cores: StateFlow<AppCore?>) {
     Scaffold(
         bottomBar = {
             NavigationBar {
-                tabs.forEach { (id, _) ->
+                tabs.forEach { (id, node) ->
+                    val count = (node as? BasketNode)?.vm?.state?.collectAsState()?.value?.count ?: 0
                     NavigationBarItem(
                         selected = id == selected,
                         onClick = { core.tabs.select(id) },
-                        icon = { Icon(if (id == "basket") Icons.Filled.ShoppingCart else Icons.Filled.Home, contentDescription = null) },
+                        icon = {
+                            // The basket's count, hidden at zero as on the reference.
+                            BadgedBox(badge = { if (count > 0) Badge { Text("$count") } }) {
+                                Icon(if (id == "basket") Icons.Filled.ShoppingCart else Icons.Filled.Home, contentDescription = null)
+                            }
+                        },
                         label = { Text(if (id == "basket") "Basket" else "Products") },
                     )
                 }

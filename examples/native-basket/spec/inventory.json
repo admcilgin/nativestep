@@ -291,7 +291,7 @@
         "lib/basket/basket_controller.dart",
         "lib/basket/order_repository.dart"
       ],
-      "status": "in_progress"
+      "status": "migrated"
     },
     {
       "name": "OrderPlaced",
@@ -301,7 +301,7 @@
         "lib/basket/basket_screen.dart",
         "lib/basket/basket_controller.dart"
       ],
-      "status": "pending"
+      "status": "migrated"
     }
   ],
   "features": [
@@ -392,7 +392,7 @@
         {
           "id": "cp5",
           "title": "Basket count badge on the tab bar",
-          "status": "planned"
+          "status": "done"
         }
       ]
     }

@@ -28,6 +28,8 @@ struct RootView: View {
                         .tabItem {
                             tab.id == "basket" ? Label("Basket", systemImage: "basket") : Label("Products", systemImage: "storefront")
                         }
+                        // The basket's count; SwiftUI hides a zero badge, as the reference does.
+                        .badge((tab.node as? BasketViewModel)?.state.count ?? 0)
                         .tag(tab.id)
                 }
             }
