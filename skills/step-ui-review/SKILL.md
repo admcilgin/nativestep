@@ -35,6 +35,7 @@ What must match the reference:
 - **States:** which elements are shown, hidden or disabled.
 - **Hierarchy:** what is primary, what is secondary, what is an error.
 - **Colors:** colors that carry meaning, such as errors and the brand color.
+- **Controls:** every action the screen's node offers has a control on screen that sends it. Tests drive the node, so a poster or row that cannot be tapped still passes them; a shot cannot show it either. For each new control, tap it once on the device and see the screen change.
 
 ## 3. Grade
 

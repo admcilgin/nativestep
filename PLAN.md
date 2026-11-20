@@ -248,7 +248,9 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - Kit'te eksik: tamsayı şemasında izin verilen değerler (`enum`) yok; referans ekranda olmayan bir film kimliğine `invalid_input` diyor, native uygulamalar yok sayıyor.
 - movies cp6 bitti: sekmelerden çıkış girişe dönüyor; TMDB oturumu silinmeye çalışılıyor, yerel kimlik her durumda siliniyor. movies feature'ı tamam (6/6, cihazda 37/37).
 - watchlist cp1 bitti: film ayrıntısında listeye ekleme ve çıkarma; gerçek depolama iki platformda atomik yazılan bir JSON dosyası, birim testli (cihazda 41/41).
-- Kalan: watchlist cp2 (liste sekmesi) ve cp3 (ana ekran widget'ı); mühendisli bir koşu.
+- watchlist cp2 bitti: Listem sekmesi, en yeni üstte, açma ve çıkarma (cihazda 45/45).
+- Bulunan açık: movies cp5'te ızgaradaki posterlere dokunulamıyordu. Testler node'un eylemini kullandığı için görmedi. Düzeltildi; step-ui-review artık her eylemin ekranda bir kontrolü olmasını ve cihazda bir kez dokunmayı istiyor.
+- Kalan: watchlist cp3 (ana ekran widget'ı); mühendisli bir koşu.
 
 ## M8 · Paketleme
 
