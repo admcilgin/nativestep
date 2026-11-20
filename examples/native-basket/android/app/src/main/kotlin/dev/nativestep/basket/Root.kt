@@ -3,6 +3,10 @@ package dev.nativestep.basket
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -35,7 +39,7 @@ fun Root(cores: StateFlow<AppCore?>) {
                     NavigationBarItem(
                         selected = id == selected,
                         onClick = { core.tabs.select(id) },
-                        icon = {},
+                        icon = { Icon(if (id == "basket") Icons.Filled.ShoppingCart else Icons.Filled.Home, contentDescription = null) },
                         label = { Text(if (id == "basket") "Basket" else "Products") },
                     )
                 }

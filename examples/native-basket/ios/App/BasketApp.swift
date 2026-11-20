@@ -42,6 +42,8 @@ struct BasketApp: App {
         WindowGroup {
             RootView(core: holder.core)
                 .id(ObjectIdentifier(holder.core))
+                // The reference's `colorSchemeSeed: Colors.teal`.
+                .tint(Color(red: 0, green: 0.416, blue: 0.376))
         }
     }
 }

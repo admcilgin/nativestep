@@ -41,7 +41,9 @@ function runAll(project: Project, runs: Run[]): number {
     let ok = prepare(project, run.name, run.mode);
     if (ok) {
       const started = performance.now();
-      const r = Bun.spawnSync(["bun", "test", ...run.bunArgs], {
+      // A device run's first test waits for a cold app start and the connection; bun's 5 s default is too short.
+      const timeout = run.mode === "device" ? ["--timeout", "30000"] : [];
+      const r = Bun.spawnSync(["bun", "test", ...timeout, ...run.bunArgs], {
         cwd: project.testsDir,
         env: { ...process.env, ...targetEnv(project, run.name, run.mode), ...run.env },
         stdout: "inherit",

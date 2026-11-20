@@ -160,6 +160,14 @@ Açık işler:
 - Android emülatöründe cihaz koşusu.
 - `spec/evidence/` akışı.
 
+**Ara durum 3 (2026-11-20):** `step-feature`, `step-ui-review` ve `step-arch-review` yazıldı. `foundation` cp1 altı gate'ten otonom modda geçti ve kapandı; kanıtı `spec/evidence/foundation-cp1/` altında, `nativestep status` 1/12 checkpoint gösteriyor.
+- G3 ilk turda Android'de üç blocking fark buldu: status bar altında kalan başlık, eksik "Products" başlığı ve ikonsuz sekmeler. İki platformda da marka rengi tutmuyordu. Hepsi düzeltildi ve ekran görüntüleri yeniden alındı.
+- Cihazda koşulan testler bun'ın 5 sn'lik varsayılan süresine takılıyordu. CLI artık cihaz koşularına 30 sn veriyor.
+- Basket'in 8 testi Android emülatöründe de yeşil.
+- G4 tek tur ve inline koşuldu. İzole iki tur için subagent gerekiyor; skill bu durumu kanıta yazdırıyor.
+
+Sıradaki adımlar: `auth` cp1–cp2 için G3, G4 ve kapanış (kod ve testler hazır), ardından `catalog` cp1. `step-fix` henüz yazılmadı.
+
 ## M7 · Pilot göç
 
 - `examples/flutter-riverpod`'un tamamı ve ikinci uygulamanın 2–3 feature'ı taşınır.

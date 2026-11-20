@@ -259,7 +259,7 @@
         "lib/auth/auth_controller.dart",
         "lib/auth/auth_repository.dart"
       ],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "name": "ProductList",
@@ -270,7 +270,7 @@
         "lib/products/product_repository.dart",
         "lib/products/product.dart"
       ],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "name": "ProductDetail",
@@ -291,7 +291,7 @@
         "lib/basket/basket_controller.dart",
         "lib/basket/order_repository.dart"
       ],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "name": "OrderPlaced",
@@ -312,7 +312,7 @@
         {
           "id": "cp1",
           "title": "App shell: signed-out start, the tabs and the products stack, switching tabs",
-          "status": "planned"
+          "status": "done"
         }
       ]
     },
@@ -325,12 +325,12 @@
         {
           "id": "cp1",
           "title": "Sign in with email and password and land on the products tab",
-          "status": "planned"
+          "status": "in_progress"
         },
         {
           "id": "cp2",
           "title": "Sign-in loading, wrong password and network errors",
-          "status": "planned"
+          "status": "in_progress"
         }
       ]
     },
