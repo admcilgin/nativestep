@@ -235,7 +235,9 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 **Ara durum (2026-11-20):** `flutter-riverpod`'un tamamı taşındı; `nativestep status` %100 gösteriyor.
 - Ölçümler `examples/native-basket/spec/pilot-metrics.md`'de: checkpoint süresi, gate başına ilk geçişte kalma oranı, test süreleri ve bulunan hatalar. Mühendis yorumu ölçülemedi, çünkü göç otonom moddaydı.
 - Ölçümlerden çıkan beş düzeltme skill'lere ve protokole işlendi.
-- Kalan: ikinci uygulamanın (`flutter-app`) 2–3 feature'ı ve mühendisli bir koşu.
+- İkinci uygulama (`../movie-tracker-native`): foundation cp1 bitti (açılış, splash, giriş ya da sekmeler; G0–G4, kanıt `spec/evidence/foundation-cp1/`). Kit'ler elle kopyalandı; `kits update` M8'de.
+- Cihazda iki nativestep uygulaması aynı portu tutunca testler yanlış uygulamaya bağlanıp zaman aşımıyla düşüyordu. SDK ve CLI artık `hello`daki uygulama adını `nativestep.json` ile karşılaştırıp hemen duruyor (`9a961a1`). Android şablonu edge-to-edge düzeltmesini aldı.
+- Kalan: movie-tracker foundation cp2 (tema), auth ve movies'in ilk checkpoint'leri; mühendisli bir koşu.
 
 ## M8 · Paketleme
 
