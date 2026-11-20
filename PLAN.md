@@ -232,6 +232,11 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 **Bitti:** `nativestep status` %100 gösteriyor ve ölçümlerden çıkan düzeltmeler skill'lere ve kit'lere işlendi.
 
+**Ara durum (2026-11-20):** `flutter-riverpod`'un tamamı taşındı; `nativestep status` %100 gösteriyor.
+- Ölçümler `examples/native-basket/spec/pilot-metrics.md`'de: checkpoint süresi, gate başına ilk geçişte kalma oranı, test süreleri ve bulunan hatalar. Mühendis yorumu ölçülemedi, çünkü göç otonom moddaydı.
+- Ölçümlerden çıkan beş düzeltme skill'lere ve protokole işlendi.
+- Kalan: ikinci uygulamanın (`flutter-app`) 2–3 feature'ı ve mühendisli bir koşu.
+
 ## M8 · Paketleme
 
 - Claude Code plugin'i (`.claude-plugin/plugin.json`, marketplace kaydı)

@@ -31,7 +31,7 @@ Run step-screen once for `ios` and once for `android`. The two runs need nothing
 nativestep test --target ios,android
 ```
 
-All tests, not only the feature's: a new checkpoint must not break an old one.
+All tests, not only the feature's: a new checkpoint must not break an old one. Then run the feature's tests on the devices (`nativestep test <feature>/ --target ios,android --device`): the real views add timing that the headless hosts do not have.
 
 ## 3. Lint (G2)
 
