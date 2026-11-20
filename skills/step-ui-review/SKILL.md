@@ -19,7 +19,7 @@ Answer `INVALID` with the reason and stop. Do not compare an invalid set.
 
 ## 2. Compare
 
-Compare each native shot with the reference, not the two native shots with each other. Go from the top of the screen to the bottom: navigation bar and title, content, controls, tab bar.
+Compare each native shot with the reference, not the two native shots with each other. Go from the top of the screen to the bottom: status bar (its icons readable on the app's background), navigation bar and title, content, controls, tab bar.
 
 Platform conventions are not differences. Each platform keeps its own:
 
