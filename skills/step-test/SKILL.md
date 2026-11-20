@@ -35,7 +35,7 @@ Write down, before any code, what a user can observe in this checkpoint. Each it
 - Wait for state with predicates (`precondition`, the third argument of `do`). Never sleep, and never assert on a state you did not wait for.
 - `do` without a predicate waits until no call is in flight, including calls the next screen starts. To see a loading state after navigation, give `do` a predicate that only that screen's loading state matches.
 - A loading state that G3 should see needs a test that ends while the call is in flight (a fixture with `delayMs`, shot with `nativestep shot --no-wait`).
-- Give such a fixture a `delayMs` of 3000, so the call is still in flight when the slowest device takes its screenshot. Every later step of that test then needs a predicate: `do` without one waits for the call, and `precondition` gives up after 3 s.
+- Give such a fixture a `delayMs` of 3000, so the call is still in flight when the slowest device takes its screenshot. Every later step of that test then needs a predicate: `do` without one waits for the call, and `precondition` gives up after 3 s. A test that waits for the slow call to finish uses its own fixture with a shorter delay (1000 ms): a 3000 ms call and a 3 s `precondition` pass only by luck.
 - Check the path when navigation is the behavior (`expect(app.path).toEqual([...])`). Check `unavailable` when the behavior is that something cannot be done.
 - Assert on the fields the behavior is about, not on whole states: a test of the error must not break when a new field is added.
 - Use the node and action names from the profile's node tree, or from Core after the migration. A name the reference does not have is a missing node, not a test to rewrite.
