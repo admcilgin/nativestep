@@ -40,6 +40,9 @@ struct ProductListView: View {
             }
         }
         .navigationTitle("Products")
+        .toolbar {
+            Button("Sign out", systemImage: "rectangle.portrait.and.arrow.right") { vm.send(.signOut) }
+        }
     }
 
     private func refresh() async {

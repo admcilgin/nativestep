@@ -12,22 +12,24 @@ class ProductListNode(val vm: ProductListViewModel) : IntrospectionNode {
     override val name = "ProductList"
     override fun state(): JsonElement = NodeJson.encodeToJsonElement(vm.state.value)
 
-    /** `refresh` while the list is shown, `retry` while the error is; nothing during the first load or a retry. */
+    /** `refresh` while the list is shown, `retry` while the error is; nothing during the first load or a retry. `signOut` is always there. */
     override val actions: List<NodeAction>
-        get() {
-            val s = vm.state.value
-            return when {
-                vm.listShown -> {
-                    val ids = s.products.map { it.id }
-                    val open = NodeAction("openProduct", "Open product", OpenProductInput.serializer(),
-                        InputSchema.obj("id" to InputSchema.string(oneOf = ids))) { vm.send(ProductListViewModel.Action.OpenProduct(it.id)) }
-                    (if (ids.isEmpty()) emptyList() else listOf(open)) +
-                        NodeAction("refresh", "Refresh") { vm.send(ProductListViewModel.Action.Refresh) }
-                }
-                s.error != null && !s.loading -> listOf(NodeAction("retry", "Retry") { vm.send(ProductListViewModel.Action.Retry) })
-                else -> emptyList()
+        get() = listActions() + NodeAction("signOut", "Sign out") { vm.send(ProductListViewModel.Action.SignOut) }
+
+    private fun listActions(): List<NodeAction> {
+        val s = vm.state.value
+        return when {
+            vm.listShown -> {
+                val ids = s.products.map { it.id }
+                val open = NodeAction("openProduct", "Open product", OpenProductInput.serializer(),
+                    InputSchema.obj("id" to InputSchema.string(oneOf = ids))) { vm.send(ProductListViewModel.Action.OpenProduct(it.id)) }
+                (if (ids.isEmpty()) emptyList() else listOf(open)) +
+                    NodeAction("refresh", "Refresh") { vm.send(ProductListViewModel.Action.Refresh) }
             }
+            s.error != null && !s.loading -> listOf(NodeAction("retry", "Retry") { vm.send(ProductListViewModel.Action.Retry) })
+            else -> emptyList()
         }
+    }
 }
 
 @Serializable

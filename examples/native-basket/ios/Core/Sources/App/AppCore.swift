@@ -21,6 +21,7 @@ public enum Route: Equatable, Sendable {
 @MainActor
 public protocol Router: AnyObject {
     func signedIn(_ user: User)
+    func signOut()
     func go(_ route: Route)
 }
 
@@ -34,8 +35,11 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     public let tabs = TabNavigator(popsToRootOnReselect: true)
     public let products = StackNavigator()
     private let services: Services
-    /// One detail per product for the session: reopening shows it without fetching again (profile: Caching).
+    /// The list, the basket and one detail per product live as long as AppCore, across sign-out, as the reference's
+    /// providers do (profile: Caching): signing in again shows them without fetching again.
     private var details: [String: ProductDetailViewModel] = [:]
+    private var productList: ProductListViewModel?
+    private var basket: BasketViewModel?
 
     public init(services: Services) {
         self.services = services
@@ -46,8 +50,18 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     public func signedIn(_ user: User) {
         self.user = user
         login = nil
-        products.reset(to: [ProductListViewModel(products: services.products, router: self)])
-        tabs.reset(to: [("products", products), ("basket", BasketViewModel())])
+        let list = productList ?? ProductListViewModel(products: services.products, router: self)
+        let basket = basket ?? BasketViewModel()
+        productList = list
+        self.basket = basket
+        products.reset(to: [list])
+        tabs.reset(to: [("products", products), ("basket", basket)])
+    }
+
+    /// Back to a clean sign-in form (memory.md, "Login after sign-in").
+    public func signOut() {
+        user = nil
+        login = LoginViewModel(auth: services.auth, router: self)
     }
 
     public func go(_ route: Route) {

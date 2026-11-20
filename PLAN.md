@@ -178,7 +178,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `catalog` cp3 (ürün detayı, geri, not_found, sekme hafızası) kapandı; `nativestep status` 6/12 checkpoint gösteriyor. İki kit'e de `TabNavigator(popsToRootOnReselect:)` eklendi; varsayılanı kapalı.
 
-Sıradaki adım: `catalog` cp4 (çıkış). `spec/memory.md`'deki Login ViewModel notu bu checkpoint'te uygulanacak.
+`catalog` cp4 (çıkış) ile `catalog` feature'ı tamamlandı: 3/4 feature, 7/12 checkpoint; ProductList `migrated`. Login ViewModel notu da uygulandı. Sepetin çıkıştan sonra kalıp kalmayacağı hâlâ mühendisin vereceği açık bir karar.
+
+Sıradaki adım: `basket` cp1 (detaydan sepete ekleme).
 
 ## M7 · Pilot göç
 

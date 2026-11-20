@@ -19,6 +19,7 @@ public final class ProductListViewModel {
     public enum Action: Equatable, Sendable {
         case load, refresh, retry
         case openProduct(id: String)
+        case signOut
     }
 
     enum Message: Sendable {
@@ -52,6 +53,9 @@ public final class ProductListViewModel {
         switch message {
         case .action(.openProduct(let id)):
             router.go(.product(id: id))
+            return []
+        case .action(.signOut):
+            router.signOut()
             return []
         case .action:
             // load (on creation), refresh (list shown, keeps it) and retry (after an error) all reload.

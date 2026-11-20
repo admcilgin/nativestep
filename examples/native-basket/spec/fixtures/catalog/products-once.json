@@ -1,0 +1,10 @@
+{
+  "services": {
+    "ProductService": {
+      "list": [{ "result": [
+        { "id": "tea", "name": "Tea", "priceCents": 450 },
+        { "id": "mug", "name": "Mug", "priceCents": 1200 }
+      ], "times": 1 }]
+    }
+  }
+}

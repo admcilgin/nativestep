@@ -33,6 +33,7 @@ sealed interface Route {
 /** What screens ask of the shell. Signing in changes the session, so it is a call rather than a route. */
 interface Router {
     fun signedIn(user: User)
+    fun signOut()
     fun go(route: Route)
 }
 
@@ -43,19 +44,33 @@ interface Router {
 class AppCore(private val services: Services, private val scope: CoroutineScope) : IntrospectionNode, Router {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
-    val login = LoginNode(LoginViewModel(services.auth, this, EffectRunner(scope)))
+    private val _login = MutableStateFlow(newLogin())
+    val login: StateFlow<LoginNode> = _login.asStateFlow()
     val products = StackNavigator()
     val tabs = TabNavigator(popsToRootOnReselect = true)
 
-    /** One detail per product for the session: reopening shows it without fetching again (profile: Caching). */
+    /**
+     * The list, the basket and one detail per product live as long as AppCore, across sign-out, as the reference's
+     * providers do (profile: Caching): signing in again shows them without fetching again.
+     */
     private val details = mutableMapOf<String, ProductDetailNode>()
+    private val productList by lazy { ProductListNode(ProductListViewModel(services.products, this, EffectRunner(scope))) }
+    private val basket by lazy { BasketNode(BasketViewModel()) }
     val modal = ModalNavigator(base = tabs)
 
     override fun signedIn(user: User) {
-        products.reset(listOf(ProductListNode(ProductListViewModel(services.products, this, EffectRunner(scope)))))
-        tabs.reset(listOf("products" to products, "basket" to BasketNode(BasketViewModel())))
+        products.reset(listOf(productList))
+        tabs.reset(listOf("products" to products, "basket" to basket))
         _user.value = user
     }
+
+    /** Back to a clean sign-in form (memory.md, "Login after sign-in"). */
+    override fun signOut() {
+        _login.value = newLogin()
+        _user.value = null
+    }
+
+    private fun newLogin() = LoginNode(LoginViewModel(services.auth, this, EffectRunner(scope)))
 
     override fun go(route: Route) {
         when (route) {
@@ -67,5 +82,5 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
 
     override val name = "App"
     override fun state(): JsonElement = JsonObject(emptyMap())
-    override val child: IntrospectionNode get() = if (_user.value == null) login else modal
+    override val child: IntrospectionNode get() = if (_user.value == null) _login.value else modal
 }

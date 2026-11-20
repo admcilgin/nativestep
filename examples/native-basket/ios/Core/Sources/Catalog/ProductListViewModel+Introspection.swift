@@ -2,10 +2,13 @@ import NativeStepKit
 
 extension ProductListViewModel: IntrospectionNodeProviding {
     public var introspectionNode: IntrospectionNode {
-        IntrospectionNode(name: "ProductList", state: state, actions: actions)
+        IntrospectionNode(name: "ProductList", state: state, actions: actions + [
+            NodeAction("signOut", title: "Sign out") { [weak self] in self?.send(.signOut) },
+        ])
     }
 
     /// `refresh` while the list is shown, `retry` while the error is; nothing during the first load or a retry.
+    /// `signOut` is always there.
     private var actions: [NodeAction] {
         if listShown {
             let ids = state.products.map(\.id)

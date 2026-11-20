@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
@@ -35,7 +37,15 @@ fun ProductListScreen(vm: ProductListViewModel) {
     val error = state.error
     // The outer Scaffold already pads for the status bar.
     Column {
-        TopAppBar(title = { Text("Products") }, windowInsets = WindowInsets(0))
+        TopAppBar(
+            title = { Text("Products") },
+            actions = {
+                IconButton(onClick = { vm.send(ProductListViewModel.Action.SignOut) }) {
+                    Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Sign out")
+                }
+            },
+            windowInsets = WindowInsets(0),
+        )
         when {
             vm.listShown -> PullToRefreshBox(
                 isRefreshing = state.loading,

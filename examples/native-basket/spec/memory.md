@@ -13,3 +13,5 @@ Engineer feedback and project decisions that depart from the defaults (ARCHITECT
 
 - iOS sets `AppCore.login` to nil after sign-in. Android keeps one `LoginNode` for the life of `AppCore`.
 - Sign-out (catalog cp4) must give both platforms a fresh `LoginViewModel`. Its tests check that the form is empty and shows no error after sign-out.
+- Resolved in catalog cp4 (2026-11-20): `signOut` builds a fresh `LoginViewModel` on both platforms; tested in `catalog/sign-out.test.ts`.
+- ProductDetail stays `in_progress` after catalog is done: its `addToBasket` comes with basket cp1.

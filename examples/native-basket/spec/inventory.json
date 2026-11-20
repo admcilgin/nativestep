@@ -270,7 +270,7 @@
         "lib/products/product_repository.dart",
         "lib/products/product.dart"
       ],
-      "status": "in_progress"
+      "status": "migrated"
     },
     {
       "name": "ProductDetail",
@@ -358,7 +358,7 @@
         {
           "id": "cp4",
           "title": "Sign out from the product list returns to sign-in",
-          "status": "planned"
+          "status": "done"
         }
       ]
     },

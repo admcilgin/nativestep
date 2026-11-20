@@ -31,7 +31,8 @@ import kotlinx.coroutines.flow.StateFlow
 fun Root(cores: StateFlow<AppCore?>) {
     val core = cores.collectAsState().value ?: return
     val user by core.user.collectAsState()
-    if (user == null) return LoginScreen(core.login.vm)
+    val login by core.login.collectAsState()
+    if (user == null) return LoginScreen(login.vm)
     val tabs by core.tabs.tabs.collectAsState()
     val selected by core.tabs.selected.collectAsState()
     Scaffold(

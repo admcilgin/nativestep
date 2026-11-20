@@ -32,6 +32,7 @@ class ProductListViewModel(
         data object Refresh : Action
         data object Retry : Action
         data class OpenProduct(val id: String) : Action
+        data object SignOut : Action
     }
 
     private sealed interface Message {
@@ -61,6 +62,10 @@ class ProductListViewModel(
         is Message.Act -> when (val action = message.action) {
             is Action.OpenProduct -> {
                 router.go(Route.Product(action.id))
+                emptyList()
+            }
+            Action.SignOut -> {
+                router.signOut()
                 emptyList()
             }
             // Load (on creation), Refresh (list shown, keeps it) and Retry (after an error) all reload.
