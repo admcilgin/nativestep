@@ -199,7 +199,15 @@ Mühendisi bekleyenler:
 - G5 incelemesi: her checkpoint'in kanıtı `spec/evidence/` altında.
 - G4'ün ikinci, izole koşusu hiç yapılmadı. Bu oturumda alt ajan kullanılmadı.
 
-Sıradaki adım: M6'nın kapanış ölçütlerini PLAN'a karşı kontrol et.
+M6 "Bitti" ölçütlerinin durumu:
+- **Altı gate'ten uçtan uca geçen feature:** karşılandı; 4 feature, 12 checkpoint. Eksikler: G5 (mühendis) otonom modda atlandı; G4'ün ikinci, izole koşusu yapılmadı.
+- **step-fix ile kırmızı test ve iki platformda düzeltme:** kısmen karşılandı.
+  - Android durum çubuğu: yalnızca görünüm, shot ile doğrulandı.
+  - iOS cihaz host'unun hızı: kırmızı test (`catalog/tab-switch`), düzeltme kit'te.
+  - İki hata da gerçek, ama hiçbiri iki platformda birden düzeltilen bir davranış hatası değil. Ölçüt, böyle bir hata çıktığında tam karşılanacak.
+- **`flutter` hedefi olmadan, dokümandan yeni bir feature:** henüz yok.
+
+Sıradaki adım: dokümandan yeni bir feature (ölçüt 3).
 
 ## M7 · Pilot göç
 
