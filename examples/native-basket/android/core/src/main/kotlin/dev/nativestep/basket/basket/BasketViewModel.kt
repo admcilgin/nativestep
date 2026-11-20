@@ -20,6 +20,8 @@ class BasketViewModel {
 
     sealed interface Action {
         data class Add(val productId: String, val name: String, val priceCents: Int) : Action
+        data class AddOne(val productId: String) : Action
+        data class RemoveOne(val productId: String) : Action
     }
 
     private val _state = MutableStateFlow(State())
@@ -38,6 +40,11 @@ class BasketViewModel {
                     current + Line(action.productId, action.name, action.priceCents, 1)
                 }
             }
+            is Action.AddOne -> _state.value.lines.map { if (it.productId == action.productId) it.copy(quantity = it.quantity + 1) else it }
+            // The line goes when its quantity reaches zero.
+            is Action.RemoveOne -> _state.value.lines
+                .map { if (it.productId == action.productId) it.copy(quantity = it.quantity - 1) else it }
+                .filter { it.quantity > 0 }
         }
         _state.value = _state.value.copy(
             lines = lines,

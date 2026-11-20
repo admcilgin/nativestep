@@ -182,7 +182,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `basket` cp1 (detaydan sepete ekleme) kapandı; 8/12 checkpoint, ProductDetail `migrated`. Sepetin çıkıştan sonra kalması geçici olarak referanstaki gibi bırakıldı (`memory.md`).
 
-Sıradaki adım: `basket` cp2 (sepette bir ekle, bir çıkar).
+`basket` cp2 (bir ekle, bir çıkar) kapandı; 9/12 checkpoint.
+
+Sıradaki adım: `basket` cp3 (sipariş verme ve "Order placed" diyaloğu).
 
 ## M7 · Pilot göç
 

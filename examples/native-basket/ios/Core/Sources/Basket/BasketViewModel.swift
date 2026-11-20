@@ -20,6 +20,8 @@ public final class BasketViewModel {
 
     public enum Action: Equatable, Sendable {
         case add(productId: String, name: String, priceCents: Int)
+        case addOne(productId: String)
+        case removeOne(productId: String)
     }
 
     public private(set) var state = State()
@@ -36,6 +38,14 @@ public final class BasketViewModel {
                 state.lines[i].quantity += 1
             } else {
                 state.lines.append(Line(productId: productId, name: name, priceCents: priceCents, quantity: 1))
+            }
+        case .addOne(let productId):
+            if let i = state.lines.firstIndex(where: { $0.productId == productId }) { state.lines[i].quantity += 1 }
+        case .removeOne(let productId):
+            // The line goes when its quantity reaches zero.
+            if let i = state.lines.firstIndex(where: { $0.productId == productId }) {
+                state.lines[i].quantity -= 1
+                if state.lines[i].quantity == 0 { state.lines.remove(at: i) }
             }
         }
         state.count = state.lines.reduce(0) { $0 + $1.quantity }

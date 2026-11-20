@@ -1,7 +1,7 @@
 import Core
 import SwiftUI
 
-/// Lines and the total. Add one and remove one come with basket cp2, placing the order with cp3.
+/// Lines with add one and remove one, and the total. Placing the order comes with basket cp3.
 struct BasketView: View {
     let vm: BasketViewModel
 
@@ -12,10 +12,17 @@ struct BasketView: View {
                     Text("Your basket is empty.")
                 } else {
                     List(vm.state.lines, id: \.productId) { line in
-                        VStack(alignment: .leading) {
-                            Text(line.name)
-                            Text("\(line.quantity) × \(formatPrice(line.priceCents))").foregroundStyle(.secondary)
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(line.name)
+                                Text("\(line.quantity) × \(formatPrice(line.priceCents))").foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button("Remove one", systemImage: "minus") { vm.send(.removeOne(productId: line.productId)) }
+                            Button("Add one", systemImage: "plus") { vm.send(.addOne(productId: line.productId)) }
                         }
+                        .labelStyle(.iconOnly)
+                        .buttonStyle(.borderless)
                     }
                     .safeAreaInset(edge: .bottom) {
                         Text("Total \(formatPrice(vm.state.totalCents))")
