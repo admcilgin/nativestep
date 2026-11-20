@@ -237,7 +237,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - Ölçümlerden çıkan beş düzeltme skill'lere ve protokole işlendi.
 - İkinci uygulama (`../movie-tracker-native`): foundation bitti. cp1 açılış, splash, giriş ya da sekmeler; cp2 tasarım token'ları ve Manrope (kanıt `spec/evidence/foundation-cp{1,2}/`). Kit'ler elle kopyalandı; `kits update` M8'de.
 - Cihazda iki nativestep uygulaması aynı portu tutunca testler yanlış uygulamaya bağlanıp zaman aşımıyla düşüyordu. SDK ve CLI artık `hello`daki uygulama adını `nativestep.json` ile karşılaştırıp hemen duruyor (`9a961a1`). Android şablonu edge-to-edge düzeltmesini aldı.
-- Kalan: movie-tracker auth ve movies'in ilk checkpoint'leri; mühendisli bir koşu.
+- auth cp1 bitti: TMDB'nin üç adımlı girişi, oturum kimliği iOS'ta Keychain'de, Android'de Keystore anahtarıyla şifreli (kanıt `spec/evidence/auth-cp1/`).
+- Kalan: movie-tracker auth cp2 ve movies'in ilk checkpoint'leri; mühendisli bir koşu.
 
 ## M8 · Paketleme
 
