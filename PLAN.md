@@ -250,7 +250,9 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - watchlist cp1 bitti: film ayrıntısında listeye ekleme ve çıkarma; gerçek depolama iki platformda atomik yazılan bir JSON dosyası, birim testli (cihazda 41/41).
 - watchlist cp2 bitti: Listem sekmesi, en yeni üstte, açma ve çıkarma (cihazda 45/45).
 - Bulunan açık: movies cp5'te ızgaradaki posterlere dokunulamıyordu. Testler node'un eylemini kullandığı için görmedi. Düzeltildi; step-ui-review artık her eylemin ekranda bir kontrolü olmasını ve cihazda bir kez dokunmayı istiyor.
-- Kalan: watchlist cp3 (ana ekran widget'ı); mühendisli bir koşu.
+- watchlist cp3 bitti: ana ekran widget'ı iki platformda; kaynağın widget kodu olduğu gibi taşındı, Core'un çağrısı birim testli. Referans bu çağrıyı fixture dışında yaptığı için davranış testi yok; cihazda uçtan uca görüldü.
+- İkinci uygulama tamam: 5/5 ekran, 4/4 feature, 13/13 checkpoint; 45 test flutter, iOS ve Android cihazda geçiyor.
+- Kalan: mühendisli bir koşu (`memory.md`'deki onaylar, oturum kapanınca listenin kalması sorusu); her checkpoint'te eksik olan ikinci bağımsız G4.
 
 ## M8 · Paketleme
 
