@@ -1,0 +1,9 @@
+{
+  "services": {
+    "OrderService": {
+      "place": [
+        { "args": { "items": [{ "productId": "tea", "quantity": 2 }, { "productId": "mug", "quantity": 1 }] }, "result": { "id": "o1" } }
+      ]
+    }
+  }
+}

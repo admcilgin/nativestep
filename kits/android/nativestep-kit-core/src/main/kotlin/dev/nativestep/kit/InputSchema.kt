@@ -22,7 +22,7 @@ sealed interface InputSchema {
             ObjectSchema(properties.toMap(), required)
         fun string(minLength: Int? = null, maxLength: Int? = null, oneOf: List<String>? = null) =
             StringSchema(minLength, maxLength, oneOf)
-        fun integer(minimum: Long? = null, maximum: Long? = null) = IntegerSchema(minimum, maximum)
+        fun integer(minimum: Long? = null, maximum: Long? = null, oneOf: List<Long>? = null) = IntegerSchema(minimum, maximum, oneOf)
         fun number(minimum: Double? = null, maximum: Double? = null) = NumberSchema(minimum, maximum)
         fun boolean() = BooleanSchema
         fun array(items: InputSchema) = ArraySchema(items)
@@ -74,18 +74,20 @@ data class StringSchema(val minLength: Int?, val maxLength: Int?, val oneOf: Lis
     }
 }
 
-data class IntegerSchema(val minimum: Long?, val maximum: Long?) : InputSchema {
+data class IntegerSchema(val minimum: Long?, val maximum: Long?, val oneOf: List<Long>? = null) : InputSchema {
     override val typeName = "integer"
     override fun toJson() = buildJsonObject {
         put("type", typeName)
         minimum?.let { put("minimum", it) }
         maximum?.let { put("maximum", it) }
+        oneOf?.let { put("enum", JsonArray(it.map(::JsonPrimitive))) }
     }
     override fun validate(value: JsonElement, path: String): List<InputSchema.Violation> {
         val n = value.literal?.content?.toLongOrNull() ?: return wrongType(path)
         return when {
             minimum != null && n < minimum -> fail(path, "must be ≥ $minimum")
             maximum != null && n > maximum -> fail(path, "must be ≤ $maximum")
+            oneOf != null && n !in oneOf -> fail(path, "must be one of ${oneOf.joinToString()}")
             else -> emptyList()
         }
     }

@@ -9,7 +9,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 /** Tabs as state in Core (R14). Each tab keeps its own node, often a [StackNavigator]; the tabs lend `selectTab` (R15). */
-class TabNavigator : IntrospectionNode {
+/** [popsToRootOnReselect]: selecting the selected tab again returns its stack to the first screen, as both platforms' tab bars do. */
+class TabNavigator(private val popsToRootOnReselect: Boolean = false) : IntrospectionNode {
     private val _tabs = MutableStateFlow<List<Pair<String, IntrospectionNode>>>(emptyList())
     val tabs: StateFlow<List<Pair<String, IntrospectionNode>>> = _tabs.asStateFlow()
     private val _selected = MutableStateFlow("")
@@ -21,7 +22,12 @@ class TabNavigator : IntrospectionNode {
     }
 
     fun select(id: String) {
-        if (_tabs.value.any { it.first == id }) _selected.value = id
+        val tab = _tabs.value.firstOrNull { it.first == id } ?: return
+        val stack = tab.second as? StackNavigator
+        if (id == _selected.value && popsToRootOnReselect && stack != null) {
+            stack.screens.value.firstOrNull()?.let { stack.reset(listOf(it)) }
+        }
+        _selected.value = id
     }
 
     @Serializable

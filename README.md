@@ -15,6 +15,7 @@ The approach is adapted from Shopify's [Reflex](https://shopify.engineering/refl
 
 | File | Contents |
 |---|---|
+| [GUIDE.md](GUIDE.md) | Install, and a first migration: the machine, the plugin and CLI, the skills in order, the gates. Start here. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The target native architecture and its numbered rules (R1–R20). `nativestep lint` and the reviewer agents report against these numbers. |
 | [PROTOCOL.md](PROTOCOL.md) | The JSON protocol spoken with every target, and the fixture format. The only interface the three platforms share. |
 | [COMPONENTS.md](COMPONENTS.md) | The components: CLI, test SDK, kits, Flutter adapter, templates, skills, project files and gates. |
@@ -39,7 +40,18 @@ nativestep/
 
 ## Status
 
-M4 is done: `nativestep lint` checks the architecture rules on both platforms, `nativestep scan` reads a Flutter project, and `nativestep status` reports progress. `nativestep init` (M3) creates a project that builds on iOS and Android, passes lint and the 15 conformance tests; the interactive CLI (`session`, `ls`, `do`, `shot`) works on all three targets. Next is M5: the migration skills and sample apps ([PLAN.md](PLAN.md)).
+Two apps were migrated autonomously with the skills: Basket (12/12 checkpoints) and a movie tracker (13/13), each passing the same tests on Flutter, iOS and Android. M6 and M7 still wait for a run with an engineer (approvals, and a second independent architecture review). M8, packaging, is in progress: `nativestep kits update` and the Claude Code plugin are done ([PLAN.md](PLAN.md)).
+
+## Install the skills
+
+The repo is a Claude Code plugin and its own marketplace. In Claude Code:
+
+```
+/plugin marketplace add admcilgin/nativestep
+/plugin install nativestep@nativestep
+```
+
+The skills call the `nativestep` CLI. Build it for your machine with `bun cli/release.ts darwin-arm64` (or `darwin-x64`, `linux-x64`, `linux-arm64`), unpack `dist/nativestep-<target>.tar.gz` anywhere and put its `bin/` on `PATH`; it keeps `kits/` and `templates/` beside it. From a checkout, `bun cli/src/main.ts` does the same. Tests still need Bun.
 
 ```bash
 NS=$PWD

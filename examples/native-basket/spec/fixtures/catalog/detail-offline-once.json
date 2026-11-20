@@ -1,0 +1,10 @@
+{
+  "services": {
+    "ProductService": {
+      "detail": [
+        { "args": { "id": "tea" }, "error": { "code": "network" }, "times": 1 },
+        { "args": { "id": "tea" }, "result": { "id": "tea", "name": "Tea", "priceCents": 450, "description": "Loose leaf, 100 g." } }
+      ]
+    }
+  }
+}

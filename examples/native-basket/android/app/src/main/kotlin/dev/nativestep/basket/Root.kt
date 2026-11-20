@@ -1,0 +1,92 @@
+package dev.nativestep.basket
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import dev.nativestep.basket.app.AppCore
+import dev.nativestep.basket.auth.LoginScreen
+import dev.nativestep.basket.basket.BasketNode
+import dev.nativestep.basket.basket.BasketScreen
+import dev.nativestep.basket.basket.OrderPlacedNode
+import dev.nativestep.basket.catalog.ProductDetailNode
+import dev.nativestep.basket.catalog.ProductDetailScreen
+import dev.nativestep.basket.catalog.ProductListNode
+import dev.nativestep.basket.catalog.ProductListScreen
+import dev.nativestep.kit.StackNavigator
+import kotlinx.coroutines.flow.StateFlow
+
+/** Draws the navigator state from Core (R14); keeps no navigation state of its own. */
+@Composable
+fun Root(cores: StateFlow<AppCore?>) {
+    val core = cores.collectAsState().value ?: return
+    val user by core.user.collectAsState()
+    val login by core.login.collectAsState()
+    if (user == null) return LoginScreen(login.vm)
+    val tabs by core.tabs.tabs.collectAsState()
+    val selected by core.tabs.selected.collectAsState()
+    val presented by core.modal.presented.collectAsState()
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                tabs.forEach { (id, node) ->
+                    val count = (node as? BasketNode)?.vm?.state?.collectAsState()?.value?.count ?: 0
+                    NavigationBarItem(
+                        selected = id == selected,
+                        onClick = { core.tabs.select(id) },
+                        icon = {
+                            // The basket's count, hidden at zero as on the reference.
+                            BadgedBox(badge = { if (count > 0) Badge { Text("$count") } }) {
+                                Icon(if (id == "basket") Icons.Filled.ShoppingCart else Icons.Filled.Home, contentDescription = null)
+                            }
+                        },
+                        label = { Text(if (id == "basket") "Basket" else "Products") },
+                    )
+                }
+            }
+        },
+    ) { padding ->
+        Box(Modifier.padding(padding)) {
+            when (val node = tabs.firstOrNull { it.first == selected }?.second) {
+                is StackNavigator -> StackContent(node)
+                is BasketNode -> BasketScreen(node.vm)
+                else -> {}
+            }
+        }
+    }
+    (presented as? OrderPlacedNode)?.let { node ->
+        val state by node.vm.state.collectAsState()
+        AlertDialog(
+            onDismissRequest = core.modal::dismiss,
+            title = { Text("Order placed") },
+            text = { Text("Your order ${state.orderId} is on its way.") },
+            confirmButton = { TextButton(onClick = core.modal::dismiss) { Text("OK") } },
+        )
+    }
+}
+
+@Composable
+fun StackContent(stack: StackNavigator) {
+    val screens by stack.screens.collectAsState()
+    BackHandler(enabled = screens.size > 1) { stack.goBack() }
+    when (val top = screens.lastOrNull()) {
+        is ProductListNode -> ProductListScreen(top.vm)
+        is ProductDetailNode -> ProductDetailScreen(top.vm, onBack = stack::goBack)
+        else -> {}
+    }
+}

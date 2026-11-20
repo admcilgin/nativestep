@@ -1,5 +1,8 @@
 import Foundation
 import Network
+#if canImport(UIKit)
+import UIKit
+#endif
 import NativeStepKit
 
 /// A protocol error response (PROTOCOL.md §8). `extra` fields go next to `code` and `message`.
@@ -58,27 +61,67 @@ public final class NativeStepHost {
     public static func listen(app: String, port: UInt16 = 7358, makeRoot: @escaping MakeRoot) {
         NetworkGuard.install()
         let host = NativeStepHost(app: app, makeRoot: makeRoot)
-        let parameters = NWParameters.tcp
-        parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(.loopback), port: NWEndpoint.Port(rawValue: port)!)
-        parameters.allowLocalEndpointReuse = true
-        do {
-            let listener = try NWListener(using: parameters)
-            listener.newConnectionHandler = { connection in
-                connection.start(queue: .main)
-                MainActor.assumeIsolated { host.receive(on: connection, buffer: Data()) }
-            }
-            listener.stateUpdateHandler = { state in
-                if case .failed(let error) = state { print("nativestep: listener failed: \(error)") }
-            }
-            listener.start(queue: .main)
-            host.listener = listener
-            print("nativestep: listening on 127.0.0.1:\(port)")
-        } catch {
-            print("nativestep: cannot listen on port \(port): \(error)")
+        host.port = port
+        host.startListening()
+        #if canImport(UIKit)
+        // The port belongs to the foreground app. A suspended app would hold it and never answer, which is what
+        // another project's debug app on the same simulator does once this one is launched.
+        // Scene-based apps (SwiftUI) get the UIScene notifications; both stop and start are idempotent.
+        let center = NotificationCenter.default
+        for name in [UIApplication.didEnterBackgroundNotification, UIScene.didEnterBackgroundNotification] {
+            center.addObserver(forName: name, object: nil, queue: .main) { _ in MainActor.assumeIsolated { host.stopListening() } }
         }
+        for name in [UIApplication.willEnterForegroundNotification, UIScene.willEnterForegroundNotification] {
+            center.addObserver(forName: name, object: nil, queue: .main) { _ in MainActor.assumeIsolated { host.startListening() } }
+        }
+        #endif
     }
 
     private var listener: NWListener?
+    private var port: UInt16 = 7358
+
+    /// Retries for up to 10 s: the app this one replaced lets go of the port only once it is in the background.
+    private func startListening(attempt: Int = 1) {
+        guard listener == nil else { return }
+        #if canImport(UIKit)
+        if UIApplication.shared.applicationState == .background { return }
+        #endif
+        let parameters = NWParameters.tcp
+        parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(.loopback), port: NWEndpoint.Port(rawValue: port)!)
+        parameters.allowLocalEndpointReuse = true
+        guard let listener = try? NWListener(using: parameters) else {
+            print("nativestep: cannot listen on port \(port)")
+            return
+        }
+        listener.newConnectionHandler = { [weak self] connection in
+            connection.start(queue: .main)
+            MainActor.assumeIsolated { self?.receive(on: connection, buffer: Data()) }
+        }
+        listener.stateUpdateHandler = { [weak self, weak listener] state in
+            MainActor.assumeIsolated {
+                guard let self, let listener, self.listener === listener else { return }
+                switch state {
+                case .ready:
+                    print("nativestep: listening on 127.0.0.1:\(self.port)")
+                case .failed(let error):
+                    self.stopListening()
+                    guard attempt < 40 else { return print("nativestep: cannot listen on port \(self.port): \(error)") }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        MainActor.assumeIsolated { self.startListening(attempt: attempt + 1) }
+                    }
+                default:
+                    break
+                }
+            }
+        }
+        self.listener = listener
+        listener.start(queue: .main)
+    }
+
+    private func stopListening() {
+        listener?.cancel()
+        listener = nil
+    }
 
     private func receive(on connection: NWConnection, buffer: Data) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 1 << 16) { data, _, isComplete, error in
@@ -87,7 +130,8 @@ public final class NativeStepHost {
                 while let newline = buffer.firstIndex(of: 0x0A) {
                     let line = String(decoding: buffer[buffer.startIndex..<newline], as: UTF8.self)
                     buffer = Data(buffer[buffer.index(after: newline)...])
-                    connection.send(content: self.respond(to: line) + Data("\n".utf8), completion: .contentProcessed { _ in })
+                    let response = self.respond(to: line) + Data("\n".utf8)
+                    whenNavigationSettles { connection.send(content: response, completion: .contentProcessed { _ in }) }
                 }
                 if isComplete || error != nil {
                     connection.cancel()
@@ -223,3 +267,40 @@ public final class NativeStepHost {
         ]
     }
 }
+
+#if canImport(UIKit)
+import UIKit
+
+/// Device mode: answers once no navigation transition (push, pop, presentation) is running, at most after 1 s, as a
+/// user waits for the screen. Answering at once let a test pop and switch tabs mid-animation; UIKit then finished
+/// the pop when the tab showed again and undid the next push.
+@MainActor
+func whenNavigationSettles(_ done: @escaping @MainActor () -> Void, deadline: Date = .now + 1) {
+    // One frame first, so the state change that the request made has reached the views.
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(16)) {
+        MainActor.assumeIsolated {
+            if Date.now < deadline, isTransitioning() {
+                whenNavigationSettles(done, deadline: deadline)
+            } else {
+                done()
+            }
+        }
+    }
+}
+
+@MainActor
+private func isTransitioning() -> Bool {
+    func busy(_ vc: UIViewController) -> Bool {
+        vc.transitionCoordinator != nil || vc.isBeingPresented || vc.isBeingDismissed
+            || vc.children.contains(where: busy) || vc.presentedViewController.map(busy) == true
+    }
+    return UIApplication.shared.connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .flatMap(\.windows)
+        .compactMap(\.rootViewController)
+        .contains(where: busy)
+}
+#else
+@MainActor
+func whenNavigationSettles(_ done: @escaping @MainActor () -> Void) { done() }
+#endif

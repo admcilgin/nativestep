@@ -1,0 +1,20 @@
+{
+  "services": {
+    "AuthService": {
+      "signIn": [{ "args": { "email": "ada@example.com", "password": "secret" }, "result": { "id": "u1", "name": "Ada", "token": "t1" } }]
+    },
+    "ProductService": {
+      "list": [{ "result": [
+        { "id": "tea", "name": "Tea", "priceCents": 450, "description": "Loose leaf, 100 g." },
+        { "id": "mug", "name": "Mug", "priceCents": 1200 }
+      ] }],
+      "detail": [
+        { "args": { "id": "tea" }, "result": { "id": "tea", "name": "Tea", "priceCents": 450, "description": "Loose leaf, 100 g." } },
+        { "args": { "id": "mug" }, "result": { "id": "mug", "name": "Mug", "priceCents": 1200 } }
+      ]
+    },
+    "OrderService": {
+      "place": [{ "result": { "id": "o1" } }]
+    }
+  }
+}

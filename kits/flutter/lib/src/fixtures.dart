@@ -33,7 +33,7 @@ class FixtureStore {
         if (entries is! List) throw ProtocolError('bad_request', 'fixtures for $service.$method must be a list');
         _entries['$service.$method'] = [
           for (final e in entries.cast<Map>())
-            if ((e['result'] == null) == (e['error'] == null))
+            if (e.containsKey('result') == (e['error'] != null))
               throw ProtocolError('bad_request', 'a fixture for $service.$method needs exactly one of result and error')
             else
               _Entry(

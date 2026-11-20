@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { parseArgs, UsageError } from "./config.ts";
 import { init } from "./init.ts";
+import { kits } from "./kits.ts";
 import { lint } from "./lint.ts";
 import { scan } from "./scan.ts";
 import { status } from "./status.ts";
@@ -13,13 +14,14 @@ const USAGE = `usage:
   nativestep session stop [--target <t>]
   nativestep ls [--target <t>] [--json]
   nativestep do <action> [json] [--target <t>] [--no-wait] [--json]
+  nativestep kits update [--dry-run]
   nativestep lint [--json]
   nativestep scan [<flutter-path>] [--json]
   nativestep status [--screens | --features] [--json]
-  nativestep test [filter] [--target a,b] [--device]
-  nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>]`;
+  nativestep test [filter...] [--target a,b] [--device]
+  nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]`;
 
-const BOOLEANS = ["device", "json", "no-wait", "force", "screens", "features"];
+const BOOLEANS = ["device", "json", "no-wait", "force", "screens", "features", "dry-run"];
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
@@ -36,6 +38,8 @@ async function main(argv: string[]): Promise<number> {
   switch (command) {
     case "init":
       return init(args);
+    case "kits":
+      return kits(args);
     case "lint":
       return lint(args);
     case "scan":

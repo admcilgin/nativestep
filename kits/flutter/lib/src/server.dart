@@ -38,13 +38,43 @@ class StepServer {
   FixtureStore? _fixtures;
   ProtocolError? _poisoned;
 
+  ServerSocket? _server;
+  bool _listening = false;
+
+  /// Serves on 127.0.0.1:[port] until [close]. The bind is retried for up to 10 s: the app this one replaced
+  /// lets go of the port only once it is hidden.
   Future<void> listen({int port = 7357}) async {
+    if (_listening) return;
+    _listening = true;
     HttpOverrides.global = _NetworkGuard(this);
-    final server = await ServerSocket.bind(InternetAddress.loopbackIPv4, port);
+    ServerSocket? server;
+    for (var attempt = 1; server == null; attempt++) {
+      try {
+        server = await ServerSocket.bind(InternetAddress.loopbackIPv4, port);
+      } on SocketException catch (e) {
+        if (attempt >= 40 || !_listening) {
+          if (_listening) stderr.writeln('nativestep: cannot listen on port $port: $e');
+          _listening = false;
+          return;
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 250));
+      }
+    }
+    if (!_listening) return server.close().ignore(); // closed while binding
+    _server = server;
     stderr.writeln('nativestep: listening on 127.0.0.1:$port');
     await for (final socket in server) {
       await _serve(socket);
     }
+  }
+
+  /// Stops listening. The binding calls it when the app is hidden: a suspended app would hold the port and never
+  /// answer, which is what another project's reference app on the same simulator does.
+  Future<void> close() async {
+    _listening = false;
+    final server = _server;
+    _server = null;
+    await server?.close();
   }
 
   Future<void> _serve(Socket socket) async {

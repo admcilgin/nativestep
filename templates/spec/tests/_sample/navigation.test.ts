@@ -1,9 +1,9 @@
 // Conformance: navigators, lent actions, deep links (ARCHITECTURE.md R14–R16, PROTOCOL.md §4).
 import { expect, test } from "bun:test";
-import { session } from "@nativestep/test";
+import { conformance } from "./conformance.ts";
 
 test("openDetail pushes SampleDetail, and the stack lends goBack", async () => {
-  const app = await session();
+  const app = await conformance();
   await app.precondition("Sample");
   await app.do("set", { value: 3 });
   await app.do("openDetail", { id: "a" });
@@ -18,7 +18,7 @@ test("openDetail pushes SampleDetail, and the stack lends goBack", async () => {
 });
 
 test("openDetail requires a non-empty id", async () => {
-  const app = await session();
+  const app = await conformance();
   await app.precondition("Sample");
   const error = await app.do("openDetail", { id: "" }).catch((e) => e);
   expect(error.code).toBe("invalid_input");
@@ -26,21 +26,21 @@ test("openDetail requires a non-empty id", async () => {
 });
 
 test("a session can start from a deep link", async () => {
-  const app = await session({ route: "sample://detail/b" });
+  const app = await conformance({ route: "sample://detail/b" });
   await app.precondition("SampleDetail", (s) => s.id === "b");
   await app.do("goBack");
   await app.precondition("Sample", (s) => s.count === 0);
 });
 
 test("a deep link can open a modal over the tab it belongs to", async () => {
-  const app = await session({ route: "sample://license" });
+  const app = await conformance({ route: "sample://license" });
   await app.precondition("License");
   await app.do("dismiss");
   await app.precondition("About");
 });
 
 test("selectTab switches tabs, and each tab keeps its own stack", async () => {
-  const app = await session();
+  const app = await conformance();
   await app.precondition("Sample");
   expect(app.node.actions).toContainEqual(expect.objectContaining({ name: "selectTab", lentBy: "Tabs" }));
   await app.do("openDetail", { id: "a" });
@@ -58,7 +58,7 @@ test("selectTab switches tabs, and each tab keeps its own stack", async () => {
 });
 
 test("a modal covers the tabs and lends dismiss", async () => {
-  const app = await session();
+  const app = await conformance();
   await app.do("selectTab", { tab: "about" });
   await app.do("openLicense");
   await app.precondition("License");

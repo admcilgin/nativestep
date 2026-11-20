@@ -1,0 +1,1 @@
+{ "services": { "AuthService": { "signIn": [{ "error": { "code": "network" }, "times": 1 }] } } }

@@ -1,12 +1,21 @@
 // `nativestep init` (COMPONENTS.md §1, §6): fills the templates and copies the kits into a project.
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { type Args, flag, UsageError } from "./config.ts";
 
-const REPO = resolve(import.meta.dir, "../..");
-const KITS = ["ios", "android", "flutter", "test-sdk"];
+/** A `bun build --compile` binary runs from Bun's virtual filesystem (macOS and Linux). */
+export const COMPILED = Bun.main.startsWith("/$bunfs/");
+// The release puts kits/ and templates/ beside bin/nativestep; from a checkout they are in the repo.
+export const REPO = COMPILED ? resolve(dirname(process.execPath), "..") : resolve(import.meta.dir, "../..");
+export const KITS = ["ios", "android", "flutter", "test-sdk"];
 // Build output and machine state never leave the nativestep repo.
-const SKIP = new Set([".build", "build", ".gradle", ".kotlin", ".swiftpm", ".dart_tool", "node_modules", ".DS_Store", "local.properties"]);
+export const SKIP = new Set([".build", "build", ".gradle", ".kotlin", ".swiftpm", ".dart_tool", "node_modules", ".DS_Store", "local.properties"]);
+// Gradle checks the namespace as a Java package, and Kotlin would need backticks in every package line.
+const KEYWORDS = new Set(
+  ("abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if " +
+    "implements import instanceof int interface long native new package private protected public return short static strictfp super switch " +
+    "synchronized this throw throws transient try void volatile while true false null as fun in is object typealias typeof val var when").split(" "),
+);
 const USAGE =
   "usage: nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]";
 
@@ -22,6 +31,8 @@ export function init(args: Args): number {
   if (!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(androidPackage)) {
     throw new UsageError(`--android-package is not a Kotlin package: ${androidPackage}`);
   }
+  const keyword = androidPackage.split(".").find((part) => KEYWORDS.has(part));
+  if (keyword) throw new UsageError(`--android-package cannot contain "${keyword}": it is a Java or Kotlin keyword`);
   const reference = flag(args, "reference");
   if (reference && !existsSync(reference)) throw new UsageError(`--reference not found: ${reference}`);
 
@@ -43,6 +54,7 @@ export function init(args: Args): number {
   copyTree(join(REPO, "templates"), dir, fill);
   refuseSymlink(join(dir, "kits"));
   for (const kit of KITS) copyTree(join(REPO, "kits", kit), join(dir, "kits", kit));
+  setKitsVersion(dir);
   if (reference) addReference(dir, resolve(reference));
 
   console.log(`created ${app} in ${dir}`);
@@ -73,18 +85,33 @@ function copyTree(src: string, dest: string, fill?: (text: string, path: boolean
 }
 
 /** Writing through a symlink would change files outside the project (an old `kits -> ../../kits` link, say). */
-function refuseSymlink(path: string) {
+export function refuseSymlink(path: string) {
   if (existsSync(path) && lstatSync(path).isSymbolicLink()) throw new UsageError(`${path} is a symlink; remove it first`);
+}
+
+/** Records the copied kits' version (`kits/VERSION`), which `nativestep kits update` moves forward. */
+function setKitsVersion(dir: string) {
+  const file = join(dir, "nativestep.json");
+  const config = JSON.parse(readFileSync(file, "utf8"));
+  config.kits = readFileSync(join(REPO, "kits/VERSION"), "utf8").trim();
+  writeFileSync(file, JSON.stringify(config, null, 2) + "\n");
+}
+
+/** The app's bundle id: the one in the build settings of the Runner target, not of tests or app extensions. */
+export function runnerBundleId(pbxproj: string): string | undefined {
+  return pbxproj
+    .split("buildSettings = {")
+    .filter((settings) => /INFOPLIST_FILE = "?Runner\/Info\.plist"?;/.test(settings.split("};")[0]!))
+    .map((settings) => settings.split("};")[0]!.match(/PRODUCT_BUNDLE_IDENTIFIER = "?([^";]+)"?;/)?.[1])
+    .find(Boolean);
 }
 
 /** Adds the Flutter app as the reference target; it runs as a debug app on the iOS simulator (COMPONENTS.md §5). */
 function addReference(dir: string, reference: string) {
   const pbxproj = join(reference, "ios/Runner.xcodeproj/project.pbxproj");
   if (!existsSync(pbxproj)) throw new UsageError(`${reference} has no ios/Runner.xcodeproj; the reference runs on the iOS simulator`);
-  const bundleId = [...readFileSync(pbxproj, "utf8").matchAll(/PRODUCT_BUNDLE_IDENTIFIER = "?([^";]+)"?;/g)]
-    .map((m) => m[1])
-    .find((id) => !id.endsWith(".RunnerTests"));
-  if (!bundleId) throw new UsageError(`no PRODUCT_BUNDLE_IDENTIFIER in ${pbxproj}`);
+  const bundleId = runnerBundleId(readFileSync(pbxproj, "utf8"));
+  if (!bundleId) throw new UsageError(`no PRODUCT_BUNDLE_IDENTIFIER for Runner/Info.plist in ${pbxproj}`);
   const path = `'${relative(dir, reference).replaceAll("'", `'\\''`)}'`;
   const file = join(dir, "nativestep.json");
   const config = JSON.parse(readFileSync(file, "utf8"));

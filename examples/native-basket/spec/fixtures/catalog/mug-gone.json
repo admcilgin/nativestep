@@ -1,0 +1,1 @@
+{ "services": { "ProductService": { "detail": [{ "args": { "id": "mug" }, "error": { "code": "not_found" } }] } } }

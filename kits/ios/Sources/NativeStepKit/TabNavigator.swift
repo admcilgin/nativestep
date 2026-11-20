@@ -5,8 +5,12 @@ import Observation
 public final class TabNavigator: IntrospectionNodeProviding {
     public private(set) var tabs: [(id: String, node: any IntrospectionNodeProviding)] = []
     public private(set) var selected = ""
+    /// Selecting the selected tab again returns its stack to the first screen, as both platforms' tab bars do.
+    private let popsToRootOnReselect: Bool
 
-    public init() {}
+    public init(popsToRootOnReselect: Bool = false) {
+        self.popsToRootOnReselect = popsToRootOnReselect
+    }
 
     public func reset(to tabs: [(id: String, node: any IntrospectionNodeProviding)], selected: String? = nil) {
         self.tabs = tabs
@@ -14,7 +18,11 @@ public final class TabNavigator: IntrospectionNodeProviding {
     }
 
     public func select(_ id: String) {
-        if tabs.contains(where: { $0.id == id }) { selected = id }
+        guard let tab = tabs.first(where: { $0.id == id }) else { return }
+        if id == selected, popsToRootOnReselect, let stack = tab.node as? StackNavigator, let root = stack.screens.first {
+            stack.reset(to: [root])
+        }
+        selected = id
     }
 
     private struct SelectTab: Decodable {

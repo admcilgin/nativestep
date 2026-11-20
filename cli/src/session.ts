@@ -8,6 +8,7 @@ import { createInterface } from "node:readline";
 import { Connection, PROTOCOL_VERSION } from "../../kits/test-sdk/src/connection.ts";
 import { loadFixtures } from "../../kits/test-sdk/src/fixtures.ts";
 import { type Args, flag, loadProject, modeFor, prepare, type Project, target, UsageError } from "./config.ts";
+import { COMPILED } from "./init.ts";
 import { printResponse } from "./output.ts";
 
 const TIMEOUT_MS = Number(process.env.NATIVESTEP_TIMEOUT_MS ?? 3000);
@@ -75,7 +76,7 @@ export async function sessionStart(args: Args): Promise<number> {
     if (!prepare(project, name, mode)) return 1;
     mkdirSync(sessionsDir(project), { recursive: true });
     const log = join(sessionsDir(project), `${name}.log`);
-    const daemon = spawn(process.execPath, [Bun.main, "__session-daemon", name, mode], {
+    const daemon = spawn(process.execPath, [...(COMPILED ? [] : [Bun.main]), "__session-daemon", name, mode], {
       cwd: project.root,
       detached: true,
       stdio: ["ignore", openSync(log, "w"), openSync(log, "a")],
@@ -136,9 +137,12 @@ export async function doAction(args: Args): Promise<number> {
 export async function daemon(name: string, mode: string): Promise<void> {
   const project = loadProject();
   const t = target(project, name);
-  const conn = mode === "headless" ? Connection.spawn(t.headless!, project.root) : await Connection.tcp(t.device!.connect!);
+  const conn = mode === "headless" ? Connection.spawn(t.headless!, project.root) : await Connection.tcp(t.device!.connect!, undefined, project.config.app.name);
   const hello = await conn.request("hello", { protocol: PROTOCOL_VERSION });
   if (!hello.ok) throw new Error(`hello failed: ${JSON.stringify(hello.error)}`);
+  if (hello.app !== project.config.app.name) {
+    throw new Error(`connected to app "${hello.app}", expected "${project.config.app.name}": another nativestep app holds the port; stop it`);
+  }
   console.log(`connected to ${name} (${mode}): ${JSON.stringify(hello)}`);
 
   const path = socketPath(project, name);

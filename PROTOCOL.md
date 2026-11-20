@@ -8,7 +8,7 @@ The conformance tests live in `templates/spec/tests/_sample/`, and every target 
 
 - Messages are UTF-8 JSON, one message per line (NDJSON).
 - **Headless target**: the CLI starts the host process, writes requests to its stdin and reads responses from its stdout. The host writes nothing but protocol messages to stdout; logs go to stderr. One host process can run several sessions in a row.
-- **Device target**: the running debug app listens on a TCP port. Default ports: flutter 7357, ios 7358, android 7359. On Android the port is opened with `adb forward`.
+- **Device target**: the running debug app listens on a TCP port. Default ports: flutter 7357, ios 7358, android 7359. On Android the port is opened with `adb forward`. Only the visible app listens: it closes the port when it goes to the background and opens it again when it comes back, retrying for up to 10 s while the app it replaced lets go, so debug apps of several projects can share one simulator or emulator. A client that connects during that hand-over and gets another app's `hello` tries again. A device target answers a request once the navigation transition the request started has ended (at most 1 s), so the next request meets the screen a user would see.
 - Every request gets exactly one response. Responses arrive in request order; the client does not send a new request before it has received the previous response.
 
 ## 2. Envelope
@@ -107,7 +107,7 @@ Input is a JSON object, validated against the action's `input` schema. The schem
 | `type` | `object`, `string`, `integer`, `number`, `boolean`, `array` |
 | `properties`, `required` | for `object` |
 | `items` | for `array` |
-| `enum` | a list of fixed values |
+| `enum` | a list of fixed values, for `string` and `integer` |
 | `minimum`, `maximum` | for `integer` and `number` |
 | `minLength`, `maxLength` | for `string` |
 
@@ -158,7 +158,7 @@ Fixtures are defined at the service boundary: what a service method returns when
 | `delayMs` | A delay before the result. For testing loading states. |
 | `times` | How many times the entry matches; once used up, the entry is skipped. For example, first an error, then a success. |
 
-An entry has exactly one of `result` and `error`.
+An entry has exactly one of `result` and `error`. A method that returns nothing has `"result": null`.
 
 **Defaults.** Without a `Clock` fixture, the clock stands still at `2026-01-01T00:00:00Z`. Without an `IdGenerator` fixture, ids are generated in sequence: `id-1`, `id-2`…
 

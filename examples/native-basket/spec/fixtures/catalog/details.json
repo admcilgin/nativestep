@@ -1,0 +1,10 @@
+{
+  "services": {
+    "ProductService": {
+      "detail": [
+        { "args": { "id": "tea" }, "result": { "id": "tea", "name": "Tea", "priceCents": 450, "description": "Loose leaf, 100 g." }, "times": 1 },
+        { "args": { "id": "mug" }, "result": { "id": "mug", "name": "Mug", "priceCents": 1200 }, "times": 1 }
+      ]
+    }
+  }
+}

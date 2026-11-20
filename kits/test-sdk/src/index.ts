@@ -48,13 +48,17 @@ let shared: Promise<Connection> | null = null;
 function connection(): Promise<Connection> {
   shared ??= (async () => {
     let conn: Connection;
-    if (env.NATIVESTEP_CONNECT) conn = await Connection.tcp(env.NATIVESTEP_CONNECT);
+    if (env.NATIVESTEP_CONNECT) conn = await Connection.tcp(env.NATIVESTEP_CONNECT, undefined, env.NATIVESTEP_APP);
     else if (env.NATIVESTEP_HEADLESS) conn = Connection.spawn(env.NATIVESTEP_HEADLESS, env.NATIVESTEP_ROOT ?? process.cwd());
     else throw new Error("no target configured: run tests with `nativestep test`");
     process.on("exit", () => conn.close());
     const hello = await conn.request("hello", { protocol: PROTOCOL_VERSION });
     if (!hello.ok) throw new NativeStepError(hello.error);
     if (!hello.capabilities?.includes("start")) throw new Error(`target ${hello.target} cannot start fixture sessions`);
+    // A device port answers for whichever debug app holds it; another project's app there fails every test late.
+    if (env.NATIVESTEP_APP && hello.app !== env.NATIVESTEP_APP) {
+      throw new Error(`connected to app "${hello.app}", expected "${env.NATIVESTEP_APP}": another nativestep app holds ${env.NATIVESTEP_CONNECT ?? "the port"}; stop it and run again`);
+    }
     return conn;
   })();
   return shared;
@@ -79,13 +83,15 @@ export async function session(options: SessionOptions = {}): Promise<App> {
 
 // `nativestep shot` sets these: after each test, wait for effects and animations, then take a screenshot.
 if (env.NATIVESTEP_SHOT_CMD && env.NATIVESTEP_SHOT_OUT) {
-  const settleMs = Number(env.NATIVESTEP_SHOT_SETTLE_MS ?? 800);
+  // `--no-wait` (NATIVESTEP_SHOT_WAIT=0) shoots with calls still in flight, for loading states.
+  const wait = env.NATIVESTEP_SHOT_WAIT !== "0";
+  const settleMs = Number(env.NATIVESTEP_SHOT_SETTLE_MS ?? (wait ? 800 : 200));
   afterEach(async () => {
     const app = current;
     current = null;
     if (!app) return;
     await app.ls().catch(() => {});
-    for (const deadline = Date.now() + TIMEOUT_MS; app.busy && Date.now() < deadline; ) {
+    for (const deadline = Date.now() + TIMEOUT_MS; wait && app.busy && Date.now() < deadline; ) {
       await Bun.sleep(INTERVAL_MS);
       await app.ls().catch(() => {});
     }

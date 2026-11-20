@@ -30,6 +30,8 @@ interface Run {
   bunArgs: string[];
   env?: Record<string, string>;
   report: string;
+  /** Why the target is not run; it counts as passed. */
+  skip?: string;
 }
 
 function runAll(project: Project, runs: Run[]): number {
@@ -37,11 +39,17 @@ function runAll(project: Project, runs: Run[]): number {
   const summary: string[] = [];
   let failed = false;
   for (const run of runs) {
+    if (run.skip) {
+      summary.push(`${run.name}: skipped (${run.skip})`);
+      continue;
+    }
     console.log(`\n── ${run.name} (${run.mode}) ──`);
     let ok = prepare(project, run.name, run.mode);
     if (ok) {
       const started = performance.now();
-      const r = Bun.spawnSync(["bun", "test", ...run.bunArgs], {
+      // A device run's first test waits for a cold app start and the connection; bun's 5 s default is too short.
+      const timeout = run.mode === "device" ? ["--timeout", "30000"] : [];
+      const r = Bun.spawnSync(["bun", "test", ...timeout, ...run.bunArgs], {
         cwd: project.testsDir,
         env: { ...process.env, ...targetEnv(project, run.name, run.mode), ...run.env },
         stdout: "inherit",
@@ -62,22 +70,30 @@ export function test(args: Args): number {
   const project = loadProject();
   const results = join(project.stateDir, "results");
   mkdirSync(results, { recursive: true });
-  const filter = args.positional[0];
+  // Every path or name given; bun test runs the files matching any of them.
+  const filters = args.positional;
+  const onlySample = Array.from(new Bun.Glob("**/*.test.ts").scanSync({ cwd: project.testsDir })).every((f) => f.startsWith("_sample/"));
   return runAll(
     project,
-    targets(project, args).map((name) => ({
-      name,
-      mode: modeFor(target(project, name), args.flags.device === true),
-      bunArgs: [...(filter ? [filter] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
-      report: "",
-    })),
+    targets(project, args).map((name) => {
+      // The conformance tests check the native kits' Sample screen, which a reference app has only when its binding
+      // was written for it (examples/native-sample); there they run when named.
+      const skipSample = target(project, name).role === "reference" && !filters.some((f) => f.includes("_sample"));
+      return {
+        name,
+        mode: modeFor(target(project, name), args.flags.device === true),
+        bunArgs: [...filters, ...(skipSample ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
+        report: skipSample ? " (_sample skipped: reference)" : "",
+        skip: skipSample && onlySample ? "only _sample tests, which a reference runs when named: nativestep test _sample" : undefined,
+      };
+    }),
   );
 }
 
 /** Replays a test on device targets and saves a screenshot of each target at the test's final state. */
 export function shot(args: Args): number {
   const [file] = args.positional;
-  if (!file) throw new UsageError("usage: nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>]");
+  if (!file) throw new UsageError("usage: nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]");
   const project = loadProject();
   const testFile = resolve(file);
   if (!existsSync(testFile)) throw new UsageError(`no such test file ${file}`);
@@ -95,7 +111,7 @@ export function shot(args: Args): number {
         name,
         mode: "device" as const,
         bunArgs: [testFile, ...(testName ? ["-t", testName] : [])],
-        env: { NATIVESTEP_SHOT_CMD: t.device.screenshot, NATIVESTEP_SHOT_OUT: png },
+        env: { NATIVESTEP_SHOT_CMD: t.device.screenshot, NATIVESTEP_SHOT_OUT: png, ...(args.flags["no-wait"] ? { NATIVESTEP_SHOT_WAIT: "0" } : {}) },
         report: ` → ${png}`,
       };
     }),

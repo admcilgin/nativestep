@@ -1,0 +1,1 @@
+{ "services": { "ProductService": { "detail": [{ "args": { "id": "tea" }, "result": { "id": "tea", "name": "Tea", "priceCents": 450, "description": "Loose leaf, 100 g." }, "delayMs": 3000 }] } } }

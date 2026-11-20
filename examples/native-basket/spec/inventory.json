@@ -1,0 +1,413 @@
+{
+  "raw": {
+    "packages": [
+      {
+        "name": "async",
+        "version": "2.13.1",
+        "direct": false
+      },
+      {
+        "name": "boolean_selector",
+        "version": "2.1.2",
+        "direct": false
+      },
+      {
+        "name": "characters",
+        "version": "1.4.1",
+        "direct": false
+      },
+      {
+        "name": "clock",
+        "version": "1.1.3",
+        "direct": false
+      },
+      {
+        "name": "collection",
+        "version": "1.19.1",
+        "direct": false
+      },
+      {
+        "name": "crypto",
+        "version": "3.0.8",
+        "direct": false
+      },
+      {
+        "name": "cupertino_ui",
+        "version": "1.1.6",
+        "direct": false
+      },
+      {
+        "name": "dio",
+        "version": "5.11.1",
+        "direct": true
+      },
+      {
+        "name": "dio_web_adapter",
+        "version": "2.2.2",
+        "direct": false
+      },
+      {
+        "name": "fake_async",
+        "version": "1.3.3",
+        "direct": false
+      },
+      {
+        "name": "fixnum",
+        "version": "1.1.1",
+        "direct": false
+      },
+      {
+        "name": "flutter",
+        "version": "0.0.0",
+        "direct": true
+      },
+      {
+        "name": "flutter_lints",
+        "version": "6.0.0",
+        "direct": true
+      },
+      {
+        "name": "flutter_localizations",
+        "version": "0.0.0",
+        "direct": false
+      },
+      {
+        "name": "flutter_riverpod",
+        "version": "3.5.0",
+        "direct": true
+      },
+      {
+        "name": "flutter_test",
+        "version": "0.0.0",
+        "direct": true
+      },
+      {
+        "name": "flutter_web_plugins",
+        "version": "0.0.0",
+        "direct": false
+      },
+      {
+        "name": "go_router",
+        "version": "18.1.4",
+        "direct": true
+      },
+      {
+        "name": "http_parser",
+        "version": "4.1.2",
+        "direct": false
+      },
+      {
+        "name": "intl",
+        "version": "0.20.3",
+        "direct": false
+      },
+      {
+        "name": "leak_tracker",
+        "version": "11.0.2",
+        "direct": false
+      },
+      {
+        "name": "leak_tracker_flutter_testing",
+        "version": "3.0.10",
+        "direct": false
+      },
+      {
+        "name": "leak_tracker_testing",
+        "version": "3.0.2",
+        "direct": false
+      },
+      {
+        "name": "lints",
+        "version": "6.1.0",
+        "direct": false
+      },
+      {
+        "name": "listen",
+        "version": "1.0.1",
+        "direct": false
+      },
+      {
+        "name": "logging",
+        "version": "1.3.0",
+        "direct": false
+      },
+      {
+        "name": "matcher",
+        "version": "0.12.20",
+        "direct": false
+      },
+      {
+        "name": "material_color_utilities",
+        "version": "0.13.0",
+        "direct": false
+      },
+      {
+        "name": "material_ui",
+        "version": "1.11.0",
+        "direct": false
+      },
+      {
+        "name": "meta",
+        "version": "1.18.3",
+        "direct": false
+      },
+      {
+        "name": "mime",
+        "version": "2.1.0",
+        "direct": false
+      },
+      {
+        "name": "path",
+        "version": "1.9.1",
+        "direct": false
+      },
+      {
+        "name": "riverpod",
+        "version": "3.5.0",
+        "direct": false
+      },
+      {
+        "name": "sky_engine",
+        "version": "0.0.0",
+        "direct": false
+      },
+      {
+        "name": "source_span",
+        "version": "1.10.2",
+        "direct": false
+      },
+      {
+        "name": "stack_trace",
+        "version": "1.12.2",
+        "direct": false
+      },
+      {
+        "name": "state_notifier",
+        "version": "1.0.0",
+        "direct": false
+      },
+      {
+        "name": "stream_channel",
+        "version": "2.1.4",
+        "direct": false
+      },
+      {
+        "name": "string_scanner",
+        "version": "1.4.1",
+        "direct": false
+      },
+      {
+        "name": "term_glyph",
+        "version": "1.2.2",
+        "direct": false
+      },
+      {
+        "name": "test_api",
+        "version": "0.7.12",
+        "direct": false
+      },
+      {
+        "name": "typed_data",
+        "version": "1.4.0",
+        "direct": false
+      },
+      {
+        "name": "uuid",
+        "version": "4.6.0",
+        "direct": false
+      },
+      {
+        "name": "vector_math",
+        "version": "2.4.0",
+        "direct": false
+      },
+      {
+        "name": "vm_service",
+        "version": "15.4.0",
+        "direct": false
+      },
+      {
+        "name": "web",
+        "version": "1.1.2",
+        "direct": false
+      }
+    ],
+    "dartFiles": 13,
+    "assets": 0,
+    "nativeCode": [
+      {
+        "path": "ios/Runner/AppDelegate.swift",
+        "channels": []
+      },
+      {
+        "path": "ios/Runner/Runner-Bridging-Header.h",
+        "channels": []
+      },
+      {
+        "path": "ios/Runner/SceneDelegate.swift",
+        "channels": []
+      }
+    ]
+  },
+  "screens": [
+    {
+      "name": "Login",
+      "feature": "auth",
+      "reference": "driven",
+      "source": [
+        "lib/auth/login_screen.dart",
+        "lib/auth/auth_controller.dart",
+        "lib/auth/auth_repository.dart"
+      ],
+      "status": "migrated"
+    },
+    {
+      "name": "ProductList",
+      "feature": "catalog",
+      "reference": "driven",
+      "source": [
+        "lib/products/product_list_screen.dart",
+        "lib/products/product_repository.dart",
+        "lib/products/product.dart"
+      ],
+      "status": "migrated"
+    },
+    {
+      "name": "ProductDetail",
+      "feature": "catalog",
+      "reference": "driven",
+      "source": [
+        "lib/products/product_detail_screen.dart",
+        "lib/products/product_repository.dart"
+      ],
+      "status": "migrated"
+    },
+    {
+      "name": "Basket",
+      "feature": "basket",
+      "reference": "driven",
+      "source": [
+        "lib/basket/basket_screen.dart",
+        "lib/basket/basket_controller.dart",
+        "lib/basket/order_repository.dart"
+      ],
+      "status": "migrated"
+    },
+    {
+      "name": "OrderPlaced",
+      "feature": "basket",
+      "reference": "driven",
+      "source": [
+        "lib/basket/basket_screen.dart",
+        "lib/basket/basket_controller.dart"
+      ],
+      "status": "migrated"
+    }
+  ],
+  "features": [
+    {
+      "name": "foundation",
+      "dependsOn": [],
+      "checkpoints": [
+        {
+          "id": "cp1",
+          "title": "App shell: signed-out start, the tabs and the products stack, switching tabs",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "dependsOn": [
+        "foundation"
+      ],
+      "checkpoints": [
+        {
+          "id": "cp1",
+          "title": "Sign in with email and password and land on the products tab",
+          "status": "done"
+        },
+        {
+          "id": "cp2",
+          "title": "Sign-in loading, wrong password and network errors",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "catalog",
+      "dependsOn": [
+        "foundation"
+      ],
+      "checkpoints": [
+        {
+          "id": "cp1",
+          "title": "Product list loads and shows names and prices",
+          "status": "done"
+        },
+        {
+          "id": "cp2",
+          "title": "Product list error with retry, and pull to refresh",
+          "status": "done"
+        },
+        {
+          "id": "cp3",
+          "title": "Product detail from the list, back, and its not-found error",
+          "status": "done"
+        },
+        {
+          "id": "cp4",
+          "title": "Sign out from the product list returns to sign-in",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "basket",
+      "dependsOn": [
+        "foundation",
+        "catalog"
+      ],
+      "checkpoints": [
+        {
+          "id": "cp1",
+          "title": "Add a product to the basket from its detail; lines, count and total",
+          "status": "done"
+        },
+        {
+          "id": "cp2",
+          "title": "Add one and remove one in the basket, down to an empty basket",
+          "status": "done"
+        },
+        {
+          "id": "cp3",
+          "title": "Place an order, see the order-placed dialog, basket emptied",
+          "status": "done"
+        },
+        {
+          "id": "cp4",
+          "title": "Order errors (out of stock, network) and the placing state",
+          "status": "done"
+        },
+        {
+          "id": "cp5",
+          "title": "Basket count badge on the tab bar",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "name": "search",
+      "dependsOn": [
+        "catalog"
+      ],
+      "checkpoints": [
+        {
+          "id": "cp1",
+          "title": "Search the product list by name, with a message when nothing matches",
+          "status": "done"
+        }
+      ]
+    }
+  ]
+}

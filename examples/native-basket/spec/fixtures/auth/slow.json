@@ -1,0 +1,7 @@
+{
+  "services": {
+    "AuthService": {
+      "signIn": [{ "args": { "email": "ada@example.com", "password": "secret" }, "result": { "id": "u1", "name": "Ada", "token": "t1" }, "delayMs": 1500 }]
+    }
+  }
+}
