@@ -243,7 +243,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - Bulunan hata: `nativestep test a/ b/` yalnızca ilk filtreyi koşuyor ve geçti diyordu (`6bd8873`). auth'un cihaz koşuları yeniden yapıldı, 16/16.
 - movies cp2 bitti: sayfalama, boş sayfada durma; görünümler yalnızca kaydırınca istiyor (kaynak gibi).
 - movies cp3 bitti: arama, boş sonuç ve yeniden deneme, eski yanıtların atılması.
-- Kalan: movies cp4–cp6 ve watchlist; mühendisli bir koşu.
+- movies cp4 bitti: yükleme hataları ve yeniden deneme; ilk trend sayfasının çevrimdışı kopyası gerçek serviste, iki platformda birim testleriyle.
+- Kalan: movies cp5–cp6 ve watchlist; mühendisli bir koşu.
 
 ## M8 · Paketleme
 
