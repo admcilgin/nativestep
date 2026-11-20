@@ -4,6 +4,7 @@ import android.app.Application
 import dev.nativestep.basket.app.AppCore
 import dev.nativestep.basket.app.Services
 import dev.nativestep.basket.auth.HttpAuthService
+import dev.nativestep.basket.basket.HttpOrderService
 import dev.nativestep.basket.catalog.HttpProductService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,7 @@ class BasketApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        core.value = AppCore(Services(auth = HttpAuthService(), products = HttpProductService()), MainScope())
+        core.value = AppCore(Services(auth = HttpAuthService(), products = HttpProductService(), orders = HttpOrderService()), MainScope())
         NativeStepLauncher.start(this)
     }
 }

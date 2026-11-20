@@ -22,7 +22,7 @@ struct BasketApp: App {
     @State private var holder: CoreHolder
 
     init() {
-        let holder = CoreHolder(AppCore(services: Services(auth: HTTPAuthService(), products: HTTPProductService())))
+        let holder = CoreHolder(AppCore(services: Services(auth: HTTPAuthService(), products: HTTPProductService(), orders: HTTPOrderService())))
         _holder = State(initialValue: holder)
         #if DEBUG
         // Debug builds only (R20): serves the protocol on 127.0.0.1:7358.

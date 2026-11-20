@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import dev.nativestep.basket.shared.Minus
 import dev.nativestep.basket.shared.formatPrice
 
-/** Lines with add one and remove one, and the total. Placing the order comes with basket cp3. */
+/** Lines with add one and remove one, the total and Place order. The order error comes with basket cp4. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasketScreen(vm: BasketViewModel) {
@@ -55,11 +56,14 @@ fun BasketScreen(vm: BasketViewModel) {
                     )
                 }
             }
-            Text(
-                "Total ${formatPrice(state.totalCents)}",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-            )
+            Column(Modifier.fillMaxWidth().padding(16.dp)) {
+                Text("Total ${formatPrice(state.totalCents)}", style = MaterialTheme.typography.titleMedium)
+                Button(
+                    onClick = { vm.send(BasketViewModel.Action.PlaceOrder) },
+                    enabled = !state.placing,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                ) { Text("Place order") }
+            }
         }
     }
 }

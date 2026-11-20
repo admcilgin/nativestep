@@ -184,7 +184,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `basket` cp2 (bir ekle, bir çıkar) kapandı; 9/12 checkpoint.
 
-Sıradaki adım: `basket` cp3 (sipariş verme ve "Order placed" diyaloğu).
+`basket` cp3 (sipariş verme, "Order placed" diyaloğu, sepet boşalır) kapandı; 10/12 checkpoint. G3'te eski bir görünüm hatası bulundu: Android'de durum çubuğu simgeleri açık zeminde açık renk. Bu, step-fix'in ilk gerçek vakası.
+
+Sıradaki adım: Android durum çubuğu düzeltmesi (step-fix), sonra `basket` cp4 (sipariş hataları ve "placing" durumu).
 
 ## M7 · Pilot göç
 

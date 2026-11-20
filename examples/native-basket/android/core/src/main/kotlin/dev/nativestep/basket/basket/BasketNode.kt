@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
-/** `addOne` and `removeOne` for the lines on screen; nothing on an empty basket. */
+/** `addOne` and `removeOne` for the lines on screen, `placeOrder` unless one is being placed; nothing on an empty basket. */
 class BasketNode(val vm: BasketViewModel) : IntrospectionNode {
     override val name = "Basket"
     override fun state(): JsonElement = NodeJson.encodeToJsonElement(vm.state.value)
@@ -20,7 +20,7 @@ class BasketNode(val vm: BasketViewModel) : IntrospectionNode {
             return listOf(
                 NodeAction("addOne", "Add one", LineInput.serializer(), line) { vm.send(BasketViewModel.Action.AddOne(it.productId)) },
                 NodeAction("removeOne", "Remove one", LineInput.serializer(), line) { vm.send(BasketViewModel.Action.RemoveOne(it.productId)) },
-            )
+            ) + if (vm.state.value.placing) emptyList() else listOf(NodeAction("placeOrder", "Place order") { vm.send(BasketViewModel.Action.PlaceOrder) })
         }
 }
 

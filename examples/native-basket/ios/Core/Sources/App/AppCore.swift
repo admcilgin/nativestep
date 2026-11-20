@@ -6,10 +6,12 @@ import Observation
 public struct Services {
     public var auth: any AuthService
     public var products: any ProductService
+    public var orders: any OrderService
 
-    public init(auth: any AuthService, products: any ProductService) {
+    public init(auth: any AuthService, products: any ProductService, orders: any OrderService) {
         self.auth = auth
         self.products = products
+        self.orders = orders
     }
 }
 
@@ -25,10 +27,13 @@ public protocol Router: AnyObject {
     func go(_ route: Route)
     /// Catalog hands a product to the basket through the shell, so catalog does not depend on basket.
     func addToBasket(_ product: Product)
+    /// Shows the "Order placed" dialog over the tabs.
+    func orderPlaced(id: String)
 }
 
 /// The single entry point (R3): `AppCore(services:)` builds everything and is the root node.
-/// App → Login while signed out; App → Modal → Tabs → { products: Stack → ProductList, basket: Basket } signed in.
+/// App → Login while signed out; App → Modal → Tabs → { products: Stack → ProductList, basket: Basket } signed in,
+/// with OrderPlaced presented on the Modal after an order.
 @MainActor @Observable
 public final class AppCore: Router, IntrospectionNodeProviding {
     public private(set) var user: User?
@@ -41,7 +46,7 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     /// providers do (profile: Caching): signing in again shows them without fetching again.
     private var details: [String: ProductDetailViewModel] = [:]
     private var productList: ProductListViewModel?
-    private let basket = BasketViewModel()
+    @ObservationIgnored private lazy var basket = BasketViewModel(orders: services.orders, router: self)
 
     public init(services: Services) {
         self.services = services
@@ -75,6 +80,10 @@ public final class AppCore: Router, IntrospectionNodeProviding {
 
     public func addToBasket(_ product: Product) {
         basket.send(.add(productId: product.id, name: product.name, priceCents: product.priceCents))
+    }
+
+    public func orderPlaced(id: String) {
+        modal.present(OrderPlacedViewModel(orderId: id))
     }
 
     public var introspectionNode: IntrospectionNode {

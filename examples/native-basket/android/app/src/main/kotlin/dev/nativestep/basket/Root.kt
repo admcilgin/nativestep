@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,6 +21,7 @@ import dev.nativestep.basket.app.AppCore
 import dev.nativestep.basket.auth.LoginScreen
 import dev.nativestep.basket.basket.BasketNode
 import dev.nativestep.basket.basket.BasketScreen
+import dev.nativestep.basket.basket.OrderPlacedNode
 import dev.nativestep.basket.catalog.ProductDetailNode
 import dev.nativestep.basket.catalog.ProductDetailScreen
 import dev.nativestep.basket.catalog.ProductListNode
@@ -35,6 +38,7 @@ fun Root(cores: StateFlow<AppCore?>) {
     if (user == null) return LoginScreen(login.vm)
     val tabs by core.tabs.tabs.collectAsState()
     val selected by core.tabs.selected.collectAsState()
+    val presented by core.modal.presented.collectAsState()
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -56,6 +60,15 @@ fun Root(cores: StateFlow<AppCore?>) {
                 else -> {}
             }
         }
+    }
+    (presented as? OrderPlacedNode)?.let { node ->
+        val state by node.vm.state.collectAsState()
+        AlertDialog(
+            onDismissRequest = core.modal::dismiss,
+            title = { Text("Order placed") },
+            text = { Text("Your order ${state.orderId} is on its way.") },
+            confirmButton = { TextButton(onClick = core.modal::dismiss) { Text("OK") } },
+        )
     }
 }
 

@@ -6,6 +6,9 @@ import dev.nativestep.basket.auth.LoginViewModel
 import dev.nativestep.basket.auth.User
 import dev.nativestep.basket.basket.BasketNode
 import dev.nativestep.basket.basket.BasketViewModel
+import dev.nativestep.basket.basket.OrderPlacedNode
+import dev.nativestep.basket.basket.OrderPlacedViewModel
+import dev.nativestep.basket.basket.OrderService
 import dev.nativestep.basket.catalog.Product
 import dev.nativestep.basket.catalog.ProductDetailNode
 import dev.nativestep.basket.catalog.ProductDetailViewModel
@@ -25,7 +28,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 /** Every external dependency of Core (R4). Mobile passes real implementations, Host fixture ones. */
-class Services(val auth: AuthService, val products: ProductService)
+class Services(val auth: AuthService, val products: ProductService, val orders: OrderService)
 
 sealed interface Route {
     data class Product(val id: String) : Route
@@ -39,11 +42,15 @@ interface Router {
 
     /** Catalog hands a product to the basket through the shell, so catalog does not depend on basket. */
     fun addToBasket(product: Product)
+
+    /** Shows the "Order placed" dialog over the tabs. */
+    fun orderPlaced(id: String)
 }
 
 /**
  * The single entry point (R3): builds everything and is the root node. Effects run in [scope].
- * App → Login while signed out; App → Modal → Tabs → { products: Stack → ProductList, basket: Basket } signed in.
+ * App → Login while signed out; App → Modal → Tabs → { products: Stack → ProductList, basket: Basket } signed in,
+ * with OrderPlaced presented on the Modal after an order.
  */
 class AppCore(private val services: Services, private val scope: CoroutineScope) : IntrospectionNode, Router {
     private val _user = MutableStateFlow<User?>(null)
@@ -59,7 +66,7 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
      */
     private val details = mutableMapOf<String, ProductDetailNode>()
     private val productList by lazy { ProductListNode(ProductListViewModel(services.products, this, EffectRunner(scope))) }
-    private val basket = BasketNode(BasketViewModel())
+    private val basket = BasketNode(BasketViewModel(services.orders, this, EffectRunner(scope)))
     val modal = ModalNavigator(base = tabs)
 
     override fun signedIn(user: User) {
@@ -87,6 +94,8 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
     override fun addToBasket(product: Product) {
         basket.vm.send(BasketViewModel.Action.Add(product.id, product.name, product.priceCents))
     }
+
+    override fun orderPlaced(id: String) = modal.present(OrderPlacedNode(OrderPlacedViewModel(id)))
 
     override val name = "App"
     override fun state(): JsonElement = JsonObject(emptyMap())

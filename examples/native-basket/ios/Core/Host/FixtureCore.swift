@@ -18,7 +18,7 @@ public func hostRoot(_ fixtures: FixtureStore, route: String?) throws -> any Int
 @MainActor
 public func fixtureCore(_ fixtures: FixtureStore, route: String?) throws -> AppCore {
     if let route { throw ProtocolError("bad_request", "Basket has no deep links; got \(route)") }
-    return AppCore(services: Services(auth: FixtureAuthService(fixtures: fixtures), products: FixtureProductService(fixtures: fixtures)))
+    return AppCore(services: Services(auth: FixtureAuthService(fixtures: fixtures), products: FixtureProductService(fixtures: fixtures), orders: FixtureOrderService(fixtures: fixtures)))
 }
 
 struct FixtureSampleService: SampleService {
@@ -46,5 +46,14 @@ struct FixtureProductService: ProductService {
 
     func detail(id: String) async -> Result<Product, AppError> {
         await fixtures.call("ProductService", "detail", ["id": .string(id)])
+    }
+}
+
+struct FixtureOrderService: OrderService {
+    let fixtures: FixtureStore
+
+    func place(items: [OrderItem]) async -> Result<PlacedOrder, AppError> {
+        let items: [JSONValue] = items.map { .object(["productId": .string($0.productId), "quantity": .int($0.quantity)]) }
+        return await fixtures.call("OrderService", "place", ["items": .array(items)])
     }
 }

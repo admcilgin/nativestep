@@ -10,6 +10,13 @@ struct RootView: View {
         Binding(get: { core.tabs.selected }, set: { core.tabs.select($0) })
     }
 
+    /// The "Order placed" dialog, while the modal presents it; closing it dismisses the modal.
+    private var orderPlaced: OrderPlacedViewModel? { core.modal.presented as? OrderPlacedViewModel }
+
+    private var showsOrderPlaced: Binding<Bool> {
+        Binding(get: { orderPlaced != nil }, set: { if !$0 { core.modal.dismiss() } })
+    }
+
     var body: some View {
         if core.user == nil, let login = core.login {
             LoginView(vm: login)
@@ -23,6 +30,11 @@ struct RootView: View {
                         }
                         .tag(tab.id)
                 }
+            }
+            .alert("Order placed", isPresented: showsOrderPlaced, presenting: orderPlaced) { _ in
+                Button("OK") {}
+            } message: { vm in
+                Text("Your order \(vm.state.orderId) is on its way.")
             }
         }
     }
