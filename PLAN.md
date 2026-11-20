@@ -143,6 +143,8 @@ Sonraya kalanlar:
 - Bir hata `step-fix` ile önce kırmızı bir testle yakalanıyor ve iki platformda düzeltiliyor.
 - `flutter` hedefi olmadan, dokümandan yeni bir feature iki platformda paralel geliştiriliyor.
 
+**Ara durum (2026-11-20):** `step-test` yazıldı ve Basket'te koşuldu. `foundation` cp1 ile `auth` cp1–cp2 için 8 test ve fixture'ları (`spec/tests/{foundation,auth}/`, `spec/fixtures/{auth,catalog}/`) G0'da, yani Flutter referansında yeşil. Native taraf henüz yok; sıradaki adım `step-screen` ve bu checkpoint'lerin iOS ve Android'de G1'den geçmesi.
+
 ## M7 · Pilot göç
 
 - `examples/flutter-riverpod`'un tamamı ve ikinci uygulamanın 2–3 feature'ı taşınır.
