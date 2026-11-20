@@ -164,7 +164,7 @@ Acceptance: a freshly created project passes `nativestep lint` cleanly and `nati
 
 ## 7. Skills
 
-The agent's method. Each skill is a `skills/<name>/SKILL.md` file, plus `references/` files where needed. The toolkit ships as a Claude Code plugin.
+The agent's method. Each skill is a `skills/<name>/SKILL.md` file, plus `references/` files where needed. The toolkit ships as a Claude Code plugin: `.claude-plugin/plugin.json` at the repo root, which is also its own marketplace (`.claude-plugin/marketplace.json`); the plugin's skills are `skills/`.
 
 Writing rules:
 

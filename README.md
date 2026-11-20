@@ -39,7 +39,18 @@ nativestep/
 
 ## Status
 
-M4 is done: `nativestep lint` checks the architecture rules on both platforms, `nativestep scan` reads a Flutter project, and `nativestep status` reports progress. `nativestep init` (M3) creates a project that builds on iOS and Android, passes lint and the 15 conformance tests; the interactive CLI (`session`, `ls`, `do`, `shot`) works on all three targets. Next is M5: the migration skills and sample apps ([PLAN.md](PLAN.md)).
+Two apps were migrated autonomously with the skills: Basket (12/12 checkpoints) and a movie tracker (13/13), each passing the same tests on Flutter, iOS and Android. M6 and M7 still wait for a run with an engineer (approvals, and a second independent architecture review). M8, packaging, is in progress: `nativestep kits update` and the Claude Code plugin are done ([PLAN.md](PLAN.md)).
+
+## Install the skills
+
+The repo is a Claude Code plugin and its own marketplace. In Claude Code:
+
+```
+/plugin marketplace add admcilgin/nativestep
+/plugin install nativestep@nativestep
+```
+
+The skills call the `nativestep` CLI; until M8's binaries, run it from a checkout with `bun cli/src/main.ts`.
 
 ```bash
 NS=$PWD

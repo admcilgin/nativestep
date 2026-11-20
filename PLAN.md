@@ -263,6 +263,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 - İlerleme: `nativestep kits update [--dry-run]` geldi. Repo'nun kit sürümü `kits/VERSION`'da (0.2.0: tamsayı şemalarında `oneOf`); `init` bunu `nativestep.json`'a yazar, `kits update` kopyayı repo'yla eşitler, build çıktısına dokunmaz, sürümü ilerletir. movie-tracker 0.1.0'dan 0.2.0'a geçti (dosyalar zaten aynıydı). Basket'in `kits/`'i repo'ya symlink; komut onu reddeder.
 
+- İlerleme: Claude Code plugin'i geldi. Repo kökündeki `.claude-plugin/plugin.json` ve aynı yerde `marketplace.json` (repo kendi marketplace'i); `claude plugin validate` iki dosyayı da geçiriyor, `claude --plugin-dir .` dokuz skill'i yüklüyor (her oturuma ~935 token). Açık karar: lisans. Repo'da LICENSE yok; plugin dizinine göndermek için gerekiyor, seçimi mühendisin.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

@@ -1,0 +1,16 @@
+{
+  "name": "nativestep",
+  "owner": {
+    "name": "admcilgin"
+  },
+  "metadata": {
+    "description": "The nativestep toolkit for Claude Code: skills for migrating Flutter apps to native iOS and Android."
+  },
+  "plugins": [
+    {
+      "name": "nativestep",
+      "source": "./",
+      "description": "The nativestep skills: adopt a Flutter repo, plan features, and migrate them checkpoint by checkpoint."
+    }
+  ]
+}
