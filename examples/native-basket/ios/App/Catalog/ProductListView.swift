@@ -12,6 +12,8 @@ struct ProductListView: View {
                 Text(errorMessage(error))
             } else if vm.state.products.isEmpty {
                 Text("No products yet.")
+                    .padding(24)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             } else {
                 List(vm.state.products, id: \.id) { product in
                     VStack(alignment: .leading) {

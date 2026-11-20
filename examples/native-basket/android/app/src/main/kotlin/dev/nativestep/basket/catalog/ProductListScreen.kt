@@ -1,6 +1,8 @@
 package dev.nativestep.basket.catalog
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,7 +40,7 @@ private fun ProductListContent(state: ProductListViewModel.State, error: AppErro
         state.loading && state.products.isEmpty() ->
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         error != null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(errorMessage(error)) }
-        state.products.isEmpty() -> Text("No products yet.")
+        state.products.isEmpty() -> Text("No products yet.", Modifier.padding(24.dp))
         else -> LazyColumn {
             items(state.products, key = { it.id }) { product ->
                 ListItem(headlineContent = { Text(product.name) }, supportingContent = { Text(formatPrice(product.priceCents)) })

@@ -170,7 +170,9 @@ Açık işler:
 
 Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `nativestep shot`'a `--no-wait` eklendi: uçuştaki çağrıları beklemiyor ve 200 ms bekleyip çekiyor. Login'in loading durumu üç hedefte de çekildi; Android'deki spinner boyutu referansa uyduruldu.
 
-Sıradaki adımlar: `catalog` cp1 ve `step-fix`.
+`catalog` cp1 de kapandı: 3 yeni test, G3'te iki minor düzeltme yapıldı, kanıtı `spec/evidence/catalog-cp1/` altında. `nativestep status` 4/12 checkpoint gösteriyor.
+
+Sıradaki adımlar: `catalog` cp2 (hata, retry, refresh) ve `step-fix`.
 
 ## M7 · Pilot göç
 

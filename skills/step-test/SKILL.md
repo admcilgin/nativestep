@@ -32,6 +32,8 @@ Write down, before any code, what a user can observe in this checkpoint. Each it
 - One `test` per behavior, named for the behavior: `"a wrong password shows the error and keeps the form"`, not `"signIn test 2"`.
 - Each test starts its own `session`. Reach the screen under test through the app's own actions, from the start the user has: tests are flows, not unit tests of a node.
 - Wait for state with predicates (`precondition`, the third argument of `do`). Never sleep, and never assert on a state you did not wait for.
+- `do` without a predicate waits until no call is in flight, including calls the next screen starts. To see a loading state after navigation, give `do` a predicate that only that screen's loading state matches.
+- A loading state that G3 should see needs a test that ends while the call is in flight (a fixture with `delayMs`, shot with `nativestep shot --no-wait`).
 - Check the path when navigation is the behavior (`expect(app.path).toEqual([...])`). Check `unavailable` when the behavior is that something cannot be done.
 - Assert on the fields the behavior is about, not on whole states: a test of the error must not break when a new field is added.
 - Use the node and action names from the profile's node tree, or from Core after the migration. A name the reference does not have is a missing node, not a test to rewrite.
