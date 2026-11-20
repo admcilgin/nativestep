@@ -8,4 +8,5 @@ data class Product(val id: String, val name: String, val priceCents: Int, val de
 /** Names and parameters match the fixtures and the iOS service exactly (R5). */
 interface ProductService {
     suspend fun list(): Result<List<Product>>
+    suspend fun detail(id: String): Result<Product>
 }

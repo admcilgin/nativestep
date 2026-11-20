@@ -18,6 +18,7 @@ public final class ProductListViewModel {
 
     public enum Action: Equatable, Sendable {
         case load, refresh, retry
+        case openProduct(id: String)
     }
 
     enum Message: Sendable {
@@ -30,9 +31,11 @@ public final class ProductListViewModel {
     public private(set) var listShown = false
     @ObservationIgnored let effects = EffectRunner()
     private let products: any ProductService
+    private unowned let router: any Router
 
-    public init(products: any ProductService) {
+    public init(products: any ProductService, router: any Router) {
         self.products = products
+        self.router = router
         send(.load)
     }
 
@@ -47,6 +50,9 @@ public final class ProductListViewModel {
     /// State changes only here (R8).
     private func update(_ message: Message) -> [Effect<Message>] {
         switch message {
+        case .action(.openProduct(let id)):
+            router.go(.product(id: id))
+            return []
         case .action:
             // load (on creation), refresh (list shown, keeps it) and retry (after an error) all reload.
             guard !state.loading else { return [] }

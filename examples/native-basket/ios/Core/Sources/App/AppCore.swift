@@ -13,10 +13,15 @@ public struct Services {
     }
 }
 
+public enum Route: Equatable, Sendable {
+    case product(id: String)
+}
+
 /// What screens ask of the shell. Signing in changes the session, so it is a call rather than a route.
 @MainActor
 public protocol Router: AnyObject {
     func signedIn(_ user: User)
+    func go(_ route: Route)
 }
 
 /// The single entry point (R3): `AppCore(services:)` builds everything and is the root node.
@@ -26,9 +31,11 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     public private(set) var user: User?
     public private(set) var login: LoginViewModel?
     public let modal: ModalNavigator
-    public let tabs = TabNavigator()
+    public let tabs = TabNavigator(popsToRootOnReselect: true)
     public let products = StackNavigator()
     private let services: Services
+    /// One detail per product for the session: reopening shows it without fetching again (profile: Caching).
+    private var details: [String: ProductDetailViewModel] = [:]
 
     public init(services: Services) {
         self.services = services
@@ -39,8 +46,17 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     public func signedIn(_ user: User) {
         self.user = user
         login = nil
-        products.reset(to: [ProductListViewModel(products: services.products)])
+        products.reset(to: [ProductListViewModel(products: services.products, router: self)])
         tabs.reset(to: [("products", products), ("basket", BasketViewModel())])
+    }
+
+    public func go(_ route: Route) {
+        switch route {
+        case .product(let id):
+            let detail = details[id] ?? ProductDetailViewModel(id: id, products: services.products)
+            details[id] = detail
+            products.push(detail)
+        }
     }
 
     public var introspectionNode: IntrospectionNode {

@@ -62,6 +62,8 @@ struct StackView: View {
         let screen = stack.screens.indices.contains(index) ? stack.screens[index] : nil
         if let vm = screen as? ProductListViewModel {
             ProductListView(vm: vm)
+        } else if let vm = screen as? ProductDetailViewModel {
+            ProductDetailView(vm: vm)
         }
     }
 }

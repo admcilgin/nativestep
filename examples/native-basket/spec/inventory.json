@@ -280,7 +280,7 @@
         "lib/products/product_detail_screen.dart",
         "lib/products/product_repository.dart"
       ],
-      "status": "pending"
+      "status": "in_progress"
     },
     {
       "name": "Basket",
@@ -353,7 +353,7 @@
         {
           "id": "cp3",
           "title": "Product detail from the list, back, and its not-found error",
-          "status": "planned"
+          "status": "done"
         },
         {
           "id": "cp4",

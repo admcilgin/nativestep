@@ -19,6 +19,8 @@ import dev.nativestep.basket.app.AppCore
 import dev.nativestep.basket.auth.LoginScreen
 import dev.nativestep.basket.basket.BasketNode
 import dev.nativestep.basket.basket.BasketScreen
+import dev.nativestep.basket.catalog.ProductDetailNode
+import dev.nativestep.basket.catalog.ProductDetailScreen
 import dev.nativestep.basket.catalog.ProductListNode
 import dev.nativestep.basket.catalog.ProductListScreen
 import dev.nativestep.kit.StackNavigator
@@ -62,6 +64,7 @@ fun StackContent(stack: StackNavigator) {
     BackHandler(enabled = screens.size > 1) { stack.goBack() }
     when (val top = screens.lastOrNull()) {
         is ProductListNode -> ProductListScreen(top.vm)
+        is ProductDetailNode -> ProductDetailScreen(top.vm, onBack = stack::goBack)
         else -> {}
     }
 }

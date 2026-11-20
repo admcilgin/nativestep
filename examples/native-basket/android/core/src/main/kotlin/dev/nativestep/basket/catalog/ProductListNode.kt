@@ -1,8 +1,10 @@
 package dev.nativestep.basket.catalog
 
+import dev.nativestep.kit.InputSchema
 import dev.nativestep.kit.IntrospectionNode
 import dev.nativestep.kit.NodeAction
 import dev.nativestep.kit.NodeJson
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
@@ -15,9 +17,18 @@ class ProductListNode(val vm: ProductListViewModel) : IntrospectionNode {
         get() {
             val s = vm.state.value
             return when {
-                vm.listShown -> listOf(NodeAction("refresh", "Refresh") { vm.send(ProductListViewModel.Action.Refresh) })
+                vm.listShown -> {
+                    val ids = s.products.map { it.id }
+                    val open = NodeAction("openProduct", "Open product", OpenProductInput.serializer(),
+                        InputSchema.obj("id" to InputSchema.string(oneOf = ids))) { vm.send(ProductListViewModel.Action.OpenProduct(it.id)) }
+                    (if (ids.isEmpty()) emptyList() else listOf(open)) +
+                        NodeAction("refresh", "Refresh") { vm.send(ProductListViewModel.Action.Refresh) }
+                }
                 s.error != null && !s.loading -> listOf(NodeAction("retry", "Retry") { vm.send(ProductListViewModel.Action.Retry) })
                 else -> emptyList()
             }
         }
 }
+
+@Serializable
+data class OpenProductInput(val id: String)

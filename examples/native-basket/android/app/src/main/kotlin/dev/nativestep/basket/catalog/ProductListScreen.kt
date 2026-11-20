@@ -1,5 +1,6 @@
 package dev.nativestep.basket.catalog
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
@@ -41,7 +45,12 @@ fun ProductListScreen(vm: ProductListViewModel) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     if (state.products.isEmpty()) item { Text("No products yet.", Modifier.padding(24.dp)) }
                     items(state.products, key = { it.id }) { product ->
-                        ListItem(headlineContent = { Text(product.name) }, supportingContent = { Text(formatPrice(product.priceCents)) })
+                        ListItem(
+                            headlineContent = { Text(product.name) },
+                            supportingContent = { Text(formatPrice(product.priceCents)) },
+                            trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null) },
+                            modifier = Modifier.clickable { vm.send(ProductListViewModel.Action.OpenProduct(product.id)) },
+                        )
                     }
                 }
             }

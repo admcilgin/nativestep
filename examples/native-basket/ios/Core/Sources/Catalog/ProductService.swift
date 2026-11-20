@@ -10,4 +10,5 @@ public struct Product: Codable, Equatable, Sendable {
 /// Names and parameters match the fixtures and the Android service exactly (R5).
 public protocol ProductService: Sendable {
     func list() async -> Result<[Product], AppError>
+    func detail(id: String) async -> Result<Product, AppError>
 }

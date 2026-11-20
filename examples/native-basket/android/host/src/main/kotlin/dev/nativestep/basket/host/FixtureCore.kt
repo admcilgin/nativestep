@@ -41,4 +41,5 @@ class FixtureAuthService(private val fixtures: FixtureStore) : AuthService {
 
 class FixtureProductService(private val fixtures: FixtureStore) : ProductService {
     override suspend fun list(): Result<List<Product>> = fixtures.call("ProductService", "list")
+    override suspend fun detail(id: String): Result<Product> = fixtures.call("ProductService", "detail", "id" to JsonPrimitive(id))
 }

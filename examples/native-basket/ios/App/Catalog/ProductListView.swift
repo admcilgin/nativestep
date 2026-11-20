@@ -15,10 +15,19 @@ struct ProductListView: View {
                 .refreshable { await refresh() }
             } else if vm.listShown {
                 List(vm.state.products, id: \.id) { product in
-                    VStack(alignment: .leading) {
-                        Text(product.name)
-                        Text(formatPrice(product.priceCents)).foregroundStyle(.secondary)
+                    // A button, not a NavigationLink: the push happens in Core (R14); the chevron is drawn here.
+                    Button { vm.send(.openProduct(id: product.id)) } label: {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(product.name)
+                                Text(formatPrice(product.priceCents)).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                        }
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                 }
                 .refreshable { await refresh() }
             } else if let error = vm.state.error, !vm.state.loading {

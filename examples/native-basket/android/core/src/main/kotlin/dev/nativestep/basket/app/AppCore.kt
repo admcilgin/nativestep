@@ -6,6 +6,8 @@ import dev.nativestep.basket.auth.LoginViewModel
 import dev.nativestep.basket.auth.User
 import dev.nativestep.basket.basket.BasketNode
 import dev.nativestep.basket.basket.BasketViewModel
+import dev.nativestep.basket.catalog.ProductDetailNode
+import dev.nativestep.basket.catalog.ProductDetailViewModel
 import dev.nativestep.basket.catalog.ProductListNode
 import dev.nativestep.basket.catalog.ProductListViewModel
 import dev.nativestep.basket.catalog.ProductService
@@ -24,9 +26,14 @@ import kotlinx.serialization.json.JsonObject
 /** Every external dependency of Core (R4). Mobile passes real implementations, Host fixture ones. */
 class Services(val auth: AuthService, val products: ProductService)
 
+sealed interface Route {
+    data class Product(val id: String) : Route
+}
+
 /** What screens ask of the shell. Signing in changes the session, so it is a call rather than a route. */
-fun interface Router {
+interface Router {
     fun signedIn(user: User)
+    fun go(route: Route)
 }
 
 /**
@@ -38,13 +45,24 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
     val user: StateFlow<User?> = _user.asStateFlow()
     val login = LoginNode(LoginViewModel(services.auth, this, EffectRunner(scope)))
     val products = StackNavigator()
-    val tabs = TabNavigator()
+    val tabs = TabNavigator(popsToRootOnReselect = true)
+
+    /** One detail per product for the session: reopening shows it without fetching again (profile: Caching). */
+    private val details = mutableMapOf<String, ProductDetailNode>()
     val modal = ModalNavigator(base = tabs)
 
     override fun signedIn(user: User) {
-        products.reset(listOf(ProductListNode(ProductListViewModel(services.products, EffectRunner(scope)))))
+        products.reset(listOf(ProductListNode(ProductListViewModel(services.products, this, EffectRunner(scope)))))
         tabs.reset(listOf("products" to products, "basket" to BasketNode(BasketViewModel())))
         _user.value = user
+    }
+
+    override fun go(route: Route) {
+        when (route) {
+            is Route.Product -> products.push(
+                details.getOrPut(route.id) { ProductDetailNode(ProductDetailViewModel(route.id, services.products, EffectRunner(scope))) },
+            )
+        }
     }
 
     override val name = "App"

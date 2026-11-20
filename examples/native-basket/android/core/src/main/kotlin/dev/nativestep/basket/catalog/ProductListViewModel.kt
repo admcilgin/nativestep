@@ -1,5 +1,7 @@
 package dev.nativestep.basket.catalog
 
+import dev.nativestep.basket.app.Route
+import dev.nativestep.basket.app.Router
 import dev.nativestep.kit.AppError
 import dev.nativestep.kit.Effect
 import dev.nativestep.kit.EffectRunner
@@ -12,6 +14,7 @@ import kotlinx.serialization.Serializable
 /** The products tab's first screen. It loads the list as soon as it exists, as the reference does when it is shown. */
 class ProductListViewModel(
     private val products: ProductService,
+    private val router: Router,
     internal val effects: EffectRunner,
 ) {
     @Serializable
@@ -28,6 +31,7 @@ class ProductListViewModel(
         data object Load : Action
         data object Refresh : Action
         data object Retry : Action
+        data class OpenProduct(val id: String) : Action
     }
 
     private sealed interface Message {
@@ -54,12 +58,18 @@ class ProductListViewModel(
 
     /** State changes only here (R8). */
     private fun update(message: Message): List<Effect<Message>> = when (message) {
-        // Load (on creation), Refresh (list shown, keeps it) and Retry (after an error) all reload.
-        is Message.Act ->
+        is Message.Act -> when (val action = message.action) {
+            is Action.OpenProduct -> {
+                router.go(Route.Product(action.id))
+                emptyList()
+            }
+            // Load (on creation), Refresh (list shown, keeps it) and Retry (after an error) all reload.
+            else ->
                 if (_state.value.loading) emptyList() else {
                     _state.update { it.copy(loading = true, error = null) }
                     listOf(suspend { Message.Loaded(products.list()) })
                 }
+        }
         is Message.Loaded -> {
             message.result
                 .onSuccess { list ->

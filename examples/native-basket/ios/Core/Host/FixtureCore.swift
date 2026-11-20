@@ -43,4 +43,8 @@ struct FixtureProductService: ProductService {
     func list() async -> Result<[Product], AppError> {
         await fixtures.call("ProductService", "list")
     }
+
+    func detail(id: String) async -> Result<Product, AppError> {
+        await fixtures.call("ProductService", "detail", ["id": .string(id)])
+    }
 }

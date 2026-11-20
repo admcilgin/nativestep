@@ -176,7 +176,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `step-fix` yazıldı: hata önce protokol üzerinden yeniden üretiliyor ve türü belirleniyor (davranış, yalnızca view, gerçek servis ya da hata değil). Davranış hatası, onu gösteren kırmızı bir testle yakalanıyor. Düzeltme iki platformda yapılıyor, ardından gate'ler koşuluyor. "Bitti" maddesi için gerçek bir hata gerekiyor; uydurma bir hatayla koşulmayacak.
 
-Sıradaki adım: `catalog` cp3 (ürün detayı).
+`catalog` cp3 (ürün detayı, geri, not_found, sekme hafızası) kapandı; `nativestep status` 6/12 checkpoint gösteriyor. İki kit'e de `TabNavigator(popsToRootOnReselect:)` eklendi; varsayılanı kapalı.
+
+Sıradaki adım: `catalog` cp4 (çıkış). `spec/memory.md`'deki Login ViewModel notu bu checkpoint'te uygulanacak.
 
 ## M7 · Pilot göç
 
