@@ -55,6 +55,10 @@ function connection(): Promise<Connection> {
     const hello = await conn.request("hello", { protocol: PROTOCOL_VERSION });
     if (!hello.ok) throw new NativeStepError(hello.error);
     if (!hello.capabilities?.includes("start")) throw new Error(`target ${hello.target} cannot start fixture sessions`);
+    // A device port answers for whichever debug app holds it; another project's app there fails every test late.
+    if (env.NATIVESTEP_APP && hello.app !== env.NATIVESTEP_APP) {
+      throw new Error(`connected to app "${hello.app}", expected "${env.NATIVESTEP_APP}": another nativestep app holds ${env.NATIVESTEP_CONNECT ?? "the port"}; stop it and run again`);
+    }
     return conn;
   })();
   return shared;

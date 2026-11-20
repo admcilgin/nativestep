@@ -97,6 +97,7 @@ export function targetEnv(project: Project, name: string, mode: Mode): Record<st
     NATIVESTEP_TARGET: name,
     NATIVESTEP_ROOT: project.root,
     NATIVESTEP_FIXTURES: project.fixturesDir,
+    NATIVESTEP_APP: project.config.app.name,
     ...(mode === "headless" ? { NATIVESTEP_HEADLESS: t.headless! } : { NATIVESTEP_CONNECT: t.device!.connect! }),
   };
 }

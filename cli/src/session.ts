@@ -139,6 +139,9 @@ export async function daemon(name: string, mode: string): Promise<void> {
   const conn = mode === "headless" ? Connection.spawn(t.headless!, project.root) : await Connection.tcp(t.device!.connect!);
   const hello = await conn.request("hello", { protocol: PROTOCOL_VERSION });
   if (!hello.ok) throw new Error(`hello failed: ${JSON.stringify(hello.error)}`);
+  if (hello.app !== project.config.app.name) {
+    throw new Error(`connected to app "${hello.app}", expected "${project.config.app.name}": another nativestep app holds the port; stop it`);
+  }
   console.log(`connected to ${name} (${mode}): ${JSON.stringify(hello)}`);
 
   const path = socketPath(project, name);

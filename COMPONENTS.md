@@ -82,7 +82,7 @@ test("decrement does nothing when stock is zero", async () => {
 - On timeout, the error message includes the last node and path.
 - The target comes from the `NATIVESTEP_TARGET` environment variable, which `nativestep test` sets for each target. One host process per target stays up for the whole test run, and each `session` sends a new `start`.
 - `network_blocked` and `fixture_missing` fail the test with a clear message.
-- On a device target the SDK connects to `device.connect` and retries until a `hello` gets an answer, for up to `NATIVESTEP_CONNECT_TIMEOUT_MS` (20 s by default). A port forwarder such as `adb forward` accepts connections before the app listens, so only an answer counts.
+- On a device target the SDK connects to `device.connect` and retries until a `hello` gets an answer, for up to `NATIVESTEP_CONNECT_TIMEOUT_MS` (20 s by default). A port forwarder such as `adb forward` accepts connections before the app listens, so only an answer counts. The answer's `app` must be `app.name` from `nativestep.json` (`NATIVESTEP_APP`): another project's debug app still holding the port fails the run at once, with its name, instead of every test timing out.
 
 ## 3. NativeStepKit (iOS)
 
