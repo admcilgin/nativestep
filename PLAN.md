@@ -242,7 +242,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - movies cp1 bitti: trend filmler açılışta yükleniyor, ızgara ve yükleniyor durumu (kanıt `spec/evidence/movies-cp1/`).
 - Bulunan hata: `nativestep test a/ b/` yalnızca ilk filtreyi koşuyor ve geçti diyordu (`6bd8873`). auth'un cihaz koşuları yeniden yapıldı, 16/16.
 - movies cp2 bitti: sayfalama, boş sayfada durma; görünümler yalnızca kaydırınca istiyor (kaynak gibi).
-- Kalan: movies cp3–cp6 ve watchlist; mühendisli bir koşu.
+- movies cp3 bitti: arama, boş sonuç ve yeniden deneme, eski yanıtların atılması.
+- Kalan: movies cp4–cp6 ve watchlist; mühendisli bir koşu.
 
 ## M8 · Paketleme
 
