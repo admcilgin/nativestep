@@ -245,7 +245,7 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - movies cp3 bitti: arama, boş sonuç ve yeniden deneme, eski yanıtların atılması.
 - movies cp4 bitti: yükleme hataları ve yeniden deneme; ilk trend sayfasının çevrimdışı kopyası gerçek serviste, iki platformda birim testleriyle.
 - movies cp5 bitti: film ayrıntısı sekmelerin üstünde, geri dönüşte ızgara olduğu gibi.
-- Kit'te eksik: tamsayı şemasında izin verilen değerler (`enum`) yok; referans ekranda olmayan bir film kimliğine `invalid_input` diyor, native uygulamalar yok sayıyor.
+- Kit'te eksikti: tamsayı şemasında izin verilen değerler (`enum`) yoktu; referans ekranda olmayan bir film kimliğine `invalid_input` diyordu, native uygulamalar yok sayıyordu. Üç kit'e `integer(oneOf:)` eklendi; movie-tracker'ın node'ları ekrandaki kimlikleri yayımlıyor, iki yeni test üç hedefte geçiyor (cihazda 47/47).
 - movies cp6 bitti: sekmelerden çıkış girişe dönüyor; TMDB oturumu silinmeye çalışılıyor, yerel kimlik her durumda siliniyor. movies feature'ı tamam (6/6, cihazda 37/37).
 - watchlist cp1 bitti: film ayrıntısında listeye ekleme ve çıkarma; gerçek depolama iki platformda atomik yazılan bir JSON dosyası, birim testli (cihazda 41/41).
 - watchlist cp2 bitti: Listem sekmesi, en yeni üstte, açma ve çıkarma (cihazda 45/45).

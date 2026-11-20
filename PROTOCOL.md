@@ -107,7 +107,7 @@ Input is a JSON object, validated against the action's `input` schema. The schem
 | `type` | `object`, `string`, `integer`, `number`, `boolean`, `array` |
 | `properties`, `required` | for `object` |
 | `items` | for `array` |
-| `enum` | a list of fixed values |
+| `enum` | a list of fixed values, for `string` and `integer` |
 | `minimum`, `maximum` | for `integer` and `number` |
 | `minLength`, `maxLength` | for `string` |
 

@@ -36,7 +36,8 @@ class InputSchema {
       : this._('object', properties: properties, required: required);
   const InputSchema.string({int? minLength, int? maxLength, List<String>? oneOf})
       : this._('string', minLength: minLength, maxLength: maxLength, oneOf: oneOf);
-  const InputSchema.integer({int? minimum, int? maximum}) : this._('integer', minimum: minimum, maximum: maximum);
+  const InputSchema.integer({int? minimum, int? maximum, List<int>? oneOf})
+      : this._('integer', minimum: minimum, maximum: maximum, oneOf: oneOf);
   const InputSchema.number({num? minimum, num? maximum}) : this._('number', minimum: minimum, maximum: maximum);
   const InputSchema.boolean() : this._('boolean');
   const InputSchema.array(InputSchema items) : this._('array', items: items);
@@ -45,7 +46,8 @@ class InputSchema {
   final Map<String, InputSchema>? properties;
   final List<String>? required;
   final InputSchema? items;
-  final List<String>? oneOf;
+  /// `enum`: strings for a string schema, integers for an integer one.
+  final List<Object>? oneOf;
   final num? minimum;
   final num? maximum;
   final int? minLength;
@@ -92,6 +94,7 @@ class InputSchema {
         final n = value as num;
         if (minimum != null && n < minimum!) return fail('must be ≥ $minimum');
         if (maximum != null && n > maximum!) return fail('must be ≤ $maximum');
+        if (oneOf != null && !oneOf!.contains(n)) return fail('must be one of ${oneOf!.join(', ')}');
         return const [];
       case 'boolean':
         return value is bool ? const [] : fail('must be of type boolean');
