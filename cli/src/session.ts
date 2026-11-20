@@ -8,6 +8,7 @@ import { createInterface } from "node:readline";
 import { Connection, PROTOCOL_VERSION } from "../../kits/test-sdk/src/connection.ts";
 import { loadFixtures } from "../../kits/test-sdk/src/fixtures.ts";
 import { type Args, flag, loadProject, modeFor, prepare, type Project, target, UsageError } from "./config.ts";
+import { COMPILED } from "./init.ts";
 import { printResponse } from "./output.ts";
 
 const TIMEOUT_MS = Number(process.env.NATIVESTEP_TIMEOUT_MS ?? 3000);
@@ -75,7 +76,7 @@ export async function sessionStart(args: Args): Promise<number> {
     if (!prepare(project, name, mode)) return 1;
     mkdirSync(sessionsDir(project), { recursive: true });
     const log = join(sessionsDir(project), `${name}.log`);
-    const daemon = spawn(process.execPath, [Bun.main, "__session-daemon", name, mode], {
+    const daemon = spawn(process.execPath, [...(COMPILED ? [] : [Bun.main]), "__session-daemon", name, mode], {
       cwd: project.root,
       detached: true,
       stdio: ["ignore", openSync(log, "w"), openSync(log, "a")],

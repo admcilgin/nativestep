@@ -50,7 +50,7 @@ The repo is a Claude Code plugin and its own marketplace. In Claude Code:
 /plugin install nativestep@nativestep
 ```
 
-The skills call the `nativestep` CLI; until M8's binaries, run it from a checkout with `bun cli/src/main.ts`.
+The skills call the `nativestep` CLI. Build it for your machine with `bun cli/release.ts darwin-arm64` (or `darwin-x64`, `linux-x64`, `linux-arm64`), unpack `dist/nativestep-<target>.tar.gz` anywhere and put its `bin/` on `PATH`; it keeps `kits/` and `templates/` beside it. From a checkout, `bun cli/src/main.ts` does the same. Tests still need Bun.
 
 ```bash
 NS=$PWD

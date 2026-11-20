@@ -265,6 +265,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 - İlerleme: Claude Code plugin'i geldi. Repo kökündeki `.claude-plugin/plugin.json` ve aynı yerde `marketplace.json` (repo kendi marketplace'i); `claude plugin validate` iki dosyayı da geçiriyor, `claude --plugin-dir .` dokuz skill'i yüklüyor (her oturuma ~935 token). Açık karar: lisans. Repo'da LICENSE yok; plugin dizinine göndermek için gerekiyor, seçimi mühendisin.
 
+- İlerleme: binary'ler geldi. `bun cli/release.ts` her platform için `dist/nativestep-<target>.tar.gz` üretiyor: `bin/nativestep` (`bun build --compile`) ve yanında commit'li `kits/` ile `templates/`. Binary kit'leri ve şablonları kendi yanında arıyor; oturum daemon'u kendini binary olarak yeniden başlatıyor. darwin-arm64 arşivi repo dışında denendi: `init`, `kits update`, `lint`, `_sample` testleri (iOS ve Android 15/15), `session start/ls/stop`. `v*` etiketi CI'da arşivleri bir GitHub release'e ekliyor (`release.yml`); ilk etiketi atmak mühendisin işi. Release çıkınca şablondaki `parity.yml` CLI'yi checkout yerine release'ten alabilir.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

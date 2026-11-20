@@ -33,6 +33,8 @@ In v1 the kits are copied into the target project. The version of the copy is re
 
 The single command through which agents and engineers talk to the toolkit. It makes no assumptions about the source project: it knows only `nativestep.json`, the `spec/` files and the protocol. It contains no target-specific code; how to reach each target is written in `nativestep.json` (§8).
 
+It ships as one archive per platform (`darwin-arm64`, `darwin-x64`, `linux-x64`, `linux-arm64`): `bin/nativestep`, built with `bun build --compile`, and beside it the `kits/` and `templates/` that `init` and `kits update` copy. `bun cli/release.ts [target...]` builds them into `dist/` from the committed files; a `v*` tag builds them in CI and attaches them to a GitHub release. Running the tests still needs Bun, since `nativestep test` runs `bun test`.
+
 | Command | What it does |
 |---|---|
 | `nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]` | Sets up the native repo from the templates, copies the kits into `kits/`, writes `nativestep.json`. `--reference` adds the Flutter app as the `flutter` target. A non-empty directory needs `--force`, which writes over the template's files and deletes nothing. |

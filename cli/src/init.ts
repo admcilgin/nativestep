@@ -1,9 +1,12 @@
 // `nativestep init` (COMPONENTS.md §1, §6): fills the templates and copies the kits into a project.
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { type Args, flag, UsageError } from "./config.ts";
 
-export const REPO = resolve(import.meta.dir, "../..");
+/** A `bun build --compile` binary runs from Bun's virtual filesystem (macOS and Linux). */
+export const COMPILED = Bun.main.startsWith("/$bunfs/");
+// The release puts kits/ and templates/ beside bin/nativestep; from a checkout they are in the repo.
+export const REPO = COMPILED ? resolve(dirname(process.execPath), "..") : resolve(import.meta.dir, "../..");
 export const KITS = ["ios", "android", "flutter", "test-sdk"];
 // Build output and machine state never leave the nativestep repo.
 export const SKIP = new Set([".build", "build", ".gradle", ".kotlin", ".swiftpm", ".dart_tool", "node_modules", ".DS_Store", "local.properties"]);
