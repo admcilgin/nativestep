@@ -30,6 +30,8 @@ interface Run {
   bunArgs: string[];
   env?: Record<string, string>;
   report: string;
+  /** Why the target is not run; it counts as passed. */
+  skip?: string;
 }
 
 function runAll(project: Project, runs: Run[]): number {
@@ -37,6 +39,10 @@ function runAll(project: Project, runs: Run[]): number {
   const summary: string[] = [];
   let failed = false;
   for (const run of runs) {
+    if (run.skip) {
+      summary.push(`${run.name}: skipped (${run.skip})`);
+      continue;
+    }
     console.log(`\n── ${run.name} (${run.mode}) ──`);
     let ok = prepare(project, run.name, run.mode);
     if (ok) {
@@ -66,16 +72,19 @@ export function test(args: Args): number {
   mkdirSync(results, { recursive: true });
   // Every path or name given; bun test runs the files matching any of them.
   const filters = args.positional;
+  const onlySample = Array.from(new Bun.Glob("**/*.test.ts").scanSync({ cwd: project.testsDir })).every((f) => f.startsWith("_sample/"));
   return runAll(
     project,
     targets(project, args).map((name) => {
-      const reference = target(project, name).role === "reference";
+      // The conformance tests check the native kits' Sample screen, which a reference app has only when its binding
+      // was written for it (examples/native-sample); there they run when named.
+      const skipSample = target(project, name).role === "reference" && !filters.some((f) => f.includes("_sample"));
       return {
         name,
         mode: modeFor(target(project, name), args.flags.device === true),
-        // The conformance tests check the native kits' Sample screen, which the reference app does not have.
-        bunArgs: [...filters, ...(reference ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
-        report: reference ? " (_sample skipped: reference)" : "",
+        bunArgs: [...filters, ...(skipSample ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
+        report: skipSample ? " (_sample skipped: reference)" : "",
+        skip: skipSample && onlySample ? "only _sample tests, which a reference runs when named: nativestep test _sample" : undefined,
       };
     }),
   );

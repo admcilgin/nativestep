@@ -106,6 +106,18 @@ nativestep session start --target ios --device
 
 `nativestep ls` then shows the focused screen's state and actions, and `nativestep do <action>` runs one: the same view the tests have. `nativestep shot <test-file> --target flutter,ios,android` takes the screenshots G3 compares.
 
+### One app per port
+
+Every nativestep app listens on the same port: 7357 for the Flutter reference, 7358 on iOS, 7359 on Android. An app from another project that is still running, even suspended in the background, holds the port, and the tests stop with "another nativestep app … holds" or "nothing answers hello". Quit it and run again:
+
+```bash
+xcrun simctl terminate booted <its bundle id>
+```
+
+```bash
+adb shell am force-stop <its package>
+```
+
 ## 5. Keeping the kits current
 
 The project holds a copy of the kits; `nativestep.json` records its version. After installing a newer `nativestep`:

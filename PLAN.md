@@ -269,6 +269,13 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 - İlerleme: kullanıcı rehberi `GUIDE.md` yazıldı (makine, plugin ve CLI kurulumu, skill sırası, gate'ler, kit güncelleme); README'deki doküman tablosunun başında. Komutları CLI'ye ve gate tanımlarını COMPONENTS.md §9'a göre kontrol edildi. M8'in bitti koşulu henüz denenmedi: temiz bir makinede rehberi izleyen biri ve yayınlanmış ilk release gerekiyor; ikisi de mühendisin işi.
 
+- İlerleme: rehber GitHub'dan taze bir klonla ve `flutter create` ile açılmış temiz bir Flutter uygulamasıyla adım adım izlendi: CLI derleme ve kurulum, `init --reference`, `lint`, `scan`, `_sample` testleri iOS ve Android'de hem headless hem cihazda (15/15). Bulunan üç hata düzeldi:
+  1. `init`, Java anahtar kelimesi içeren bir paketi (`com.myapp.native`) kabul ediyordu, Gradle sonra reddediyordu. Artık `init` reddediyor.
+  2. Simülatörde arka planda askıya alınmış başka bir nativestep uygulaması portu tutunca testler 30'ar saniye sessizce bekliyordu (13 test, 450 sn). Test SDK'sı artık her `hello` denemesine 3 sn veriyor ve 22 sn'de nedeni söyleyen tek bir hatayla duruyor.
+  3. Reference'ta `_sample` atlaması native-sample'ın README'deki akışını bozmuştu. Artık `_sample` adı verilince koşuyor; yalnızca `_sample` varsa reference "skipped" sayılıyor.
+  
+  Kit'ler 0.2.1 oldu. Klon `main`'i alıyor; `release.ts` bu dal birleşince orada olacak. Plugin kurulumu (`/plugin marketplace add`) kullanıcı ayarını değiştirdiği için denenmedi.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

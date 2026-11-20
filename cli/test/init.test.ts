@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { runnerBundleId } from "../src/init.ts";
+import { init, runnerBundleId } from "../src/init.ts";
 
 const settings = (plist: string, id: string) =>
   `buildSettings = {\n\t\t\t\tINFOPLIST_FILE = ${plist};\n\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = ${id};\n\t\t\t};`;
@@ -12,4 +12,11 @@ test("runnerBundleId skips app extensions and tests that come before the Runner 
   ].join("\n");
   expect(runnerBundleId(pbxproj)).toBe("com.example.app");
   expect(runnerBundleId(settings("Widget/Info.plist", "x"))).toBeUndefined();
+});
+
+test("init refuses an Android package with a Java or Kotlin keyword, before writing anything", () => {
+  const flags = { app: "Demo", "ios-bundle-id": "com.demo.app" };
+  for (const pkg of ["com.myapp.native", "com.in.app", "com.demo.object"]) {
+    expect(() => init({ positional: ["/nonexistent/demo"], flags: { ...flags, "android-package": pkg } })).toThrow("keyword");
+  }
 });

@@ -4,6 +4,9 @@ import { createInterface } from "node:readline";
 import type { Readable, Writable } from "node:stream";
 
 export const PROTOCOL_VERSION = 1;
+const HELLO_TIMEOUT_MS = 3000;
+const NO_ANSWER =
+  "the port accepts connections but nothing answers hello; another nativestep app suspended on the simulator may hold it: quit that app and run again";
 
 /** One NDJSON connection to a target (PROTOCOL.md §1). Requests are strictly sequential. */
 export class Connection {
@@ -49,7 +52,19 @@ export class Connection {
         const conn = new Connection(socket, socket, () => socket.destroy());
         // A forwarder (adb forward, iproxy) accepts before the app listens; only a response proves the app is up.
         // hello is stateless (PROTOCOL.md §3), so the caller's own hello after this one is harmless.
-        await conn.request("hello", { protocol: PROTOCOL_VERSION });
+        // An app suspended in the background still accepts on its port but never answers, so each try is bounded.
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const silent = new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error(NO_ANSWER)), HELLO_TIMEOUT_MS);
+        });
+        try {
+          await Promise.race([conn.request("hello", { protocol: PROTOCOL_VERSION }), silent]);
+        } catch (e) {
+          conn.close();
+          throw e;
+        } finally {
+          clearTimeout(timer);
+        }
         return conn;
       } catch (e) {
         if (Date.now() > deadline) throw new Error(`cannot connect to ${url}: ${(e as Error).message}`);

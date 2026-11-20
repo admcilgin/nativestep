@@ -37,7 +37,7 @@ It ships as one archive per platform (`darwin-arm64`, `darwin-x64`, `linux-x64`,
 
 | Command | What it does |
 |---|---|
-| `nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]` | Sets up the native repo from the templates, copies the kits into `kits/`, writes `nativestep.json`. `--reference` adds the Flutter app as the `flutter` target. A non-empty directory needs `--force`, which writes over the template's files and deletes nothing. |
+| `nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]` | Sets up the native repo from the templates, copies the kits into `kits/`, writes `nativestep.json`. `--reference` adds the Flutter app as the `flutter` target. A non-empty directory needs `--force`, which writes over the template's files and deletes nothing. An Android package with a Java or Kotlin keyword as a segment (`com.app.native`) is refused: Gradle rejects it as a namespace. |
 | `nativestep kits update [--dry-run]` | Makes the project's `kits/` equal to this repo's kits: adds, updates and removes files (build output such as `.build/` is left alone), prints one line per file, and sets the `kits` field to `kits/VERSION`. Local edits in `kits/` are overwritten; a fix belongs in this repo. `--dry-run` only prints. A `kits/` that is a symlink is refused: it has no copy to update. |
 | `nativestep scan [<flutter-path>] [--json]` | Writes the raw facts that look the same in every Flutter project to the `raw` section of `spec/inventory.json`: packages from `pubspec.lock`, the number of Dart files under `lib/`, the asset and font files in `pubspec.yaml`, and the native code and platform channels under `ios/` and `android/` (generated and vendored code such as `Pods/` and `GeneratedPluginRegistrant` is skipped). The import graph of `lib/` goes to `.nativestep/scan/imports.json`. Without a path it reads `targets.flutter.path`. It never writes to the Flutter project. |
 | `nativestep session start --target <t> [--device] [--fixtures a,b] [--route <url>]` · `nativestep session stop [--target <t>]` | Starts a background session on the target, headless or (with `--device`) on the simulator or emulator; `ls` and `do` use this session. On a running session it sends a new `start`. |
@@ -147,7 +147,7 @@ The compilable projects that `nativestep init` sets up. The template decides the
 
 The templates map one to one onto the project root. The placeholders are `__APP_NAME__`, `__IOS_BUNDLE_ID__` and `__ANDROID_PACKAGE__`. They are filled by plain text replacement in file names and in text files; in paths, `__ANDROID_PACKAGE__` becomes directories (`com/basket/app`). The `Sample` and `About` screens are the conformance screens; a migrated app keeps them until the migration ends. Every conformance session sends the flag `conformance: true` (`fixtures/_sample/conformance.json`, through `tests/_sample/conformance.ts`). At `init` the app's shell is the Sample tree, so the flag changes nothing. When the app gets its own shell (its `foundation` feature), the template's `AppCore` moves to `Sample/SampleCore` unchanged, and the host's `fixtureCore` builds it for sessions with the flag. The conformance tests then run headless only; the debug app draws the app's own shell.
 
-**Sample screen and conformance tests.** The `Sample` screen implements the same behavior on every platform, and the `tests/_sample/` tests are the protocol's conformance tests. A target that does not pass them does not follow the protocol. `nativestep test` skips `tests/_sample/` on a target whose `role` is `reference`: the reference app has no Sample screen.
+**Sample screen and conformance tests.** The `Sample` screen implements the same behavior on every platform, and the `tests/_sample/` tests are the protocol's conformance tests. A target that does not pass them does not follow the protocol. On a target whose `role` is `reference`, `nativestep test` skips `tests/_sample/` unless a filter names `_sample`: a migrated app's reference has no Sample screen, while `examples/flutter-sample`'s binding implements one. When `_sample` is all there is, the reference is reported as skipped.
 
 | Behavior | Checks |
 |---|---|
@@ -209,7 +209,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
 ```json
 {
   "protocol": 1,
-  "kits": "0.2.0",
+  "kits": "0.2.1",
   "app": { "name": "Basket", "iosBundleId": "com.basket.app", "androidPackage": "com.basket.app" },
   "paths": { "tests": "spec/tests", "fixtures": "spec/fixtures" },
   "targets": {

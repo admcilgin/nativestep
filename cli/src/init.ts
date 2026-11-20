@@ -10,6 +10,12 @@ export const REPO = COMPILED ? resolve(dirname(process.execPath), "..") : resolv
 export const KITS = ["ios", "android", "flutter", "test-sdk"];
 // Build output and machine state never leave the nativestep repo.
 export const SKIP = new Set([".build", "build", ".gradle", ".kotlin", ".swiftpm", ".dart_tool", "node_modules", ".DS_Store", "local.properties"]);
+// Gradle checks the namespace as a Java package, and Kotlin would need backticks in every package line.
+const KEYWORDS = new Set(
+  ("abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if " +
+    "implements import instanceof int interface long native new package private protected public return short static strictfp super switch " +
+    "synchronized this throw throws transient try void volatile while true false null as fun in is object typealias typeof val var when").split(" "),
+);
 const USAGE =
   "usage: nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]";
 
@@ -25,6 +31,8 @@ export function init(args: Args): number {
   if (!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(androidPackage)) {
     throw new UsageError(`--android-package is not a Kotlin package: ${androidPackage}`);
   }
+  const keyword = androidPackage.split(".").find((part) => KEYWORDS.has(part));
+  if (keyword) throw new UsageError(`--android-package cannot contain "${keyword}": it is a Java or Kotlin keyword`);
   const reference = flag(args, "reference");
   if (reference && !existsSync(reference)) throw new UsageError(`--reference not found: ${reference}`);
 

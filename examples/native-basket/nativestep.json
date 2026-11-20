@@ -1,6 +1,6 @@
 {
   "protocol": 1,
-  "kits": "0.2.0",
+  "kits": "0.2.1",
   "app": {
     "name": "Basket",
     "iosBundleId": "dev.nativestep.basket",
