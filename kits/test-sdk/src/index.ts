@@ -48,7 +48,7 @@ let shared: Promise<Connection> | null = null;
 function connection(): Promise<Connection> {
   shared ??= (async () => {
     let conn: Connection;
-    if (env.NATIVESTEP_CONNECT) conn = await Connection.tcp(env.NATIVESTEP_CONNECT);
+    if (env.NATIVESTEP_CONNECT) conn = await Connection.tcp(env.NATIVESTEP_CONNECT, undefined, env.NATIVESTEP_APP);
     else if (env.NATIVESTEP_HEADLESS) conn = Connection.spawn(env.NATIVESTEP_HEADLESS, env.NATIVESTEP_ROOT ?? process.cwd());
     else throw new Error("no target configured: run tests with `nativestep test`");
     process.on("exit", () => conn.close());

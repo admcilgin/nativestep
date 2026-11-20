@@ -276,6 +276,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
   
   Kit'ler 0.2.1 oldu. Klon `main`'i alıyor; `release.ts` bu dal birleşince orada olacak. Plugin kurulumu (`/plugin marketplace add`) kullanıcı ayarını değiştirdiği için denenmedi.
 
+- İlerleme: port paylaşımı. Aynı simülatörde iki projenin uygulaması aynı portu tutuyordu; proje değiştirmek her seferinde elle uygulama kapatmayı gerektiriyordu. Artık yalnızca öndeki uygulama dinliyor: iOS kit'i sahne arka plana geçince portu bırakıyor, öne gelince alıyor; Flutter'da binding `AppLifecycleListener` ile `close`/`listen` çağırıyor; Android'de launcher, başlamış bir activity varken dinliyor. Bind 10 sn boyunca yeniden deneniyor; test SDK'sı devir sırasında başka bir uygulamanın `hello`'sunu yeniden deniyor ve sıfırlanan soket hatasını yakalıyor (önceden bir sonraki testi düşürüyordu). native-sample ile movie-tracker arasında elle bir şey kapatmadan gidip gelindi: iOS 4/4, Flutter 10/10, Android 4/4; Basket üç hedefte, taze bir `init` iOS ve Android cihazda geçiyor. Kit'ler 0.2.2; step-reference'ın binding örneği ve üç binding güncellendi.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar

@@ -137,7 +137,7 @@ export async function doAction(args: Args): Promise<number> {
 export async function daemon(name: string, mode: string): Promise<void> {
   const project = loadProject();
   const t = target(project, name);
-  const conn = mode === "headless" ? Connection.spawn(t.headless!, project.root) : await Connection.tcp(t.device!.connect!);
+  const conn = mode === "headless" ? Connection.spawn(t.headless!, project.root) : await Connection.tcp(t.device!.connect!, undefined, project.config.app.name);
   const hello = await conn.request("hello", { protocol: PROTOCOL_VERSION });
   if (!hello.ok) throw new Error(`hello failed: ${JSON.stringify(hello.error)}`);
   if (hello.app !== project.config.app.name) {

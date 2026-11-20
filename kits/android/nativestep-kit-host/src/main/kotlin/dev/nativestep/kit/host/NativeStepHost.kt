@@ -66,28 +66,63 @@ class NativeStepHost(
         exitProcess(0)
     }
 
+    @Volatile private var listening = false
+    @Volatile private var server: ServerSocket? = null
+    @Volatile private var generation = 0
+
     /**
-     * Device mode: the debug app listens on 127.0.0.1:[port] (PROTOCOL.md §1); reach it with `adb forward`.
-     * Call it once, from debug code only (R20).
+     * Device mode: the debug app listens on 127.0.0.1:[port] (PROTOCOL.md §1) until [close]; reach it with
+     * `adb forward`. Call it from debug code only (R20). Listening again is a no-op. The bind is retried for up
+     * to 10 s: the app this one replaced lets go of the port only once it is stopped.
      */
-    fun listen(port: Int = 7359): Thread = thread(isDaemon = true, name = "nativestep-server") {
-        NetworkGuard.install()
-        ServerSocket(port, 1, InetAddress.getLoopbackAddress()).use { server ->
+    @Synchronized
+    fun listen(port: Int = 7359) {
+        if (listening) return
+        listening = true
+        val mine = ++generation
+        // A later close() and listen() start a new thread; this one stops at its next check.
+        val active = { listening && generation == mine }
+        thread(isDaemon = true, name = "nativestep-server") {
+            NetworkGuard.install()
+            var bound: ServerSocket? = null
+            for (attempt in 1..40) {
+                if (!active()) return@thread
+                bound = runCatching { ServerSocket(port, 1, InetAddress.getLoopbackAddress()) }.getOrNull()
+                if (bound != null) break
+                Thread.sleep(250)
+            }
+            if (bound == null) {
+                System.err.println("nativestep: cannot listen on port $port")
+                if (active()) listening = false
+                return@thread
+            }
+            server = bound
+            if (!active()) bound.close() // closed while binding
             System.err.println("nativestep: listening on 127.0.0.1:$port")
-            while (true) {
-                val socket = server.accept()
-                runCatching {
-                    socket.use { s ->
-                        val input = s.getInputStream().bufferedReader(Charsets.UTF_8)
-                        val output = PrintStream(s.getOutputStream(), true, Charsets.UTF_8)
-                        while (true) {
-                            val line = input.readLine() ?: break
-                            output.println(runBlocking(dispatcher) { respond(line) })
+            bound.use { s ->
+                while (active()) {
+                    val socket = runCatching { s.accept() }.getOrNull() ?: break
+                    runCatching {
+                        socket.use { c ->
+                            val input = c.getInputStream().bufferedReader(Charsets.UTF_8)
+                            val output = PrintStream(c.getOutputStream(), true, Charsets.UTF_8)
+                            while (true) {
+                                val line = input.readLine() ?: break
+                                output.println(runBlocking(dispatcher) { respond(line) })
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    /** Stops listening, so another project's debug app can take the port; the app calls it when it is stopped. */
+    @Synchronized
+    fun close() {
+        listening = false
+        server?.close()
+        server = null
     }
 
     /** Handles one request line and returns one response line. Must run on the host's dispatcher. */

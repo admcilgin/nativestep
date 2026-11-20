@@ -98,7 +98,7 @@ The Swift package used by Core and the host. It is platform-independent and buil
 
 In v1, input schemas are written by hand. A macro that derives the schema from the `NodeInput` type comes later. `Router` and `Route` are not in the kit: each app's Core defines them (ARCHITECTURE.md R14).
 
-The fixture services live in a `CoreHost` library product of `ios/Core`, next to `fixtureCore(fixtures, route:)`, which builds Core with them. The headless host and the App's debug build both use it. The App starts `NativeStepHost.listen(app:makeRoot:)` (port 7358) inside `#if DEBUG`; `makeRoot` also swaps the core the views draw. The Xcode project is generated from `ios/project.yml` with XcodeGen.
+The fixture services live in a `CoreHost` library product of `ios/Core`, next to `fixtureCore(fixtures, route:)`, which builds Core with them. The headless host and the App's debug build both use it. The App starts `NativeStepHost.listen(app:makeRoot:)` (port 7358) inside `#if DEBUG`; `makeRoot` also swaps the core the views draw. The host closes the port when the app goes to the background and opens it when it comes back (PROTOCOL.md §1). The Xcode project is generated from `ios/project.yml` with XcodeGen.
 
 ## 4. nativestep-kit (Android)
 
@@ -111,7 +111,7 @@ The Kotlin/JVM counterpart of NativeStepKit, with the same API names.
 
 In a fixture session the host never constructs the real services (R4), so the network guard is the second line of defense. It is a default `ProxySelector` that records the first URL and sends every connection to a closed local port. That covers `HttpURLConnection`, `java.net.http`, OkHttp and plain sockets; code that passes `Proxy.NO_PROXY` gets through.
 
-`:host` is a library with the fixture services and `fixtureCore(fixtures, route, scope)`, plus the headless entry point. `:app` takes it as a `debugImplementation` dependency. `NativeStepLauncher` exists twice: in `src/debug` it starts `NativeStepHost.listen(7359)` on the main dispatcher and swaps the app's core on `start`; in `src/release` it does nothing.
+`:host` is a library with the fixture services and `fixtureCore(fixtures, route, scope)`, plus the headless entry point. `:app` takes it as a `debugImplementation` dependency. `NativeStepLauncher` exists twice: in `src/debug` it builds the `NativeStepHost` on the main dispatcher, swaps the app's core on `start`, and listens on 7359 while one of the app's activities is started (`listen` and `close`); in `src/release` it does nothing.
 
 ## 5. nativestep_adapter (Flutter)
 
@@ -129,7 +129,7 @@ The binding's duties:
 3. Map Flutter repository and method names to target service names. Fixtures and recordings are always written with the target names; the mapping is in `spec/profile.md`.
 4. In recording mode, write real service responses to `spec/fixtures/` with `StepRecorder`, in the PROTOCOL.md §7 format.
 
-The reference runs as a debug app on the iOS simulator (`flutter build ios --simulator --debug --dart-define=NATIVESTEP=true`), so `simctl` takes its screenshots like the iOS target's. `StepServer` listens on port 7357.
+The reference runs as a debug app on the iOS simulator (`flutter build ios --simulator --debug --dart-define=NATIVESTEP=true`), so `simctl` takes its screenshots like the iOS target's. `StepServer` listens on port 7357; the binding closes it when the app is hidden and listens again when it is shown (`AppLifecycleListener`).
 
 Only two places change in the Flutter repo: `pubspec.yaml` gets a path dependency on the binding, and `main.dart` gets one startup line that runs only in debug builds with `--dart-define=NATIVESTEP=true`. Both are reverted when the migration is done.
 
@@ -209,7 +209,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
 ```json
 {
   "protocol": 1,
-  "kits": "0.2.1",
+  "kits": "0.2.2",
   "app": { "name": "Basket", "iosBundleId": "com.basket.app", "androidPackage": "com.basket.app" },
   "paths": { "tests": "spec/tests", "fixtures": "spec/fixtures" },
   "targets": {

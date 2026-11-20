@@ -25,3 +25,17 @@ test("a port that answers hello connects", async () => {
   conn.close();
   server.close();
 });
+
+test("another app answering is retried until the expected one takes the port", async () => {
+  let answering = "Other";
+  const server = createServer((s) =>
+    s.on("data", (d) => s.write(JSON.stringify({ id: JSON.parse(d.toString()).id, ok: true, protocol: 1, app: answering }) + "\n")),
+  );
+  await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+  const url = `tcp://127.0.0.1:${(server.address() as { port: number }).port}`;
+  await expect(Connection.tcp(url, 600, "Mine")).rejects.toThrow('connected to app "Other", expected "Mine"');
+  setTimeout(() => (answering = "Mine"), 500);
+  const conn = await Connection.tcp(url, 3000, "Mine");
+  conn.close();
+  server.close();
+});

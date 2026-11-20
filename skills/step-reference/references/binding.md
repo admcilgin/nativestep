@@ -33,7 +33,10 @@ import 'package:nativestep_adapter/nativestep_adapter.dart';
 void startNativeStep() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const Center(child: Text('Waiting for nativestep…', textDirection: TextDirection.ltr)));
-  StepServer(app: '<App>', start: _start, settle: _settle).listen();
+  final server = StepServer(app: '<App>', start: _start, settle: _settle);
+  // The port belongs to the visible app; a hidden one lets another project's reference app take it.
+  AppLifecycleListener(onHide: server.close, onShow: server.listen);
+  server.listen();
 }
 
 /// Lets the UI catch up; frames can be throttled while the simulator window is hidden, so never wait long.

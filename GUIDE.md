@@ -108,7 +108,7 @@ nativestep session start --target ios --device
 
 ### One app per port
 
-Every nativestep app listens on the same port: 7357 for the Flutter reference, 7358 on iOS, 7359 on Android. An app from another project that is still running, even suspended in the background, holds the port, and the tests stop with "another nativestep app … holds" or "nothing answers hello". Quit it and run again:
+Every nativestep app uses the same port: 7357 for the Flutter reference, 7358 on iOS, 7359 on Android. Only the app in front listens, so you can switch between projects on one simulator and emulator. An app built with kits older than 0.2.2 keeps the port in the background, and the tests stop with "another nativestep app … holds" or "nothing answers hello". Quit it and run again, or rebuild it after `nativestep kits update`:
 
 ```bash
 xcrun simctl terminate booted <its bundle id>
