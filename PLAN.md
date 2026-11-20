@@ -104,17 +104,34 @@ Sonraya kalanlar: `parity.yml`'a `nativestep lint` (M4), kit'lerin güncellenmes
 
 Sonraya kalanlar: Dart tarafındaki channel adları (`scan` şimdilik yalnızca native tarafa bakıyor), state alanlarının iki platformda karşılaştırılması (şimdilik testler kapsıyor).
 
-## M5 · Göç skill'leri ve örnek uygulamalar
+## M5 · Göç skill'leri ve örnek uygulamalar ✓
 
 - `examples/flutter-riverpod`: kendi küçük Basket uygulamamız. Giriş, liste, detay ve sepet ekranları; Riverpod, Dio, go_router.
-- İkinci girdi: farklı bir state yönetimi kullanan açık kaynak bir Flutter uygulaması (aday seçimi açık karar).
+- İkinci girdi: farklı bir state yönetimi kullanan bir Flutter uygulaması. Karar (2026-11-20): açık kaynak bir aday yerine mühendisin yerel uygulaması movie_tracker.
 - Skill'ler: `step-adopt`, `step-reference`, `step-plan`.
-
-**Ara durum (2026-11-20):** Üç skill yazıldı. Basket (`examples/flutter-riverpod`) üzerinde uçtan uca koşuldu: `examples/native-basket` init edildi, `_sample` iOS ve Android'de yeşil, scan çalıştı; `spec/profile.md`, beş ekranlı `screens`, binding, `spec/fixtures/reference/` ve 4 feature / 12 checkpoint'lik taslak plan yazıldı. Simülatörde `ls`/`do` ile beş ekranın hepsi `driven` doğrulandı. Skill'lerin öngörmediği bir şey çıkmadı; profilde öne çıkan karar Riverpod 3'ün varsayılan otomatik retry'ının kapatılması (hata ekranı ~30 sn spinner'dan sonra geliyordu). Kalan: ikinci girdi uygulaması (aday seçimi açık karar) ve onda skill'lerin değişmeden çalıştığının gösterilmesi; mühendisin profil ve plan onayı (iki açık soru: sepet çıkışta kalıyor mu, checkout hatası satırlar değişince kalıyor mu).
 
 **Bitti:**
 - İki uygulamada da `profile.md`, `inventory.json` ve feature planı üretiliyor, binding yazılıyor ve `nativestep ls --target flutter` çalışıyor.
 - İki uygulama arasında skill'lerde değişiklik gerekmiyor. Gerekiyorsa skill'e projeye özel bilgi sızmış demektir.
+
+**Sonuç (2026-11-20):** Üç skill iki uygulamada uçtan uca koşuldu ve iki uygulama arasında hiçbir skill dosyası değişmedi.
+
+- Basket (`examples/flutter-riverpod`, Riverpod + go_router) → `examples/native-basket`: 5 ekran, 4 feature, 12 checkpoint.
+- movie_tracker (mühendisin yerel uygulaması, açık kaynak değil; `flutter_bloc` + GetX ile DI ve navigasyon, Isar, sqflite, secure storage, platform channel, WidgetKit extension) → repo dışında `../movie-tracker-native`: 5 ekran, 4 feature, 13 checkpoint.
+- İki uygulamada da beş ekranın hepsi simülatörde `ls`/`do` ile `driven` doğrulandı: hata kodları, `fixture_missing` ve aynı süreçte ikinci `start` dahil.
+
+Skill'ler değişmedi ama araç ve kit'te iki hata çıktı, ikisi de düzeltildi:
+
+- `init --reference` bundle id'yi pbxproj'daki ilk satırdan okuyordu; movie_tracker'da o satır widget extension'ınki. Artık `Runner/Info.plist` kullanan target'ın ayarlarından okunuyor (`cli/test/init.test.ts`).
+- Flutter adapter'ı `"result": null`'ı reddediyordu; iOS ve Android kit'leri kabul ediyordu. Dönüş değeri olmayan metodlar için PROTOCOL.md §7'ye kural eklendi.
+
+Binding'lerin en zor yerleri projeye özel kaldı ve profillere yazıldı: Riverpod 3'ün otomatik retry'ı kapatıldı; GetX'in global navigator'ı ve registry'si her `start`'ta sıfırlanıyor.
+
+Sonraya kalanlar:
+
+- İki profilin ve iki planın mühendis onayı (açık sorular profillerde).
+- İki referans uygulama aynı simülatörde aynı portu (7357) dinliyor; yalnızca biri açıkken çalışılmalı.
+- Widget'ların yüklediği resimler (`Image.network`) network guard'a takılıyor; movie_tracker'da referans fixture'larında `posterPath` yok. Bir `StepRecorder` ya da resim istisnası M6'da düşünülmeli.
 
 ## M6 · Döngü skill'leri ve gate'ler
 

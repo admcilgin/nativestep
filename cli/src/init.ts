@@ -77,14 +77,21 @@ function refuseSymlink(path: string) {
   if (existsSync(path) && lstatSync(path).isSymbolicLink()) throw new UsageError(`${path} is a symlink; remove it first`);
 }
 
+/** The app's bundle id: the one in the build settings of the Runner target, not of tests or app extensions. */
+export function runnerBundleId(pbxproj: string): string | undefined {
+  return pbxproj
+    .split("buildSettings = {")
+    .filter((settings) => /INFOPLIST_FILE = "?Runner\/Info\.plist"?;/.test(settings.split("};")[0]!))
+    .map((settings) => settings.split("};")[0]!.match(/PRODUCT_BUNDLE_IDENTIFIER = "?([^";]+)"?;/)?.[1])
+    .find(Boolean);
+}
+
 /** Adds the Flutter app as the reference target; it runs as a debug app on the iOS simulator (COMPONENTS.md §5). */
 function addReference(dir: string, reference: string) {
   const pbxproj = join(reference, "ios/Runner.xcodeproj/project.pbxproj");
   if (!existsSync(pbxproj)) throw new UsageError(`${reference} has no ios/Runner.xcodeproj; the reference runs on the iOS simulator`);
-  const bundleId = [...readFileSync(pbxproj, "utf8").matchAll(/PRODUCT_BUNDLE_IDENTIFIER = "?([^";]+)"?;/g)]
-    .map((m) => m[1])
-    .find((id) => !id.endsWith(".RunnerTests"));
-  if (!bundleId) throw new UsageError(`no PRODUCT_BUNDLE_IDENTIFIER in ${pbxproj}`);
+  const bundleId = runnerBundleId(readFileSync(pbxproj, "utf8"));
+  if (!bundleId) throw new UsageError(`no PRODUCT_BUNDLE_IDENTIFIER for Runner/Info.plist in ${pbxproj}`);
   const path = `'${relative(dir, reference).replaceAll("'", `'\\''`)}'`;
   const file = join(dir, "nativestep.json");
   const config = JSON.parse(readFileSync(file, "utf8"));

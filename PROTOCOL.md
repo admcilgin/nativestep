@@ -158,7 +158,7 @@ Fixtures are defined at the service boundary: what a service method returns when
 | `delayMs` | A delay before the result. For testing loading states. |
 | `times` | How many times the entry matches; once used up, the entry is skipped. For example, first an error, then a success. |
 
-An entry has exactly one of `result` and `error`.
+An entry has exactly one of `result` and `error`. A method that returns nothing has `"result": null`.
 
 **Defaults.** Without a `Clock` fixture, the clock stands still at `2026-01-01T00:00:00Z`. Without an `IdGenerator` fixture, ids are generated in sequence: `id-1`, `id-2`…
 
