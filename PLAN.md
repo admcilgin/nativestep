@@ -244,7 +244,9 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 - movies cp2 bitti: sayfalama, boş sayfada durma; görünümler yalnızca kaydırınca istiyor (kaynak gibi).
 - movies cp3 bitti: arama, boş sonuç ve yeniden deneme, eski yanıtların atılması.
 - movies cp4 bitti: yükleme hataları ve yeniden deneme; ilk trend sayfasının çevrimdışı kopyası gerçek serviste, iki platformda birim testleriyle.
-- Kalan: movies cp5–cp6 ve watchlist; mühendisli bir koşu.
+- movies cp5 bitti: film ayrıntısı sekmelerin üstünde, geri dönüşte ızgara olduğu gibi.
+- Kit'te eksik: tamsayı şemasında izin verilen değerler (`enum`) yok; referans ekranda olmayan bir film kimliğine `invalid_input` diyor, native uygulamalar yok sayıyor.
+- Kalan: movies cp6 ve watchlist; mühendisli bir koşu.
 
 ## M8 · Paketleme
 
