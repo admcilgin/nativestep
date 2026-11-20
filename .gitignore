@@ -17,4 +17,7 @@ local.properties
 /examples/native-basket/*
 !/examples/native-basket/nativestep.json
 !/examples/native-basket/spec/
+!/examples/native-basket/ios/
+!/examples/native-basket/android/
+!/examples/native-basket/kits
 /examples/native-basket/spec/*/_sample/

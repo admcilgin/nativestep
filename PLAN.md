@@ -145,6 +145,21 @@ Sonraya kalanlar:
 
 **Ara durum (2026-11-20):** `step-test` yazıldı ve Basket'te koşuldu. `foundation` cp1 ile `auth` cp1–cp2 için 8 test ve fixture'ları (`spec/tests/{foundation,auth}/`, `spec/fixtures/{auth,catalog}/`) G0'da, yani Flutter referansında yeşil. Native taraf henüz yok; sıradaki adım `step-screen` ve bu checkpoint'lerin iOS ve Android'de G1'den geçmesi.
 
+**Ara durum 2 (2026-11-20):** `step-screen` yazıldı ve Basket'te iki platformda koşuldu. iOS ve Android'de Core (`auth`, `catalog`, `basket` feature klasörleri), host'taki fixture servisleri ve Mobile katmanı (gerçek HTTP servisleri, Login, ürün listesi ve sepet ekranları) var. Sonuçlar:
+- G1: 23/23, headless olarak iOS'ta ve Android'de (15 `_sample` + 8 Basket). Basket'in 8 testi iOS simülatöründeki gerçek uygulamada da yeşil.
+- G2: lint temiz.
+- Debug ve release derlemeleri iki platformda da başarılı.
+
+Şablonun örnek kabuğu ile uygulamanın kabuğu arasındaki çakışma `conformance` bayrağıyla çözüldü (COMPONENTS.md §6). İlk feature'da şablonun `AppCore`'u `Sample/SampleCore`'a taşınıyor. Host, bayrak gelince onu kuruyor; debug uygulaması bu oturumlara `unsupported` dönüyor.
+
+`examples/native-basket/{ios,android}` artık repoda. `kits` ise `../../kits`'e sembolik bağlantı.
+
+Açık işler:
+- `step-feature`, `step-ui-review` (G3), `step-arch-review` (G4) ve `step-fix`.
+- Basket'in kalan checkpoint'leri.
+- Android emülatöründe cihaz koşusu.
+- `spec/evidence/` akışı.
+
 ## M7 · Pilot göç
 
 - `examples/flutter-riverpod`'un tamamı ve ikinci uygulamanın 2–3 feature'ı taşınır.
