@@ -36,3 +36,10 @@ Engineer feedback and project decisions that depart from the defaults (ARCHITECT
 - Product documents for new features live in `docs/features/<feature>.md`. Their acceptance criteria are the reference, and tests run on `ios,android` only.
 - `docs/features/search.md` was written in autonomous mode. The engineer still has to approve the doc, and the tests against it (G0 after the migration).
 - The `flutter` target is still in `nativestep.json`. COMPONENTS.md says to remove it when the migration is done. That is the engineer's call, because the reference app is still useful for comparing older screens.
+
+## 2026-11-20 · Reopening a product that failed to load (step-fix, provisional)
+
+- The reference keeps a failed product load for the session: the page says "Try again", but nothing can.
+- Native reopening a product whose load failed now loads it again on both platforms. Pages that loaded are still cached.
+- `catalog/product-detail-retry.test.ts` covers this and fails on the reference by design.
+- Provisional until the engineer decides. A Retry button on the error is the alternative, or an addition.

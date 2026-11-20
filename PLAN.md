@@ -214,10 +214,14 @@ M6 "Bitti" ölçütlerinin durumu:
 - Paralellik eksik kaldı: iki platform sırayla yazıldı, çünkü bu oturumda alt ajan kullanılmadı. Ayrıca dokümanın ve testlerin mühendis onayı (G0) bekliyor.
 
 M6'da kalan:
-- iki platformda düzeltilen bir davranış hatası (step-fix);
 - izole ikinci G4 koşusu;
 - iki platform için paralel step-screen koşusu (alt ajan izni gerekiyor);
 - mühendisin vereceği kararlar (`memory.md`).
+
+step-fix ölçütü tam karşılandı. Eski kodun denetiminde iki platformda birden gerçek bir davranış hatası bulundu: yüklenemeyen bir ürün oturum boyunca hatada kalıyordu.
+- Kırmızı test: `catalog/product-detail-retry`. flutter, iOS ve Android'de kırmızıydı; referansta da aynı hata var.
+- Düzeltme iki platformda da `AppCore.go` içinde. Testler headless ve cihazda yeşil.
+- Beklenen davranış `memory.md`'de geçici karar olarak duruyor.
 
 Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 

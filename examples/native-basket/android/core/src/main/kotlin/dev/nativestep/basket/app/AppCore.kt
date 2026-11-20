@@ -85,8 +85,10 @@ class AppCore(private val services: Services, private val scope: CoroutineScope)
 
     override fun go(route: Route) {
         when (route) {
+            // A page whose load failed is built again, so reopening the product tries again (memory.md).
             is Route.Product -> products.push(
-                details.getOrPut(route.id) { ProductDetailNode(ProductDetailViewModel(route.id, services.products, this, EffectRunner(scope))) },
+                details[route.id]?.takeIf { it.vm.state.value.error == null }
+                    ?: ProductDetailNode(ProductDetailViewModel(route.id, services.products, this, EffectRunner(scope))).also { details[route.id] = it },
             )
         }
     }

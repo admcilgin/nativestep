@@ -72,7 +72,9 @@ public final class AppCore: Router, IntrospectionNodeProviding {
     public func go(_ route: Route) {
         switch route {
         case .product(let id):
-            let detail = details[id] ?? ProductDetailViewModel(id: id, products: services.products, router: self)
+            // A page whose load failed is built again, so reopening the product tries again (memory.md).
+            let cached = details[id].flatMap { $0.state.error == nil ? $0 : nil }
+            let detail = cached ?? ProductDetailViewModel(id: id, products: services.products, router: self)
             details[id] = detail
             products.push(detail)
         }
