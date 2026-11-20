@@ -1,0 +1,13 @@
+{
+  "services": {
+    "ProductService": {
+      "list": [{ "result": [
+        { "id": "tea", "name": "Tea", "priceCents": 450 },
+        { "id": "green", "name": "Green tea", "priceCents": 600 },
+        { "id": "mug", "name": "Mug", "priceCents": 1200 },
+        { "id": "pot", "name": "Teapot", "priceCents": 3400 }
+      ] }],
+      "detail": [{ "args": { "id": "mug" }, "result": { "id": "mug", "name": "Mug", "priceCents": 1200 } }]
+    }
+  }
+}

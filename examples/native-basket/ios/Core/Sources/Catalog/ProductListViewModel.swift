@@ -1,3 +1,4 @@
+import Foundation
 import NativeStepKit
 import Observation
 
@@ -12,6 +13,9 @@ public final class ProductListViewModel {
 
     public struct State: Codable, Equatable, Sendable {
         public var products: [Item] = []
+        /// The search as typed, and the products it shows, in catalog order (docs/features/search.md).
+        public var query = ""
+        public var results: [Item] = []
         public var loading = false
         public var error: AppError?
     }
@@ -19,6 +23,7 @@ public final class ProductListViewModel {
     public enum Action: Equatable, Sendable {
         case load, refresh, retry
         case openProduct(id: String)
+        case search(query: String)
         case signOut
     }
 
@@ -48,9 +53,17 @@ public final class ProductListViewModel {
         }
     }
 
-    /// State changes only here (R8).
+    /// State changes only here (R8). The results follow the products and the search after every message.
     private func update(_ message: Message) -> [Effect<Message>] {
+        defer {
+            // Case-insensitive without locale rules, like Kotlin's `ignoreCase`, so both platforms match the same names (R12).
+            let text = state.query.trimmingCharacters(in: .whitespacesAndNewlines)
+            state.results = text.isEmpty ? state.products : state.products.filter { $0.name.range(of: text, options: .caseInsensitive) != nil }
+        }
         switch message {
+        case .action(.search(let query)):
+            state.query = query
+            return []
         case .action(.openProduct(let id)):
             router.go(.product(id: id))
             return []

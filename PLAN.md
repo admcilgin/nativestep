@@ -207,7 +207,19 @@ M6 "Bitti" ölçütlerinin durumu:
   - İki hata da gerçek, ama hiçbiri iki platformda birden düzeltilen bir davranış hatası değil. Ölçüt, böyle bir hata çıktığında tam karşılanacak.
 - **`flutter` hedefi olmadan, dokümandan yeni bir feature:** henüz yok.
 
-Sıradaki adım: dokümandan yeni bir feature (ölçüt 3).
+Ölçüt 3 karşılandı: `search` feature'ı `flutter` hedefi olmadan, `docs/features/search.md`'deki kabul kriterlerinden geliştirildi.
+- 7 test yazıldı, her kriter için bir tane. Önce iki platformda da kırmızıydı.
+- Core ve görünümler iOS ve Android'de yazıldı.
+- G1 headless ve cihazda yeşil; G2 temiz; G3 dokümana göre yapıldı; G4 onaylıyor.
+- Paralellik eksik kaldı: iki platform sırayla yazıldı, çünkü bu oturumda alt ajan kullanılmadı. Ayrıca dokümanın ve testlerin mühendis onayı (G0) bekliyor.
+
+M6'da kalan:
+- iki platformda düzeltilen bir davranış hatası (step-fix);
+- izole ikinci G4 koşusu;
+- iki platform için paralel step-screen koşusu (alt ajan izni gerekiyor);
+- mühendisin vereceği kararlar (`memory.md`).
+
+Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 ## M7 · Pilot göç
 

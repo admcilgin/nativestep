@@ -6,30 +6,32 @@ struct ProductListView: View {
 
     var body: some View {
         Group {
-            if vm.listShown && vm.state.products.isEmpty {
-                ScrollView {
-                    Text("No products yet.")
-                        .padding(24)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .refreshable { await refresh() }
-            } else if vm.listShown {
-                List(vm.state.products, id: \.id) { product in
-                    // A button, not a NavigationLink: the push happens in Core (R14); the chevron is drawn here.
-                    Button { vm.send(.openProduct(id: product.id)) } label: {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(product.name)
-                                Text(formatPrice(product.priceCents)).foregroundStyle(.secondary)
+            if vm.listShown {
+                Group {
+                    if vm.state.products.isEmpty {
+                        message("No products yet.")
+                    } else if vm.state.results.isEmpty {
+                        message("No products match \"\(vm.state.query.trimmingCharacters(in: .whitespacesAndNewlines))\".")
+                    } else {
+                        List(vm.state.results, id: \.id) { product in
+                            // A button, not a NavigationLink: the push happens in Core (R14); the chevron is drawn here.
+                            Button { vm.send(.openProduct(id: product.id)) } label: {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text(product.name)
+                                        Text(formatPrice(product.priceCents)).foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                                }
+                                .contentShape(Rectangle())
                             }
-                            Spacer()
-                            Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                            .buttonStyle(.plain)
                         }
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
                 }
                 .refreshable { await refresh() }
+                .searchable(text: query, prompt: "Search products")
             } else if let error = vm.state.error, !vm.state.loading {
                 VStack(spacing: 12) {
                     Text(errorMessage(error))
@@ -42,6 +44,18 @@ struct ProductListView: View {
         .navigationTitle("Products")
         .toolbar {
             Button("Sign out", systemImage: "rectangle.portrait.and.arrow.right") { vm.send(.signOut) }
+        }
+    }
+
+    private var query: Binding<String> {
+        Binding(get: { vm.state.query }, set: { vm.send(.search(query: $0)) })
+    }
+
+    private func message(_ text: String) -> some View {
+        ScrollView {
+            Text(text)
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

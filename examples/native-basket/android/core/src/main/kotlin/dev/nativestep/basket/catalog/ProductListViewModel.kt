@@ -23,6 +23,9 @@ class ProductListViewModel(
     @Serializable
     data class State(
         val products: List<Item> = emptyList(),
+        /** The search as typed, and the products it shows, in catalog order (docs/features/search.md). */
+        val query: String = "",
+        val results: List<Item> = emptyList(),
         val loading: Boolean = false,
         val error: AppError? = null,
     )
@@ -32,6 +35,7 @@ class ProductListViewModel(
         data object Refresh : Action
         data object Retry : Action
         data class OpenProduct(val id: String) : Action
+        data class Search(val query: String) : Action
         data object SignOut : Action
     }
 
@@ -57,9 +61,20 @@ class ProductListViewModel(
         update(message).forEach { effect -> effects.run(effect) { handle(it) } }
     }
 
-    /** State changes only here (R8). */
-    private fun update(message: Message): List<Effect<Message>> = when (message) {
+    /** State changes only here (R8). The results follow the products and the search after every message. */
+    private fun update(message: Message): List<Effect<Message>> = step(message).also {
+        _state.update { s ->
+            val text = s.query.trim()
+            s.copy(results = if (text.isEmpty()) s.products else s.products.filter { it.name.contains(text, ignoreCase = true) })
+        }
+    }
+
+    private fun step(message: Message): List<Effect<Message>> = when (message) {
         is Message.Act -> when (val action = message.action) {
+            is Action.Search -> {
+                _state.update { it.copy(query = action.query) }
+                emptyList()
+            }
             is Action.OpenProduct -> {
                 router.go(Route.Product(action.id))
                 emptyList()

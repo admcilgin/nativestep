@@ -395,6 +395,19 @@
           "status": "done"
         }
       ]
+    },
+    {
+      "name": "search",
+      "dependsOn": [
+        "catalog"
+      ],
+      "checkpoints": [
+        {
+          "id": "cp1",
+          "title": "Search the product list by name, with a message when nothing matches",
+          "status": "done"
+        }
+      ]
     }
   ]
 }

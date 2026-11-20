@@ -12,7 +12,10 @@ class ProductListNode(val vm: ProductListViewModel) : IntrospectionNode {
     override val name = "ProductList"
     override fun state(): JsonElement = NodeJson.encodeToJsonElement(vm.state.value)
 
-    /** `refresh` while the list is shown, `retry` while the error is; nothing during the first load or a retry. `signOut` is always there. */
+    /**
+     * `search`, `openProduct` for the products shown and `refresh` while the list is shown, `retry` while the error is;
+     * nothing during the first load or a retry. `signOut` is always there.
+     */
     override val actions: List<NodeAction>
         get() = listActions() + NodeAction("signOut", "Sign out") { vm.send(ProductListViewModel.Action.SignOut) }
 
@@ -20,10 +23,13 @@ class ProductListNode(val vm: ProductListViewModel) : IntrospectionNode {
         val s = vm.state.value
         return when {
             vm.listShown -> {
-                val ids = s.products.map { it.id }
+                val ids = s.results.map { it.id }
+                val search = NodeAction("search", "Search", SearchInput.serializer(), InputSchema.obj("query" to InputSchema.string())) {
+                    vm.send(ProductListViewModel.Action.Search(it.query))
+                }
                 val open = NodeAction("openProduct", "Open product", OpenProductInput.serializer(),
                     InputSchema.obj("id" to InputSchema.string(oneOf = ids))) { vm.send(ProductListViewModel.Action.OpenProduct(it.id)) }
-                (if (ids.isEmpty()) emptyList() else listOf(open)) +
+                listOf(search) + (if (ids.isEmpty()) emptyList() else listOf(open)) +
                     NodeAction("refresh", "Refresh") { vm.send(ProductListViewModel.Action.Refresh) }
             }
             s.error != null && !s.loading -> listOf(NodeAction("retry", "Retry") { vm.send(ProductListViewModel.Action.Retry) })
@@ -34,3 +40,6 @@ class ProductListNode(val vm: ProductListViewModel) : IntrospectionNode {
 
 @Serializable
 data class OpenProductInput(val id: String)
+
+@Serializable
+data class SearchInput(val query: String)

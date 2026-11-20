@@ -6,18 +6,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -53,8 +56,21 @@ fun ProductListScreen(vm: ProductListViewModel) {
                 modifier = Modifier.fillMaxSize(),
             ) {
                 LazyColumn(Modifier.fillMaxSize()) {
-                    if (state.products.isEmpty()) item { Text("No products yet.", Modifier.padding(24.dp)) }
-                    items(state.products, key = { it.id }) { product ->
+                    item {
+                        OutlinedTextField(
+                            value = state.query,
+                            onValueChange = { vm.send(ProductListViewModel.Action.Search(it)) },
+                            placeholder = { Text("Search products") },
+                            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                    }
+                    when {
+                        state.products.isEmpty() -> item { Text("No products yet.", Modifier.padding(24.dp)) }
+                        state.results.isEmpty() -> item { Text("No products match \"${state.query.trim()}\".", Modifier.padding(24.dp)) }
+                    }
+                    items(state.results, key = { it.id }) { product ->
                         ListItem(
                             headlineContent = { Text(product.name) },
                             supportingContent = { Text(formatPrice(product.priceCents)) },
