@@ -79,7 +79,7 @@ export function test(args: Args): number {
 /** Replays a test on device targets and saves a screenshot of each target at the test's final state. */
 export function shot(args: Args): number {
   const [file] = args.positional;
-  if (!file) throw new UsageError("usage: nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>]");
+  if (!file) throw new UsageError("usage: nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]");
   const project = loadProject();
   const testFile = resolve(file);
   if (!existsSync(testFile)) throw new UsageError(`no such test file ${file}`);
@@ -97,7 +97,7 @@ export function shot(args: Args): number {
         name,
         mode: "device" as const,
         bunArgs: [testFile, ...(testName ? ["-t", testName] : [])],
-        env: { NATIVESTEP_SHOT_CMD: t.device.screenshot, NATIVESTEP_SHOT_OUT: png },
+        env: { NATIVESTEP_SHOT_CMD: t.device.screenshot, NATIVESTEP_SHOT_OUT: png, ...(args.flags["no-wait"] ? { NATIVESTEP_SHOT_WAIT: "0" } : {}) },
         report: ` → ${png}`,
       };
     }),

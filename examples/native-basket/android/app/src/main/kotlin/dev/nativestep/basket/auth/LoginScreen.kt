@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +41,7 @@ fun LoginScreen(vm: LoginViewModel) {
             enabled = !state.loading,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            if (state.loading) CircularProgressIndicator() else Text("Sign in")
+            if (state.loading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp) else Text("Sign in")
         }
     }
 }

@@ -25,6 +25,14 @@ test("while signing in, the form shows loading and cannot be sent again", async 
   await app.precondition("ProductList");
 });
 
+// Ends while the call is in flight, so `nativestep shot --no-wait` shows the loading form (G3).
+test("while signing in, the app stays on the sign-in screen", async () => {
+  const app = await session({ fixtures: ["auth/slow", "catalog/products"] });
+  await app.precondition("Login");
+  await app.do("signIn", { email: "ada@example.com", password: "secret" }, (s) => s.loading === true);
+  expect(app.path).toEqual(["App", "Login"]);
+});
+
 test("a wrong password shows unauthorized and keeps the form", async () => {
   const app = await session({ fixtures: ["auth/user", "auth/wrong-password"] });
   await app.precondition("Login");

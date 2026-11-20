@@ -168,9 +168,9 @@ Açık işler:
 
 `auth` cp1 ve cp2 de kapandı: 2/4 feature ve 3/12 checkpoint tamam, Login `migrated`. Kanıtı `spec/evidence/auth-cp1-cp2/` altında.
 
-Açık bir boşluk var: `nativestep shot` çekimden önce uçuştaki çağrıların bitmesini bekliyor. Bu yüzden loading durumlarının ekran görüntüsü alınamıyor. Çözüm, `shot`'a "beklemeden çek" seçeneği eklemek.
+Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `nativestep shot`'a `--no-wait` eklendi: uçuştaki çağrıları beklemiyor ve 200 ms bekleyip çekiyor. Login'in loading durumu üç hedefte de çekildi; Android'deki spinner boyutu referansa uyduruldu.
 
-Sıradaki adımlar: `catalog` cp1 ve bu boşluk. `step-fix` henüz yazılmadı.
+Sıradaki adımlar: `catalog` cp1 ve `step-fix`.
 
 ## M7 · Pilot göç
 

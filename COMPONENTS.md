@@ -42,7 +42,7 @@ The single command through which agents and engineers talk to the toolkit. It ma
 | `nativestep do <action> [json] [--target <t>] [--no-wait]` | Runs an action and waits until `busy` is `false`; `--no-wait` returns the state right after the action |
 | `nativestep test [filter] [--target a,b] [--device]` | Runs `bun test` under `spec/` for each target and writes the results to `.nativestep/results/` |
 | `nativestep lint [--json]` | Checks the rules tagged *lint* in ARCHITECTURE.md (R1, R5, R6, R10, R12, R17, R20) and prints one line per violation: rule, file and line, message |
-| `nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>]` | Replays the test on device targets and takes a screenshot at the test's final state |
+| `nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]` | Replays the test on device targets and takes a screenshot at the test's final state |
 | `nativestep status [--screens \| --features] [--json]` | Progress from `inventory.json` and the latest test results in `.nativestep/results/`. A feature counts as done when all its checkpoints are done. |
 
 Shared behavior:
@@ -52,7 +52,7 @@ Shared behavior:
 - `lint` reads source text with comments blanked out; it does not parse Swift or Kotlin. That is enough for names, imports, calls and folders; a rule that needs types will need a parser.
 - `.nativestep/` is the runtime directory (session sockets, results, screenshots, scan output) and stays out of git.
 - A session is a background process that holds one connection to the target and listens on `.nativestep/sessions/<target>.sock`; its log is next to the socket.
-- `shot` runs the test with `NATIVESTEP_SHOT_CMD` and `NATIVESTEP_SHOT_OUT` set. After each test the SDK waits until `busy` is `false`, then `NATIVESTEP_SHOT_SETTLE_MS` (800 ms by default) for animations, and runs the target's `device.screenshot`. Files are named `<file>[-<test>]-<target>.png` under `.nativestep/shots/`.
+- `shot` runs the test with `NATIVESTEP_SHOT_CMD` and `NATIVESTEP_SHOT_OUT` set. After each test the SDK waits until `busy` is `false`, then `NATIVESTEP_SHOT_SETTLE_MS` (800 ms by default) for animations, and runs the target's `device.screenshot`. With `--no-wait` (`NATIVESTEP_SHOT_WAIT=0`) it does not wait for `busy` and settles for 200 ms, so a test that ends while a call is in flight shows its loading state; the call's fixture needs a `delayMs` longer than that. Files are named `<file>[-<test>]-<target>.png` under `.nativestep/shots/`.
 
 ## 2. @nativestep/test
 

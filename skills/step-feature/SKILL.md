@@ -49,7 +49,7 @@ Take screenshots of the states the checkpoint adds, on the reference and on both
 nativestep shot spec/tests/<feature>/<topic>.test.ts --name "<test>" --target flutter,ios,android --out spec/evidence/<feature>-<cp>/shots
 ```
 
-A shot shows the state where the test ends. Pick the tests that end in the states this checkpoint adds; a state that no test ends in needs a test of its own, not a shot taken by hand.
+A shot shows the state where the test ends. Pick the tests that end in the states this checkpoint adds; a state that no test ends in needs a test of its own, not a shot taken by hand. For a loading state, write a test that ends while the call is in flight (a fixture with `delayMs`) and shoot it with `--no-wait`.
 
 Then run step-ui-review on each set. Blocking differences are fixed in the view (step-screen §5) and the shots are taken again. `INVALID` means the shots do not show the same state; fix the test or the fixture timing and take them again. Do not judge an `INVALID` set.
 

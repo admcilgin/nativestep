@@ -79,13 +79,15 @@ export async function session(options: SessionOptions = {}): Promise<App> {
 
 // `nativestep shot` sets these: after each test, wait for effects and animations, then take a screenshot.
 if (env.NATIVESTEP_SHOT_CMD && env.NATIVESTEP_SHOT_OUT) {
-  const settleMs = Number(env.NATIVESTEP_SHOT_SETTLE_MS ?? 800);
+  // `--no-wait` (NATIVESTEP_SHOT_WAIT=0) shoots with calls still in flight, for loading states.
+  const wait = env.NATIVESTEP_SHOT_WAIT !== "0";
+  const settleMs = Number(env.NATIVESTEP_SHOT_SETTLE_MS ?? (wait ? 800 : 200));
   afterEach(async () => {
     const app = current;
     current = null;
     if (!app) return;
     await app.ls().catch(() => {});
-    for (const deadline = Date.now() + TIMEOUT_MS; app.busy && Date.now() < deadline; ) {
+    for (const deadline = Date.now() + TIMEOUT_MS; wait && app.busy && Date.now() < deadline; ) {
       await Bun.sleep(INTERVAL_MS);
       await app.ls().catch(() => {});
     }
