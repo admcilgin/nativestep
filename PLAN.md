@@ -174,7 +174,9 @@ Loading durumlarının ekran görüntüsü artık alınabiliyor. Bunun için `na
 
 `catalog` cp2 (hata, retry, refresh) da kapandı; `nativestep status` 5/12 checkpoint gösteriyor.
 
-Sıradaki adımlar: `catalog` cp3 (ürün detayı) ve `step-fix`.
+`step-fix` yazıldı: hata önce protokol üzerinden yeniden üretiliyor ve türü belirleniyor (davranış, yalnızca view, gerçek servis ya da hata değil). Davranış hatası, onu gösteren kırmızı bir testle yakalanıyor. Düzeltme iki platformda yapılıyor, ardından gate'ler koşuluyor. "Bitti" maddesi için gerçek bir hata gerekiyor; uydurma bir hatayla koşulmayacak.
+
+Sıradaki adım: `catalog` cp3 (ürün detayı).
 
 ## M7 · Pilot göç
 
