@@ -16,7 +16,7 @@ const USAGE = `usage:
   nativestep lint [--json]
   nativestep scan [<flutter-path>] [--json]
   nativestep status [--screens | --features] [--json]
-  nativestep test [filter] [--target a,b] [--device]
+  nativestep test [filter...] [--target a,b] [--device]
   nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]`;
 
 const BOOLEANS = ["device", "json", "no-wait", "force", "screens", "features"];

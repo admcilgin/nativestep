@@ -64,13 +64,14 @@ export function test(args: Args): number {
   const project = loadProject();
   const results = join(project.stateDir, "results");
   mkdirSync(results, { recursive: true });
-  const filter = args.positional[0];
+  // Every path or name given; bun test runs the files matching any of them.
+  const filters = args.positional;
   return runAll(
     project,
     targets(project, args).map((name) => ({
       name,
       mode: modeFor(target(project, name), args.flags.device === true),
-      bunArgs: [...(filter ? [filter] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
+      bunArgs: [...filters, "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
       report: "",
     })),
   );
