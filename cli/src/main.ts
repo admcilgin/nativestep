@@ -1,14 +1,17 @@
 #!/usr/bin/env bun
 import { parseArgs, UsageError } from "./config.ts";
+import { doctor } from "./doctor.ts";
 import { init } from "./init.ts";
 import { kits } from "./kits.ts";
 import { lint } from "./lint.ts";
+import { migrate } from "./migrate.ts";
 import { scan } from "./scan.ts";
 import { status } from "./status.ts";
 import { daemon, doAction, ls, sessionStart, sessionStop } from "./session.ts";
 import { shot, test } from "./test.ts";
 
 const USAGE = `usage:
+  nativestep doctor [--json]
   nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]
   nativestep session start --target <t> [--fixtures a,b] [--route <url>] [--device] [--json]
   nativestep session stop [--target <t>]
@@ -16,6 +19,7 @@ const USAGE = `usage:
   nativestep do <action> [json] [--target <t>] [--no-wait] [--json]
   nativestep kits update [--dry-run]
   nativestep lint [--json]
+  nativestep migrate finish [--dry-run] [--force]
   nativestep scan [<flutter-path>] [--json]
   nativestep status [--screens | --features] [--json]
   nativestep test [filter...] [--target a,b] [--device]
@@ -36,12 +40,16 @@ async function main(argv: string[]): Promise<number> {
   }
   const args = parseArgs(rest, BOOLEANS);
   switch (command) {
+    case "doctor":
+      return doctor(args);
     case "init":
       return init(args);
     case "kits":
       return kits(args);
     case "lint":
       return lint(args);
+    case "migrate":
+      return migrate(args);
     case "scan":
       return scan(args);
     case "status":

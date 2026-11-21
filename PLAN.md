@@ -288,6 +288,25 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
+## M9 · Göçsüz başlangıç ve sürdürme
+
+- Sıfırdan uygulama: Flutter olmadan iki native proje ve özellik dokümanları
+- Göçün bitişi: referansı emekliye ayıran komut
+- Takip: gate sonuçları ve sıradaki checkpoint `nativestep status`'ta
+- Rehber: iki başlangıç yolu ve günlük döngü
+
+- İlerleme: yeni skill `step-start`. `nativestep init`'i referanssız koşuyor, mühendisin anlattığını `docs/features/<feature>.md` dosyalarına çeviriyor (ekranlar ve state'leri, servis çağrıları ve hata kodları, numaralı kabul kriterleri `AC1…`), ekranları `reference: none` ile `spec/inventory.json`'a yazıyor. Tasarım çıktıları `docs/design/<feature>/<stem>.png`; stem `nativestep shot`'ın vereceği adla aynı. step-plan, step-test, step-screen, step-feature ve step-ui-review referans yokken bu dokümanları kullanıyor: her kabul kriterinin en az bir testi var ve test adı kriterin numarasıyla başlıyor; G0 mühendisin testleri dokümana göre onaylaması, G3 tasarımla ya da tasarım yoksa iki platformun birbiriyle karşılaştırılması.
+- İlerleme: `nativestep migrate finish [--dry-run] [--force]`. Flutter repo'sundaki iki işaretli satırı, `flutter` hedefini ve `spec/adapters/flutter/`'ı kaldırıyor, `spec/profile.md`'yi `spec/archive/`'a taşıyor, `memory.md`'ye tarih düşüyor. Açık checkpoint varken `--force` olmadan reddediyor. Bundan sonra göç edilmiş proje yeni bir uygulama gibi geliştiriliyor.
+- İlerleme: kanıt README'lerinde her gate'in bölümü bir `Result:` satırıyla başlıyor (`pass`, `fail`, `skipped — …`, `pending — …`). `nativestep status` bunları okuyor: `--features` her checkpoint'in gate'lerini gösteriyor, özet sıradaki checkpoint'i (devam eden, yoksa bağımlılıkları bitmiş ilk planlı) ve gate'i geçmemiş bitmiş checkpoint'leri (`attention`) veriyor. Basket'in kanıtlarına `Result:` satırları bölümlerin yazdığından eklendi: 13 checkpoint'in hepsinde G4 `pending` (ikinci yalıtılmış inceleme yok), `search` cp1'de G0 ve G5 mühendis onayı bekliyor.
+- İlerleme: GUIDE iki başlangıç (§3 göç, §4 yeni uygulama), ortak gate'ler (§5), göçü bitirme (§6) ve günlük iş (§7) olarak yeniden düzenlendi. Plugin 0.2.0.
+
+- İlerleme: deneme. Sıfırdan bir uygulama (Tally: cihazda saklanan sayaçlar) step-start'tan ilk checkpoint'e kadar götürüldü. `init` referanssız, `lint` temiz, `_sample` 15/15; iki özellik dokümanı (`foundation` AC1–AC5, `editing` AC1–AC7), iki ekran, beş checkpoint. foundation cp1: üç test, başlıkları AC numarasıyla; G1 headless iOS ve Android 18/18, cihazda 3/3; G2 temiz, iki platformun release derlemesi geçiyor; G3 tasarım olmadan iOS ile Android karşılaştırıldı, üç set geçerli, engelleyen fark yok; G4 tek koşu onay, ikincisi `pending`; G0 ve G5 mühendis onayı bekliyor. `nativestep status` sıradaki checkpoint'i (foundation cp2) ve bekleyen gate'leri (G0 G4 G5) doğru gösteriyor. Proje scratchpad'de, git dışında. Dönenler:
+  1. İki ekranlı simülatörde (iPhone Duo) `simctl io booted screenshot` ekran seçemeyip düşüyordu. Şablon, `init --reference` ve örnekler artık `--display=primary` ile yeniden deniyor.
+  2. Süzgeçli bir `nativestep test` koşusu (`foundation/`) hedefin sonuç dosyasının üstüne yazıyordu; `status` 18 yerine 3 test gösteriyordu. Artık yalnızca süzgeçsiz koşular sonuç yazıyor, cihaz koşuları ayrı dosyaya (`<target>-device.xml`).
+  3. step-screen'in ilk feature adımı şablonun Sample ve About ekranlarını uygulamadan kaldırmayı söylemiyordu; release uygulaması ulaşılamayan ekranlar taşıyordu. Artık söylüyor; Core'daki `Sample/` conformance testleri için kalıyor.
+
+**Bitti:** sıfırdan bir uygulama step-start'tan ilk checkpoint'e kadar gate'lerden geçiyor; göç edilmiş bir uygulama `migrate finish` sonrası yeni bir feature'ı dokümandan ekliyor.
+
 ## Verilen kararlar
 
 | Karar | Seçim | Gerekçe | Tarih |

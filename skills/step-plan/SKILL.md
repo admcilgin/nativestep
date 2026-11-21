@@ -1,11 +1,11 @@
 ---
 name: step-plan
-description: Plan nativestep work as features, their order and their checkpoints in spec/inventory.json. During a migration the reference is the Flutter app; afterwards it is docs and designs. Use after step-reference, and again whenever new work is added to a native project.
+description: Plan nativestep work as features, their order and their checkpoints in spec/inventory.json. During a migration the reference is the Flutter app; without one (after a migration, or in an app started with step-start) it is the feature docs in docs/features/. Use after step-reference or step-start, and again whenever new work is added to a native project.
 ---
 
 # step-plan
 
-Input: the reference (the Flutter code and `spec/profile.md` during a migration; docs and designs afterwards) and the `screens` in `spec/inventory.json`. Output: `features` with `dependsOn` and `checkpoints` in `spec/inventory.json`, and each screen's `feature`. The format is in [COMPONENTS.md](../../COMPONENTS.md) §8.
+Input: the reference (the Flutter code and `spec/profile.md` during a migration; the approved feature docs in `docs/features/` and the designs in `docs/design/` without one) and the `screens` in `spec/inventory.json`. Output: `features` with `dependsOn` and `checkpoints` in `spec/inventory.json`, and each screen's `feature`. The format is in [COMPONENTS.md](../../COMPONENTS.md) §8.
 
 A feature is a folder on both platforms (ARCHITECTURE.md R17) and the unit parallel agents take. A checkpoint is the unit that passes the gates (COMPONENTS.md §9) and becomes one commit. The plan decides how much can run in parallel and how big each review is.
 
@@ -14,7 +14,7 @@ A feature is a folder on both platforms (ARCHITECTURE.md R17) and the unit paral
 - Group screens by what they are about, not by how the source is organized. The source's folders are evidence, not the answer: a source folder per layer (all screens in one place, all repositories in another) says nothing about features.
 - Two screens belong together when they share state, a service, or a flow the user goes through without leaving. A screen used by several flows belongs to the feature that owns its data.
 - Feature names are lowercase words (`catalog`, `checkout`); the iOS folder is the same name capitalized.
-- Put the app shell in a first feature, `foundation`: `AppCore`, the navigator tree from the profile, the `Services` wiring, `Shared/` formatting, and the `Clock` and `IdGenerator` services if the profile found clock or id use. Other features depend on it.
+- Put the app shell in a first feature, `foundation`: `AppCore`, the navigator tree from the profile (or from `docs/features/foundation.md`), the `Services` wiring, `Shared/` formatting, and the `Clock` and `IdGenerator` services if the profile found clock or id use. Other features depend on it.
 - Set each screen's `feature`. Every screen has exactly one.
 
 ## 2. Order
@@ -34,7 +34,7 @@ For each feature, split the work into checkpoints:
 - Visual-only work (layout, theming) is its own checkpoint, so logic checkpoints skip G3.
 - `id` is `cp1`, `cp2`, … per feature; `title` says what the user can see or do when it is done; `status` is `planned`.
 
-Use the reference to find the behaviors: during a migration, the profile's service errors and navigation guards, and each screen's branches in the Flutter code; afterwards, the acceptance criteria in the docs and the states in the designs.
+Use the reference to find the behaviors: during a migration, the profile's service errors and navigation guards, and each screen's branches in the Flutter code; without one, the acceptance criteria in the feature docs (each criterion lands in exactly one checkpoint; name them in its title or in `memory.md`) and the states in the designs.
 
 ## 4. Check and hand over
 

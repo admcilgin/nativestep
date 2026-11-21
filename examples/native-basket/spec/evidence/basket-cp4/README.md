@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/basket/checkout-errors.test.ts`, 5 tests.
 
 New fixtures in `basket/`:
@@ -32,14 +34,20 @@ The first G0 run had 4 pass and 1 fail. The failing test expected placing again 
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): 0 fail on ios and on android.
 On devices, `nativestep test basket/ --device`: ios and android pass, 0 fail.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean. The Android release build passes, and so does the iOS Release build for the simulator.
 
 ## G3 · UI review
+
+Result: pass
 
 The shots are in `shots/`:
 - out of stock: `checkout-errors-an-out-of-stock-…`;
@@ -51,11 +59,15 @@ Both sets are valid. There are no blocking differences: on all three, the error 
 
 ## G4 · Architecture review
 
+Result: pending — second isolated review missing
+
 One review run, inline. The second, isolated run is missing because subagents are not used in this session. Verdict: approve, no findings.
 - R8: `orderError` and `error` change only in `update`. On Android they change through `setLines`, which only `update` calls.
 - R12: on both platforms the error is derived in the same way, and the State fields and node actions are the same.
 - R9: the views only read `error`.
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous). There is one new provisional decision for the engineer in `memory.md`: "Order error after the lines change".

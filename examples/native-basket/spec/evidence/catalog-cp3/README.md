@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/catalog/product-detail.test.ts`, 7 tests:
 - opening a product pushes its detail with the description (also checks that `openProduct`'s ids are limited to the listed ones)
 - a product without a description shows an empty one
@@ -34,14 +36,20 @@ New fixtures:
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): ios 37 pass, android 37 pass, 0 fail.
 On devices, `nativestep test catalog/product-detail --device`: ios 6 pass, android 6 pass. That run predates splitting the not-found test into two.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean. The Android debug and release builds pass; so does the iOS debug build.
 
 ## G3 · UI review
+
+Result: pass
 
 Shots of the detail, its loading and not_found states, and the list with chevrons are in `shots/`.
 
@@ -56,6 +64,8 @@ Second pass: no blocking differences.
 
 ## G4 · Architecture review
 
+Result: pending — second isolated review missing
+
 One review run, inline. Verdict: approve, no findings.
 - R14: the list sends `openProduct`, and AppCore pushes through `Router.go(.product(id:))`. The iOS rows are Buttons, not NavigationLinks, so the push happens in Core.
 - R12: the ViewModels, the node actions, the route and the detail cache are the same on both platforms.
@@ -63,5 +73,7 @@ One review run, inline. Verdict: approve, no findings.
 - note · ios: whether tapping the already-selected tab calls the `TabView` selection setter is not checked on the device. The protocol path is tested. Android's `NavigationBarItem` always calls `select`.
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous).

@@ -5,7 +5,7 @@ description: Write the behavior tests and fixtures for one nativestep checkpoint
 
 # step-test
 
-Input: one checkpoint from `spec/inventory.json` and its reference: during a migration the Flutter app (driven over the protocol) and `spec/profile.md`; afterwards the docs and designs. Output: `spec/tests/<feature>/<topic>.test.ts`, the fixture documents they use under `spec/fixtures/<feature>/`, and a G0 result.
+Input: one checkpoint from `spec/inventory.json` and its reference: during a migration the Flutter app (driven over the protocol) and `spec/profile.md`; without one, the feature doc in `docs/features/<feature>.md`. Output: `spec/tests/<feature>/<topic>.test.ts`, the fixture documents they use under `spec/fixtures/<feature>/`, and a G0 result.
 
 Tests are written once and run unchanged on every target. The SDK is in [COMPONENTS.md](../../COMPONENTS.md) §2, the fixture format in [PROTOCOL.md](../../PROTOCOL.md) §7, and what belongs in behavior tests (and what does not) in [ARCHITECTURE.md](../../ARCHITECTURE.md) §8. Read those first.
 
@@ -15,12 +15,12 @@ Write down, before any code, what a user can observe in this checkpoint. Each it
 
 - Start from the checkpoint's `title` and the screens of its feature.
 - During a migration, read the screen's code for every branch that changes what is shown or what can be done: loading, empty, error per error code, disabled actions, validation, navigation after success. The profile's service table lists the error codes; its decisions say which library behaviors are in or out.
-- Afterwards, take the acceptance criteria from the docs and every state the designs show.
+- Without a reference, every acceptance criterion of the checkpoint gets at least one test, and the test's title starts with its id (`AC3: retry after offline shows the list`). Every state in the doc's screen table and every design is covered too.
 - Leave out what belongs to another checkpoint, pure styling, and what the real services do inside (caching, retries, storage). Those are unit, visual or real-service tests.
 
 ## 2. Write the fixtures
 
-- Fixtures are written in the target's service and method names (the profile's service table, or the `Services` in Core).
+- Fixtures are written in the target's service and method names (the profile's service table, the feature doc's Services table, or the `Services` in Core).
 - Put shared data (a product list, a signed-in user) in its own file and compose files per test: `session({ fixtures: ["catalog/products", "auth/wrong-password"] })`. A later file's entries are tried first.
 - Keep each document as small as the test allows. Every call the app makes during the test needs an entry, or the session stops with `fixture_missing`. That is how a test proves which calls happen.
 - Use `args` when the test is about what the app sends: a trimmed field, a page number, the items of an order.
@@ -38,7 +38,7 @@ Write down, before any code, what a user can observe in this checkpoint. Each it
 - Give such a fixture a `delayMs` of 3000, so the call is still in flight when the slowest device takes its screenshot. Every later step of that test then needs a predicate: `do` without one waits for the call, and `precondition` gives up after 3 s. A test that waits for the slow call to finish uses its own fixture with a shorter delay (1000 ms): a 3000 ms call and a 3 s `precondition` pass only by luck.
 - Check the path when navigation is the behavior (`expect(app.path).toEqual([...])`). Check `unavailable` when the behavior is that something cannot be done.
 - Assert on the fields the behavior is about, not on whole states: a test of the error must not break when a new field is added.
-- Use the node and action names from the profile's node tree, or from Core after the migration. A name the reference does not have is a missing node, not a test to rewrite.
+- Use the node and action names from the profile's node tree, or from the feature doc and Core without one. A name the reference does not have is a missing node, not a test to rewrite.
 
 ## 4. Run G0
 
@@ -52,7 +52,7 @@ During a migration every new test must pass on the reference.
 - If the reference does something the native app should not do, that is a decision for the engineer. Write it to `spec/memory.md`. The binding applies decisions that turn a library behavior off; a decision that changes app behavior means the test cannot pass on the reference, and the engineer approves it as the spec instead.
 - For `read-only` screens the tests cannot run on the reference; the engineer approves them as the spec.
 
-After the migration, G0 is the engineer approving the tests against the docs.
+Without a reference, G0 is the engineer approving the tests against the feature doc: every acceptance criterion has a test, and no test asserts what the doc does not say. A behavior the doc leaves open is a question for the engineer, and the answer goes into the doc.
 
 Do not run the tests on the native targets here; G1 is step-feature's gate. A red G1 at this point is expected: the native code does not exist yet.
 

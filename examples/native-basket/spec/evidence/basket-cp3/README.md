@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/basket/checkout.test.ts`, 4 tests, with the new fixture `basket/order` (`OrderService.place`, `items` in basket order, returns `{ "id": "o1" }`):
 - place order is offered only while the basket has lines
 - placing an order sends the basket's lines and shows the order-placed dialog (`App › Modal › OrderPlaced`, `{ orderId: "o1" }`)
@@ -27,14 +29,20 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): ios 53 pass, android 53 pass, 0 fail.
 On devices, `nativestep test basket/ --device`: ios 12 pass, android 12 pass. iOS ran again after the G4 fix: 12 pass.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean. The Android release build passes, and so does the iOS Release build for the simulator.
 
 ## G3 · UI review
+
+Result: pass
 
 The shots are in `shots/`: the "Order placed" dialog (`checkout-placing-an-order-…`) and the filled basket with Place order (`quantities-add-one-raises-…`). Both sets are valid. No blocking differences: the dialog title, the message with the order id, OK, "Total $33.00" and "Place order" match.
 - minor · android: the dialog's surface is lavender, from Material's baseline surface colors, while the reference's is teal-tinted. The theme sets only `primary`.
@@ -43,6 +51,8 @@ The shots are in `shots/`: the "Order placed" dialog (`checkout-placing-an-order
 - Older, not cp3: on Android the status-bar icons are light on the light background, as in the cp2 shots too. This goes to step-fix as a separate commit.
 
 ## G4 · Architecture review
+
+Result: pending — second isolated review missing
 
 One review run, inline. The second, isolated run is missing because subagents are not used in this session.
 - First pass: changes, 1 finding.
@@ -58,5 +68,7 @@ One review run, inline. The second, isolated run is missing because subagents ar
   - The views only read state and send (R9).
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous).

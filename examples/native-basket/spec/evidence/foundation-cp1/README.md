@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/foundation/shell.test.ts`, 3 tests:
 - the app starts signed out, on sign-in, without the tabs;
 - signed in, the products tab shows the product list inside its stack;
@@ -13,14 +15,20 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): ios 23 pass, 0 fail; android 23 pass, 0 fail.
 On devices, `nativestep test foundation/ --device`: ios 3 pass (iPhone 18 Pro simulator), android 3 pass (Pixel 10 Pro emulator).
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean.
 
 ## G3 · UI review
+
+Result: pass
 
 Shots in `shots/`, one set per test, taken with `nativestep shot` at the end of each test.
 
@@ -43,6 +51,8 @@ Second pass: no blocking differences.
 
 ## G4 · Architecture review
 
+Result: pending — second isolated review missing
+
 One review run, inline, not in an isolated context. The second, isolated run was not done; isolated runs need subagents, which this session runs only when the engineer asks.
 
 Verdict: approve, no findings.
@@ -50,5 +60,7 @@ Verdict: approve, no findings.
 - note · R14: the views call `tabs.select` and `goBack`, the navigators' lent actions, as the template does.
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous).

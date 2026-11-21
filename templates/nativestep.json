@@ -18,7 +18,7 @@
         "build": "cd ios && xcodegen generate --quiet && xcodebuild -project __APP_NAME__.xcodeproj -scheme __APP_NAME__ -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath build -quiet build && xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/__APP_NAME__.app",
         "setup": "xcrun simctl launch --terminate-running-process booted __IOS_BUNDLE_ID__",
         "connect": "tcp://127.0.0.1:7358",
-        "screenshot": "xcrun simctl io booted screenshot {out}"
+        "screenshot": "xcrun simctl io booted screenshot {out} 2>/dev/null || xcrun simctl io booted screenshot --display=primary {out}"
       }
     },
     "android": {

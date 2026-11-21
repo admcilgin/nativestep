@@ -4,13 +4,13 @@
     "name": "admcilgin"
   },
   "metadata": {
-    "description": "The nativestep toolkit for Claude Code: skills for migrating Flutter apps to native iOS and Android."
+    "description": "The nativestep toolkit for Claude Code: skills for building native iOS and Android apps, migrated from Flutter or new."
   },
   "plugins": [
     {
       "name": "nativestep",
       "source": "./",
-      "description": "The nativestep skills: adopt a Flutter repo, plan features, and migrate them checkpoint by checkpoint."
+      "description": "The nativestep skills: start a new app or adopt a Flutter repo, plan features, and build them checkpoint by checkpoint."
     }
   ]
 }

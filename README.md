@@ -1,6 +1,10 @@
 # nativestep
 
-A toolkit for moving a cross-platform mobile app to native iOS and Android projects, and for continuing development on those projects with agents working in parallel once the move is done. Flutter is the first supported source.
+A toolkit for building native iOS (SwiftUI) and Android (Compose) apps with agents, as two separate codebases that pass the same behavior tests. It covers two starts and one way of working after them:
+
+- **Migrate** a cross-platform app to native, screen by screen, with the old app as the test reference. Flutter is the first supported source.
+- **Start** a new app from feature docs, with no app to migrate.
+- **Develop** either one afterwards: features in small checkpoints, each through the same gates, with progress and gate results in `nativestep status`.
 
 The approach is adapted from Shopify's [Reflex](https://shopify.engineering/reflex) and [Helix](https://shopify.engineering/helix) posts. Native code is written twice; behavior tests are written once. Agents work in small checkpoints, and every checkpoint passes the same gates.
 
@@ -15,7 +19,7 @@ The approach is adapted from Shopify's [Reflex](https://shopify.engineering/refl
 
 | File | Contents |
 |---|---|
-| [GUIDE.md](GUIDE.md) | Install, and a first migration: the machine, the plugin and CLI, the skills in order, the gates. Start here. |
+| [GUIDE.md](GUIDE.md) | Install, then a first migration or a new app to its first checkpoint, the gates, and the daily loop afterwards. Start here. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The target native architecture and its numbered rules (R1–R20). `nativestep lint` and the reviewer agents report against these numbers. |
 | [PROTOCOL.md](PROTOCOL.md) | The JSON protocol spoken with every target, and the fixture format. The only interface the three platforms share. |
 | [COMPONENTS.md](COMPONENTS.md) | The components: CLI, test SDK, kits, Flutter adapter, templates, skills, project files and gates. |
@@ -33,20 +37,23 @@ nativestep/
 │   ├── android/    nativestep-kit: the Kotlin/JVM counterpart of NativeStepKit
 │   └── flutter/    nativestep_adapter: protocol server and fixture recording for the Flutter reference app
 ├── templates/      the project `nativestep init` creates: ios/, android/, spec/, nativestep.json, CI
-├── skills/         step-adopt, step-reference, step-plan, step-feature, step-fix,
-│                   step-test, step-screen, step-ui-review, step-arch-review
+├── skills/         step-start (new app), step-adopt and step-reference (migration),
+│                   step-plan, step-feature, step-fix, step-test, step-screen,
+│                   step-ui-review, step-arch-review
 └── examples/       Sample apps for development and pilots
 ```
 
 ## Status
 
-Two apps were migrated autonomously with the skills: Basket (12/12 checkpoints) and a movie tracker (13/13), each passing the same tests on Flutter, iOS and Android. M6 and M7 still wait for a run with an engineer (approvals, and a second independent architecture review). M8, packaging, is done but for its check: v0.1.0 ships the CLI as a release, the skills install as a Claude Code plugin, and `nativestep kits update` keeps a project's kits current; [GUIDE.md](GUIDE.md) still has to be followed on a clean Mac ([PLAN.md](PLAN.md)).
+Two apps were migrated autonomously with the skills: Basket (12/12 checkpoints) and a movie tracker (13/13), each passing the same tests on Flutter, iOS and Android. M6 and M7 still wait for a run with an engineer (approvals, and a second independent architecture review). M8, packaging, is done but for its check: one `curl | bash` installs the released CLI and the skills plugin, and `nativestep kits update` keeps a project's kits current; [GUIDE.md](GUIDE.md) still has to be followed on a clean Mac. M9 adds new apps without a migration (`step-start`, feature docs as the reference), `nativestep migrate finish`, and gate tracking in `nativestep status` ([PLAN.md](PLAN.md)).
 
 ## Install
 
 ```bash
 curl -fsSL https://admcilgin.github.io/nativestep/install.sh | bash
 ```
+
+For the skills alone, in Claude Code 2.1.275 or later: `/plugin install nativestep --marketplace admcilgin/nativestep`.
 
 [install.sh](install.sh) puts the `nativestep` CLI from the latest [release](https://github.com/admcilgin/nativestep/releases) in `~/.nativestep`, adds it to `PATH`, and installs the skills: the repo is a Claude Code plugin and its own marketplace ([GUIDE.md](GUIDE.md) §2). `bun cli/release.ts <target>` builds the same archive from a checkout. From a checkout, `bun cli/src/main.ts` does the same. Tests still need Bun.
 

@@ -22,7 +22,7 @@ public protocol SampleRouter: AnyObject {
     func go(_ route: SampleRoute)
 }
 
-/// The template's app shell, kept for the conformance tests (`_sample`) until the migration ends (COMPONENTS.md §6).
+/// The template's app shell, kept for the conformance tests (`_sample`), which check the kits (COMPONENTS.md §6).
 /// The host builds it for sessions with the `conformance` flag; the app itself never does.
 @MainActor @Observable
 public final class SampleCore: SampleRouter, IntrospectionNodeProviding {

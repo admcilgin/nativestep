@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/catalog/product-list-errors.test.ts`, 3 tests:
 - a failed load shows the error and offers retry, not refresh
 - retry loads the list again
@@ -31,14 +33,20 @@ Views:
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): ios 30 pass, android 30 pass, 0 fail.
 On devices, `nativestep test catalog/ --device`: ios 6 pass, android 6 pass.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean. The Android debug and release builds pass.
 
 ## G3 · UI review
+
+Result: pass
 
 The error state is in `shots/` and the set is valid. There are no blocking differences: all three show "Could not reach the server. Try again." with a Retry button under it.
 - note · ios: Retry is a `.bordered` button. The reference uses an outlined Material button. This is a platform convention.
@@ -47,6 +55,8 @@ Not shot: a refresh in progress. On the reference the indicator shows only while
 
 ## G4 · Architecture review
 
+Result: pending — second isolated review missing
+
 One review run, inline. Verdict: approve, no findings.
 - R8: `listShown` changes only in `update`, on both platforms.
 - R12: the node actions match on both platforms (`refresh` and `retry`), as do the rules for when each is offered.
@@ -54,5 +64,7 @@ One review run, inline. Verdict: approve, no findings.
 - note · android: the view reads `vm.listShown`, a plain property. It changes only in the same `update` call as `state`, so the view recomposes on the state emission.
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous).
