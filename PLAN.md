@@ -283,6 +283,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
   2. Android şablonunda ikon kütüphanesi yok; step-screen tek ikon için bağımlılık yerine `ImageVector` öneriyor.
   3. Her göçün `foundation` adımında şablon kabuğu `Sample/SampleCore`'a elle taşınıyor (Basket, movie-tracker, Counter: üçünde de aynı dosyalar). Şablonun bunu baştan ayrı getirmesi sonraki iş.
 
+- İlerleme: rehberdeki `nativestep test --target flutter,ios,android --device` göç edilmiş bir uygulamada iOS ve Android'de 15 `_sample` testini düşürüyordu (debug uygulama conformance oturumlarını reddeder, bunlar headless koşar). Artık `--device` koşusu `_sample`'ı adı verilmedikçe atlıyor; movie-tracker'da komut olduğu gibi üç hedefte geçiyor.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## Verilen kararlar
