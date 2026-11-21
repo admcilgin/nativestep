@@ -37,6 +37,7 @@ It ships as one archive per platform (`darwin-arm64`, `darwin-x64`, `linux-x64`,
 
 | Command | What it does |
 |---|---|
+| `nativestep --version` | Prints the CLI's version (`cli/package.json`, which the release tag must match) and the kits version it copies. |
 | `nativestep doctor [--json]` | Checks the machine and, inside a project, the project: Bun's version, Xcode and a booted simulator, XcodeGen, `JAVA_HOME`, adb and a running emulator, Flutter (only without a project or with a reference target), and whether the project's kits match this nativestep's. One line per check, `ok`, `warn` or `fail`; exits 1 on a `fail`. |
 | `nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]` | Sets up the native repo from the templates, copies the kits into `kits/`, writes `nativestep.json`. `--reference` adds the Flutter app as the `flutter` target. A non-empty directory needs `--force`, which writes over the template's files and deletes nothing. An Android package with a Java or Kotlin keyword as a segment (`com.app.native`) is refused: Gradle rejects it as a namespace. |
 | `nativestep kits update [--dry-run]` | Makes the project's `kits/` equal to this repo's kits: adds, updates and removes files (build output such as `.build/` is left alone), prints one line per file, and sets the `kits` field to `kits/VERSION`. Local edits in `kits/` are overwritten; a fix belongs in this repo. `--dry-run` only prints. A `kits/` that is a symlink is refused: it has no copy to update. |

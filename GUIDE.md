@@ -54,7 +54,7 @@ Then check the machine:
 nativestep doctor
 ```
 
-Every line should say `ok`; a `fail` names the fix. `warn` lines (no booted simulator, no running emulator) matter only for device runs. `nativestep` with no arguments prints every command.
+Every line should say `ok`; a `fail` names the fix. `warn` lines (no booted simulator, no running emulator) matter only for device runs. `nativestep --version` names the installed release, and `nativestep` with no arguments prints every command.
 
 ## 3. Start: migrate a Flutter app
 

@@ -2,7 +2,8 @@
 import { parseArgs, UsageError } from "./config.ts";
 import { doctor } from "./doctor.ts";
 import { init } from "./init.ts";
-import { kits } from "./kits.ts";
+import pkg from "../package.json";
+import { kits, KITS_VERSION } from "./kits.ts";
 import { lint } from "./lint.ts";
 import { migrate } from "./migrate.ts";
 import { scan } from "./scan.ts";
@@ -11,6 +12,7 @@ import { daemon, doAction, ls, sessionStart, sessionStop } from "./session.ts";
 import { shot, test } from "./test.ts";
 
 const USAGE = `usage:
+  nativestep --version
   nativestep doctor [--json]
   nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]
   nativestep session start --target <t> [--fixtures a,b] [--route <url>] [--device] [--json]
@@ -29,6 +31,10 @@ const BOOLEANS = ["device", "json", "no-wait", "force", "screens", "features", "
 
 async function main(argv: string[]): Promise<number> {
   const [command, ...rest] = argv;
+  if (command === "--version" || command === "version") {
+    console.log(`nativestep ${pkg.version} (kits ${KITS_VERSION})`);
+    return 0;
+  }
   if (command === "__session-daemon") {
     await daemon(rest[0], rest[1]);
     return -1; // keeps running
