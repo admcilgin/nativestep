@@ -33,28 +33,20 @@ emulator -avd <avd-name> &
 
 ## 2. Install
 
-### The skills
+```bash
+curl -fsSL https://admcilgin.github.io/nativestep/install.sh | bash
+```
 
-In Claude Code:
+This puts the latest release's CLI in `~/.nativestep` (macOS or Linux, arm64 or x64), adds `~/.nativestep/bin` to `PATH` in `~/.zshrc` or `~/.bashrc`, and installs the skills plugin into Claude Code. Open a new terminal afterwards. Run it again to update; it replaces `~/.nativestep` as a whole. `curl` also keeps macOS from quarantining the binary, which a browser download does.
+
+`kits/` and `templates/` must stay beside `bin/`: `init` and `kits update` copy them.
+
+Without the `claude` command on `PATH`, the script prints the two commands to run in Claude Code instead:
 
 ```
 /plugin marketplace add admcilgin/nativestep
 /plugin install nativestep@nativestep
 ```
-
-### The CLI
-
-Download the latest release into `~/.nativestep` (`darwin-x64` on an Intel Mac). `curl` keeps macOS from quarantining the binary, which a browser download does:
-
-```bash
-mkdir -p ~/.nativestep && curl -fsSL https://github.com/admcilgin/nativestep/releases/latest/download/nativestep-darwin-arm64.tar.gz | tar -xz -C ~/.nativestep
-```
-
-```bash
-export PATH="$HOME/.nativestep/nativestep-darwin-arm64/bin:$PATH"
-```
-
-`kits/` and `templates/` must stay beside `bin/`: `init` and `kits update` copy them. To update, delete `~/.nativestep/nativestep-darwin-arm64` and run the download again; unpacking over it would keep files a newer release removed.
 
 `nativestep` with no arguments prints every command.
 

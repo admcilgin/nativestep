@@ -42,16 +42,13 @@ nativestep/
 
 Two apps were migrated autonomously with the skills: Basket (12/12 checkpoints) and a movie tracker (13/13), each passing the same tests on Flutter, iOS and Android. M6 and M7 still wait for a run with an engineer (approvals, and a second independent architecture review). M8, packaging, is done but for its check: v0.1.0 ships the CLI as a release, the skills install as a Claude Code plugin, and `nativestep kits update` keeps a project's kits current; [GUIDE.md](GUIDE.md) still has to be followed on a clean Mac ([PLAN.md](PLAN.md)).
 
-## Install the skills
+## Install
 
-The repo is a Claude Code plugin and its own marketplace. In Claude Code:
-
-```
-/plugin marketplace add admcilgin/nativestep
-/plugin install nativestep@nativestep
+```bash
+curl -fsSL https://admcilgin.github.io/nativestep/install.sh | bash
 ```
 
-The skills call the `nativestep` CLI. Download `nativestep-<target>.tar.gz` (`darwin-arm64`, `darwin-x64`, `linux-x64`, `linux-arm64`) from the [releases](https://github.com/admcilgin/nativestep/releases), unpack it anywhere and put its `bin/` on `PATH`; it keeps `kits/` and `templates/` beside it ([GUIDE.md](GUIDE.md) §2 has the commands). `bun cli/release.ts <target>` builds the same archive from a checkout. From a checkout, `bun cli/src/main.ts` does the same. Tests still need Bun.
+[install.sh](install.sh) puts the `nativestep` CLI from the latest [release](https://github.com/admcilgin/nativestep/releases) in `~/.nativestep`, adds it to `PATH`, and installs the skills: the repo is a Claude Code plugin and its own marketplace ([GUIDE.md](GUIDE.md) §2). `bun cli/release.ts <target>` builds the same archive from a checkout. From a checkout, `bun cli/src/main.ts` does the same. Tests still need Bun.
 
 ```bash
 NS=$PWD
