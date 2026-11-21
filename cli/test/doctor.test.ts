@@ -1,5 +1,7 @@
+// The machine checks depend on the machine; these cover the logic around them.
 import { expect, test } from "bun:test";
-import { checks, older } from "../src/doctor.ts";
+import { flutterNeed, older, projectChecks } from "../src/doctor.ts";
+import { KITS_VERSION } from "../src/kits.ts";
 
 test("older compares dotted versions", () => {
   expect(older("1.4.3", "1.4.4")).toBe(true);
@@ -8,12 +10,21 @@ test("older compares dotted versions", () => {
   expect(older("1.4", "1.4.1")).toBe(true);
 });
 
-test("doctor reports bun and asks for flutter only without a project or with a reference", () => {
-  const none = checks(undefined);
-  expect(none.find((c) => c.what === "bun")?.level).toBe("ok");
-  expect(none.some((c) => c.what === "flutter")).toBe(true);
-  const project = { root: "/x", config: { protocol: 1, kits: "0.0.1", app: { name: "A", iosBundleId: "a.b", androidPackage: "a.b" }, targets: { ios: {} } }, testsDir: "", fixturesDir: "", stateDir: "" };
-  const list = checks(project);
-  expect(list.some((c) => c.what === "flutter")).toBe(false);
-  expect(list.find((c) => c.what === "kits")).toMatchObject({ level: "warn" });
+const project = (kits: string, targets: Record<string, { role?: string }>) => ({
+  root: "/x",
+  config: { protocol: 1, kits, app: { name: "A", iosBundleId: "a.b", androidPackage: "a.b" }, targets },
+  testsDir: "",
+  fixturesDir: "",
+  stateDir: "",
+});
+
+test("flutter is needed with a reference, optional before a project, and not asked for otherwise", () => {
+  expect(flutterNeed(undefined)).toBe("warn");
+  expect(flutterNeed(project("1", { flutter: { role: "reference" }, ios: {} }))).toBe("fail");
+  expect(flutterNeed(project("1", { ios: {} }))).toBeUndefined();
+});
+
+test("stale kits are a warning", () => {
+  expect(projectChecks(project(KITS_VERSION, {}))[0]!.level).toBe("ok");
+  expect(projectChecks(project("0.0.1", {}))[0]).toMatchObject({ level: "warn", what: "kits" });
 });

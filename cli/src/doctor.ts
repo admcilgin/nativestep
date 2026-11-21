@@ -26,10 +26,25 @@ function has(command: string): boolean {
   return sh(`command -v ${command}`, process.cwd()).ok;
 }
 
+/** Flutter is needed while a Flutter app is the reference, and may be before a project exists. */
+export function flutterNeed(project: Project | undefined): Check["level"] | undefined {
+  if (!project) return "warn";
+  return Object.values(project.config.targets).some((t) => t.role === "reference") ? "fail" : undefined;
+}
+
+/** Checks that read only the project, not the machine. */
+export function projectChecks(project: Project): Check[] {
+  const kits = project.config.kits;
+  return [
+    kits === KITS_VERSION
+      ? { level: "ok", what: "kits", detail: kits }
+      : { level: "warn", what: "kits", detail: `project has ${kits}, this nativestep has ${KITS_VERSION}: nativestep kits update` },
+  ];
+}
+
 export function checks(project: Project | undefined): Check[] {
   const out: Check[] = [];
   const add = (level: Check["level"], what: string, detail: string) => out.push({ level, what, detail });
-  const reference = project && Object.values(project.config.targets).some((t) => t.role === "reference");
 
   add(older(Bun.version, MIN_BUN) ? "fail" : "ok", "bun", older(Bun.version, MIN_BUN) ? `${Bun.version}; nativestep test needs ${MIN_BUN} or later` : Bun.version);
 
@@ -49,14 +64,9 @@ export function checks(project: Project | undefined): Check[] {
     add(devices.length ? "ok" : "warn", "android emulator", devices.length ? devices.map((l) => l.split("\t")[0]).join(", ") : "none running; device runs need one: emulator -avd <name>");
   }
 
-  // Flutter matters only while a Flutter app is the reference.
-  if (!project || reference) add(has("flutter") ? "ok" : reference ? "fail" : "warn", "flutter", has("flutter") ? "found" : "not found; only a migration needs it");
-
-  if (project) {
-    const kits = project.config.kits;
-    add(kits === KITS_VERSION ? "ok" : "warn", "kits", kits === KITS_VERSION ? kits : `project has ${kits}, this nativestep has ${KITS_VERSION}: nativestep kits update`);
-  }
-  return out;
+  const need = flutterNeed(project);
+  if (need) add(has("flutter") ? "ok" : need, "flutter", has("flutter") ? "found" : "not found; only a migration needs it");
+  return project ? [...out, ...projectChecks(project)] : out;
 }
 
 export function doctor(args: Args): number {
