@@ -12,7 +12,16 @@ The source project is unknown. Do not assume its packages, folder layout or arch
 ## 1. Check the source builds
 
 1. `flutter pub get` in the Flutter project. `nativestep scan` needs `pubspec.lock`.
-2. `flutter build ios --simulator --debug`. The reference app runs on the iOS simulator; if it does not build there, stop and tell the engineer. Nothing later works without it.
+2. `flutter build ios --simulator --debug`, with the same `--dart-define` / `--dart-define-from-file` flags the project's own run configuration uses. The reference app runs on the iOS simulator; if it does not build there, stop and tell the engineer. Nothing later works without it. Check the build's own exit code: piped through `tail` or `tee`, a failed build looks green.
+
+When it fails, these causes are common. Each fix is the engineer's to approve, and is not one of the binding's lines:
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| SPM cannot resolve packages (e.g. `firebase-ios-sdk` against `GoogleSignIn`) | Flutter 3.50+ builds plugins with Swift Package Manager by default; some plugin sets have no common version | `enable-swift-package-manager: false` under `flutter: config:` in `pubspec.yaml`, for this project only |
+| `GoogleService-Info.plist` not found | `flutterfire configure` writes it and the repo ignores it | Copy it from a machine that has it, or write it from the iOS values in `lib/firebase_options.dart` |
+| `flutterfire: command not found` in a build phase | The Crashlytics symbol upload runs on every build | Install the FlutterFire CLI, or put a no-op `flutterfire` script on `PATH` for the reference build only (in `device.build`) |
+| The app starts with a missing config error | It reads `--dart-define-from-file` | Put the same flag in the `flutter` target's `device.build` in `nativestep.json` |
 
 Do not change the Flutter project in this skill. step-reference makes the only two changes it ever gets.
 

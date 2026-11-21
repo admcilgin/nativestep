@@ -1,6 +1,6 @@
 {
   "name": "nativestep",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Build native iOS (SwiftUI) and Android (Compose) apps with agents: migrate a Flutter app or start a new one, then develop feature by feature with shared behavior tests and gated checkpoints.",
   "author": { "name": "admcilgin" },
   "homepage": "https://github.com/admcilgin/nativestep",

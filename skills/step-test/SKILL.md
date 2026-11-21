@@ -14,6 +14,7 @@ Tests are written once and run unchanged on every target. The SDK is in [COMPONE
 Write down, before any code, what a user can observe in this checkpoint. Each item becomes one test.
 
 - Start from the checkpoint's `title` and the screens of its feature.
+- During a migration, a screen may still have a stateless node in the binding (step-reference's scope). Design its row in the profile's `Node tree` table, add the node to the binding, and check it with `ls` and `do` (step-reference §5) before writing its tests.
 - During a migration, read the screen's code for every branch that changes what is shown or what can be done: loading, empty, error per error code, disabled actions, validation, navigation after success. The profile's service table lists the error codes; its decisions say which library behaviors are in or out.
 - Without a reference, every acceptance criterion of the checkpoint gets at least one test, and the test's title starts with its id (`AC3: retry after offline shows the list`). Every state in the doc's screen table and every design is covered too.
 - Leave out what belongs to another checkpoint, pure styling, and what the real services do inside (caching, retries, storage). Those are unit, visual or real-service tests.

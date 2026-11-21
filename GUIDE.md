@@ -21,7 +21,7 @@ Gradle needs `JAVA_HOME`. Android Studio's bundled JDK works:
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ```
 
-Device runs need a booted simulator and a running emulator. Keep both open while you migrate:
+Device runs need a booted simulator and a running emulator. Keep both open while you migrate. Use a phone-sized iPhone simulator, not an iPad or the iPhone Duo: on a wide screen SwiftUI's `TabView` becomes an icon-only rail, so the shots G3 compares stop matching a phone layout.
 
 ```bash
 xcrun simctl boot "<device name from xcrun simctl list devices available>"

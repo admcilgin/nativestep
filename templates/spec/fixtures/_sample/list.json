@@ -5,7 +5,7 @@
         { "args": { "page": 2 }, "result": { "items": [] } },
         {
           "args": { "page": 1 },
-          "result": { "items": [{ "id": "a", "title": "Alpha" }, { "id": "b", "title": "Beta" }] },
+          "result": { "items": [{ "id": "a", "title": "Alpha", "updatedAt": "2026-01-01T00:00:00Z" }, { "id": "b", "title": "Beta" }], "total": 2 },
           "delayMs": 200
         }
       ]
