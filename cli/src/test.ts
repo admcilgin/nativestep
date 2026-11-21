@@ -76,15 +76,18 @@ export function test(args: Args): number {
   return runAll(
     project,
     targets(project, args).map((name) => {
-      // The conformance tests check the native kits' Sample screen, which a reference app has only when its binding
-      // was written for it (examples/native-sample); there they run when named.
-      const skipSample = target(project, name).role === "reference" && !filters.some((f) => f.includes("_sample"));
+      const mode = modeFor(target(project, name), args.flags.device === true);
+      // The conformance tests run when named. Otherwise a reference skips them (it has the Sample screen only when its
+      // binding was written for it, as examples/native-sample's), and so does a device run: a migrated app's debug
+      // build refuses conformance sessions, which run headless (COMPONENTS.md §6).
+      const named = filters.some((f) => f.includes("_sample"));
+      const why = named ? undefined : target(project, name).role === "reference" ? "reference" : mode === "device" ? "device; run them headless" : undefined;
       return {
         name,
-        mode: modeFor(target(project, name), args.flags.device === true),
-        bunArgs: [...filters, ...(skipSample ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
-        report: skipSample ? " (_sample skipped: reference)" : "",
-        skip: skipSample && onlySample ? "only _sample tests, which a reference runs when named: nativestep test _sample" : undefined,
+        mode,
+        bunArgs: [...filters, ...(why ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
+        report: why ? ` (_sample skipped: ${why})` : "",
+        skip: why && onlySample ? `only _sample tests, which run here when named: nativestep test _sample` : undefined,
       };
     }),
   );
