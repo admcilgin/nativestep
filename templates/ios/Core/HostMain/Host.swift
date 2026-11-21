@@ -6,6 +6,6 @@ import NativeStepHostKit
 struct Host {
     @MainActor
     static func main() async {
-        await NativeStepHost.runStdio(app: "__APP_NAME__", makeRoot: fixtureCore)
+        await NativeStepHost.runStdio(app: "__APP_NAME__", makeRoot: hostRoot)
     }
 }

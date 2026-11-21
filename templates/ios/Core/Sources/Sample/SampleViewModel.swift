@@ -30,9 +30,9 @@ public final class SampleViewModel {
     public private(set) var state = State()
     @ObservationIgnored let effects = EffectRunner()
     private let sample: any SampleService
-    private unowned let router: any Router
+    private unowned let router: any SampleRouter
 
-    public init(sample: any SampleService, router: any Router) {
+    public init(sample: any SampleService, router: any SampleRouter) {
         self.sample = sample
         self.router = router
     }
