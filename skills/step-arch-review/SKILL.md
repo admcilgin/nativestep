@@ -27,6 +27,7 @@ Go through Core, then Host, then Mobile, on each platform. For each changed file
   - Is every external call behind a service protocol (R4)?
   - Are service, method and argument names the same on both platforms (R5)?
   - Does a real implementation leak into Core or into a behavior session?
+  - Is each new service's real implementation complete (R4)? A stub, a request without the token or headers the reference sends, or a status code it maps and this one does not, is a finding, unless `inventory.json` names the planned checkpoint that finishes it. No gate runs real services, so this question is the only check.
 - **Host.** Are the fixture services free of logic: a call in, a fixture out?
 - **Mobile.**
   - Do views only read state and send actions (R9)?

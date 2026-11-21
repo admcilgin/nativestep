@@ -14,6 +14,7 @@ The shots must show the same state: the same screen, the same data, the same loa
 - one shot shows another screen, another state, a spinner the others do not have, or an empty screen;
 - the data differs (another product, another count), which means the fixtures or the timing differ;
 - a system dialog, keyboard or debug banner covers content. A banner in an empty corner is a note, not a reason.
+- the iOS shot comes from a wide simulator (an iPad or the iPhone Duo). There, `TabView` becomes an icon-only rail and layouts take their regular-width form. Boot an iPhone simulator and take the shots again (GUIDE.md §1).
 
 Answer `INVALID` with the reason and stop. Do not compare an invalid set.
 

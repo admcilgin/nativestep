@@ -32,6 +32,7 @@ For each feature, split the work into checkpoints:
 - Each checkpoint is small enough that its tests, both platforms' code and the reviews fit in one sitting. A screen with a list, its loading and its errors is usually one; a form with several validation rules is usually two.
 - The first checkpoint of a feature makes its first screen reachable and showing its main state. Later ones add the rest.
 - Visual-only work (layout, theming) is its own checkpoint, so logic checkpoints skip G3.
+- Behavior tests run on fixtures, so no gate sees a real service at work. Plan the real side as work too: the API client and authentication (tokens, headers, App Check, refresh) are a checkpoint of `foundation`, or of the first feature that calls the backend, with a thin real-service test (ARCHITECTURE.md §8). Every later service's real implementation lands in the checkpoint that adds its protocol.
 - `id` is `cp1`, `cp2`, … per feature; `title` says what the user can see or do when it is done; `status` is `planned`.
 
 Use the reference to find the behaviors: during a migration, the profile's service errors and navigation guards, and each screen's branches in the Flutter code; without one, the acceptance criteria in the feature docs (each criterion lands in exactly one checkpoint; name them in its title or in `memory.md`) and the states in the designs.

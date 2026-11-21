@@ -1,6 +1,6 @@
 ---
 name: step-reference
-description: Make the Flutter app a nativestep reference target. Writes the project's binding in spec/adapters/flutter/nativestep_binding/, makes the two allowed changes to the Flutter repo, and checks every driven screen with nativestep ls and do on the iOS simulator. Use after step-adopt, once spec/profile.md is approved.
+description: Make the Flutter app a nativestep reference target. Writes the project's binding in spec/adapters/flutter/nativestep_binding/, makes the two allowed changes to the Flutter repo, and checks each screen it binds with nativestep ls and do on the iOS simulator. Use after step-adopt, once spec/profile.md is approved.
 ---
 
 # step-reference
@@ -8,6 +8,10 @@ description: Make the Flutter app a nativestep reference target. Writes the proj
 Input: an approved `spec/profile.md`. Output: the binding package, two changes in the Flutter repo, the node tree in `spec/profile.md`, and corrected `reference` values in `spec/inventory.json`.
 
 The binding is the only code that knows both sides: the Flutter app's state, wiring and routes, and the target's node, service and field names. Everything it needs to know about the Flutter app is in the profile; if it is not, add it to the profile first. The binding's duties are in [COMPONENTS.md](../../COMPONENTS.md) §5, the node and focus rules in [PROTOCOL.md](../../PROTOCOL.md) §4, the navigator tree in [ARCHITECTURE.md](../../ARCHITECTURE.md) §5. [references/binding.md](references/binding.md) shows the package's shape.
+
+## Scope
+
+Bind the app shell and the screens the first features need, not every screen: the navigators, the screens reachable from launch by switching tabs, and the screens of the app's core flow that step-plan will start with. Every other screen gets a stateless node (its name, no state, no actions), so the path is right wherever a test lands. step-test completes a screen's node when its first checkpoint needs it (step-test §1). An app with 25 screens and as many services takes days to bind in full, all before the first checkpoint.
 
 ## 1. Design the node tree
 
@@ -51,9 +55,15 @@ Only two changes, both marked so they are easy to revert when the migration ends
 ```
 
 ```dart
+// main.dart imports. kDebugMode is not exported by package:flutter/material.dart since Flutter 3.50.
+import 'package:flutter/foundation.dart' show kDebugMode; // nativestep (remove after the migration)
+import 'package:nativestep_binding/nativestep_binding.dart'; // nativestep (remove after the migration)
+
 // The first line of main():
-if (kDebugMode && const bool.fromEnvironment('NATIVESTEP')) return startNativeStep();
+if (kDebugMode && const bool.fromEnvironment('NATIVESTEP')) return startNativeStep(); // nativestep
 ```
+
+Leave out the `foundation` import when `main.dart` already has `kDebugMode`. `nativestep migrate finish` removes the binding's import and the `main()` line, and `dart fix` then drops the `foundation` import if nothing else uses it.
 
 Run `flutter pub get` and `flutter analyze` in the Flutter project. If anything else in the Flutter repo seems to need a change, the binding is reaching for something it should get another way; find it, or ask the engineer.
 
@@ -81,5 +91,5 @@ When no session is running, `session start` builds, installs and launches the ap
 
 ## 6. Record
 
-- Set each screen's `reference` in `spec/inventory.json` to what the check showed: `driven` when it passed, `read-only` when the binding cannot reach the screen's state, with the reason in the profile.
+- Set each bound screen's `reference` in `spec/inventory.json` to what the check showed: `driven` when it passed, `read-only` when the binding cannot reach the screen's state, with the reason in the profile. Screens with a stateless node stay `driven` until step-test binds them.
 - Complete the profile's `Node tree` table and move anything new you learned about the app into the profile's other sections.

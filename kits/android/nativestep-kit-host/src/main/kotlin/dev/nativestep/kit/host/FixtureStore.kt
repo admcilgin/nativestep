@@ -6,6 +6,7 @@ import dev.nativestep.kit.NodeJson
 import kotlinx.coroutines.delay
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -69,7 +70,7 @@ class FixtureStore internal constructor(document: JsonObject, private val poison
         if (entry.delayMs > 0) delay(entry.delayMs)
         entry.error?.let { return Result.failure(AppException(it)) }
         return try {
-            Result.success(NodeJson.decodeFromJsonElement(serializer, entry.result!!))
+            Result.success(FixtureJson.decodeFromJsonElement(serializer, entry.result!!))
         } catch (e: Exception) {
             poison(ProtocolError("internal", "fixture result for $service.$method does not decode",
                 mapOf("detail" to JsonPrimitive(e.message ?: e.toString()))))
@@ -80,3 +81,9 @@ class FixtureStore internal constructor(document: JsonObject, private val poison
     suspend inline fun <reified T> call(service: String, method: String, vararg args: Pair<String, JsonElement>): Result<T> =
         call(service, method, args.toMap(), serializer<T>())
 }
+
+/**
+ * Fixture results are decoded leniently, as iOS's Codable does: they are recorded from the reference or copied from
+ * the server, and carry fields a model reads only in a later checkpoint.
+ */
+internal val FixtureJson = Json(NodeJson) { ignoreUnknownKeys = true }
