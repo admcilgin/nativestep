@@ -305,6 +305,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
   2. Süzgeçli bir `nativestep test` koşusu (`foundation/`) hedefin sonuç dosyasının üstüne yazıyordu; `status` 18 yerine 3 test gösteriyordu. Artık yalnızca süzgeçsiz koşular sonuç yazıyor, cihaz koşuları ayrı dosyaya (`<target>-device.xml`).
   3. step-screen'in ilk feature adımı şablonun Sample ve About ekranlarını uygulamadan kaldırmayı söylemiyordu; release uygulaması ulaşılamayan ekranlar taşıyordu. Artık söylüyor; Core'daki `Sample/` conformance testleri için kalıyor.
 
+- İlerleme: Thrift Snap saha denemesinin düzeltmeleri (#7) Android kit'inin `FixtureStore`'unu değiştirdi; kit'ler 0.2.3 oldu, böylece `kits update` ve `doctor` 0.2.2'deki projelere güncelleme olduğunu söylüyor. CLI 0.2.0 (`nativestep --version`); release etiketi `cli/package.json` ile eşleşmezse `release.yml` duruyor.
+
 **Bitti:** sıfırdan bir uygulama step-start'tan ilk checkpoint'e kadar gate'lerden geçiyor; göç edilmiş bir uygulama `migrate finish` sonrası yeni bir feature'ı dokümandan ekliyor.
 
 ## Verilen kararlar
