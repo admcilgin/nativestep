@@ -44,21 +44,17 @@ In Claude Code:
 
 ### The CLI
 
-Once a release is published, download `nativestep-darwin-arm64.tar.gz` (`darwin-x64` on an Intel Mac) from its GitHub releases page. Until then, build it from a checkout:
+Download the latest release into `~/.nativestep` (`darwin-x64` on an Intel Mac). `curl` keeps macOS from quarantining the binary, which a browser download does:
 
 ```bash
-git clone https://github.com/admcilgin/nativestep && cd nativestep && bun cli/release.ts darwin-arm64
-```
-
-Unpack it somewhere permanent and put its `bin/` on `PATH`. `kits/` and `templates/` must stay beside `bin/`: `init` and `kits update` copy them.
-
-```bash
-mkdir -p ~/.nativestep && tar -xzf dist/nativestep-darwin-arm64.tar.gz -C ~/.nativestep
+mkdir -p ~/.nativestep && curl -fsSL https://github.com/admcilgin/nativestep/releases/latest/download/nativestep-darwin-arm64.tar.gz | tar -xz -C ~/.nativestep
 ```
 
 ```bash
 export PATH="$HOME/.nativestep/nativestep-darwin-arm64/bin:$PATH"
 ```
+
+`kits/` and `templates/` must stay beside `bin/`: `init` and `kits update` copy them. To update, delete `~/.nativestep/nativestep-darwin-arm64` and run the download again; unpacking over it would keep files a newer release removed.
 
 `nativestep` with no arguments prints every command.
 

@@ -13,12 +13,13 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      # shortcut: nativestep has no release yet; until M8 the CLI comes from GitHub (NATIVESTEP_REPO overrides the repo).
-      - uses: actions/checkout@v4
-        with:
-          repository: ${{ vars.NATIVESTEP_REPO || 'admcilgin/nativestep' }}
-          path: .nativestep/cli
+      # The latest nativestep release (NATIVESTEP_REPO overrides the repo). macos-latest runs on arm64.
+      - name: nativestep CLI
+        run: |
+          mkdir -p "$RUNNER_TEMP/nativestep"
+          curl -fsSL "https://github.com/${{ vars.NATIVESTEP_REPO || 'admcilgin/nativestep' }}/releases/latest/download/nativestep-darwin-arm64.tar.gz" | tar -xz -C "$RUNNER_TEMP/nativestep"
+          echo "$RUNNER_TEMP/nativestep/nativestep-darwin-arm64/bin" >> "$GITHUB_PATH"
       - name: Architecture rules
-        run: bun .nativestep/cli/cli/src/main.ts lint
+        run: nativestep lint
       - name: Behavior tests
-        run: bun .nativestep/cli/cli/src/main.ts test --target ios,android
+        run: nativestep test --target ios,android
