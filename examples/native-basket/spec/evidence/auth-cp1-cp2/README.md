@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode. Both checkpoints share one
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/auth/sign-in.test.ts`, 6 tests. cp1 is the first two; cp2 is the last four.
 - signing in lands on the product list
 - the email is sent without surrounding spaces
@@ -16,14 +18,20 @@ Run on 2026-11-20 with step-feature, autonomous mode. Both checkpoints share one
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): ios 24 pass, 0 fail; android 24 pass, 0 fail.
 On devices, `nativestep test auth/ --device`: ios 6 pass, android 6 pass.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean.
 
 ## G3 · UI review
+
+Result: pass
 
 Shots of the wrong-password state are in `shots/`. The set is valid: all three show "Wrong email or password." under the fields.
 
@@ -41,6 +49,8 @@ Not covered: the network error. It uses the same view path as unauthorized, with
 
 ## G4 · Architecture review
 
+Result: pending — second isolated review missing
+
 One review run, inline (see foundation-cp1). Verdict: approve, no findings.
 
 Both platforms match:
@@ -53,5 +63,7 @@ Both platforms match:
 `router.signedIn` is called from `update` on both platforms, through the `Router` protocol (R14).
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous).

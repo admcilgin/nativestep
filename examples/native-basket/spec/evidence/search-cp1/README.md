@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode. This is the first feature 
 
 ## G0 · Tests against the doc
 
+Result: pending
+
 `spec/tests/search/search.test.ts`, 7 tests, one per acceptance criterion (1–7). Criterion 8, no server call, is covered by every test: the fixtures have no search method, so a call would fail as `fixture_missing`. New fixture: `search/catalog` (Tea, Green tea, Mug, Teapot); the tests also reuse `catalog/restocked` and `catalog/slow-products`.
 
 After the migration, G0 is the engineer approving the tests against the doc (step-test §4). In autonomous mode that approval is **pending**.
@@ -24,14 +26,20 @@ The two platforms were built one after the other in this session. Parallel step-
 
 ## G1 · Behavior
 
+Result: pass
+
 - `nativestep test --target ios,android` (headless, all tests): pass on both.
 - On devices: `search/` passes on ios and on android, and so does `catalog/`.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean. The Android debug and release builds pass, and so does the iOS Release build for the simulator.
 
 ## G3 · UI review (against the doc)
+
+Result: pass
 
 The shots in `shots/` are for ios and android only:
 - results for "  TEA ": Tea, Green tea, Teapot;
@@ -42,6 +50,8 @@ The sets are valid. There are no blocking differences from the doc: the placehol
 
 ## G4 · Architecture review
 
+Result: pending — second isolated review missing
+
 One review run, inline. The second, isolated run is missing because subagents are not used in this session. Verdict: approve, no findings.
 - R8: `query` and `results` change only in `update`. On Android, the derived `results` are applied in `update` after `step`.
 - R12: the State fields, the action and its input schema, and the matching rule are the same on both platforms.
@@ -49,6 +59,8 @@ One review run, inline. The second, isolated run is missing because subagents ar
 - R4: no service was added; search is local.
 
 ## G5 · Engineer
+
+Result: pending
 
 Skipped (autonomous). Pending for the engineer:
 - approve the tests against the doc (G0);

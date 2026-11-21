@@ -4,6 +4,8 @@ Run on 2026-11-20 with step-feature, autonomous mode.
 
 ## G0 · Reference
 
+Result: pass
+
 `spec/tests/basket/add.test.ts`, 4 tests:
 - the basket starts empty
 - adding a product stays on its detail and puts one in the basket
@@ -27,20 +29,28 @@ The last test needed two changes:
 
 ## G1 · Behavior
 
+Result: pass
+
 `nativestep test --target ios,android` (headless, all tests): ios 45 pass, android 45 pass, 0 fail.
 On devices, `nativestep test basket/ --device`: ios 4 pass, android 4 pass.
 
 ## G2 · Lint
 
+Result: pass
+
 `nativestep lint`: clean. The Android debug and release builds pass.
 
 ## G3 · UI review
+
+Result: pass
 
 The detail with its button and the Basket with two lines are in `shots/`. The sets are valid. There are no blocking differences: the lines, quantities and "Total $21.00" match.
 - note · all · the −/+ buttons are basket cp2, Place order is cp3, and the count badge on the tab is cp5.
 - note · android: the cart icon on the button is `ShoppingCart`, without the reference's plus sign (small icon set).
 
 ## G4 · Architecture review
+
+Result: pending — second isolated review missing
 
 One review run, inline. Verdict: approve, no findings.
 - R8: the basket changes only in `update`. It has no effects yet.
@@ -49,5 +59,7 @@ One review run, inline. Verdict: approve, no findings.
 - note: the basket survives sign-out, as on the reference. This is provisional until the engineer answers the profile's open question (memory.md).
 
 ## G5 · Engineer
+
+Result: skipped — autonomous
 
 Skipped (autonomous).

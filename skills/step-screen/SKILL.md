@@ -5,7 +5,7 @@ description: Build one checkpoint's screens on one native platform (iOS or Andro
 
 # step-screen
 
-Input: one checkpoint, one platform (`ios` or `android`), the checkpoint's tests in `spec/tests/<feature>/` and their fixtures, and the reference: during a migration the Flutter screen and `spec/profile.md`; afterwards the docs and designs. Output: services, ViewModels, nodes and views in the native project, green tests on that platform, and a clean lint.
+Input: one checkpoint, one platform (`ios` or `android`), the checkpoint's tests in `spec/tests/<feature>/` and their fixtures, and the reference: during a migration the Flutter screen and `spec/profile.md`; without one, the feature doc in `docs/features/` and the designs in `docs/design/`. Output: services, ViewModels, nodes and views in the native project, green tests on that platform, and a clean lint.
 
 The architecture is in [ARCHITECTURE.md](../../ARCHITECTURE.md) and the node tree format in [PROTOCOL.md](../../PROTOCOL.md) §3–§5. Read them first; this skill names the rules (R1…) instead of repeating them.
 
@@ -25,7 +25,7 @@ Work in Core first. It is what the tests drive.
 3. **Node.** The Introspection extension (iOS) or Node class (Android) (R10): the name from the tests, the state the tests read, and the actions the user can take now. An action that cannot be taken is left out, not disabled: that is how a test sees `unavailable`. Give every action with arguments a schema.
 4. **AppCore.** Add the new services to `Services` (R3), build the ViewModel where the user reaches it, and put it in the right navigator (R14). A screen the user reaches from a deep link gets a route (R16).
 
-**The first feature of a migration** replaces the template's sample shell. Do not delete it: the conformance tests in `spec/tests/_sample/` still need it.
+**The first feature** (`foundation`, in a migration or a new app) replaces the template's sample shell. Do not delete it: the conformance tests in `spec/tests/_sample/` still need it.
 
 1. Replace the body of `AppCore` with the app's own shell; leave `Sample/SampleCore` as it is. The host's `hostRoot` already builds `SampleCore` for sessions with the `conformance` flag (COMPONENTS.md §6).
 2. Drop the `sample` service from `Services` and `fixtureCore`; `hostRoot` builds `SampleCore` with its own fixture service.
@@ -55,7 +55,7 @@ Repeat until both are green. When a test fails:
 
 Only now write what the user sees. Mobile is not covered by G1, so keep it thin.
 
-- **Real services** (R4): the HTTP or platform implementation of each service protocol, in the app's feature folder. Error mapping to the codes in the profile's service table.
+- **Real services** (R4): the HTTP or platform implementation of each service protocol, in the app's feature folder. Error mapping to the codes in the profile's service table, or the feature doc's.
 - **Views** read the ViewModel's state and send its actions, nothing else (R9). Texts and formatting come from the reference. The Android template has no icon library: draw the few icons a screen needs as an `ImageVector` from the icon's path rather than adding `material-icons` for them.
 - **Root** draws the navigators' state (R14) and keeps no navigation state of its own.
 - Build the app in debug and release. Release must not contain the protocol server (R20); lint checks this.

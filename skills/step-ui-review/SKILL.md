@@ -1,11 +1,11 @@
 ---
 name: step-ui-review
-description: Compare screenshots of one state on the reference and on the native platforms, and list the differences by severity (gate G3). Use in step-feature after G2, on the shots `nativestep shot` takes; after the migration, compare against the design instead of the Flutter app.
+description: Compare screenshots of one state on the reference and on the native platforms, and list the differences by severity (gate G3). Use in step-feature after G2, on the shots `nativestep shot` takes; without a reference, compare against the design in docs/design/, or the two platforms with each other when there is none.
 ---
 
 # step-ui-review
 
-Input: one set of screenshots of the same state, taken with `nativestep shot`: `<stem>-flutter.png` (or a design export after the migration), `<stem>-ios.png` and `<stem>-android.png`. Output: a list of differences, or `INVALID`.
+Input: one set of screenshots of the same state, taken with `nativestep shot`: `<stem>-flutter.png` (without a reference, the design export `docs/design/<feature>/<stem>.png`, if there is one), `<stem>-ios.png` and `<stem>-android.png`. Output: a list of differences, or `INVALID`.
 
 ## 1. Is the set valid?
 
@@ -19,7 +19,7 @@ Answer `INVALID` with the reason and stop. Do not compare an invalid set.
 
 ## 2. Compare
 
-Compare each native shot with the reference, not the two native shots with each other. Go from the top of the screen to the bottom: status bar (its icons readable on the app's background), navigation bar and title, content, controls, tab bar.
+Compare each native shot with the reference (the Flutter shot or the design), not the two native shots with each other. Without either, compare iOS with Android, and both with the feature doc's words: the texts, the states and the order the doc gives. Go from the top of the screen to the bottom: status bar (its icons readable on the app's background), navigation bar and title, content, controls, tab bar.
 
 Platform conventions are not differences. Each platform keeps its own:
 

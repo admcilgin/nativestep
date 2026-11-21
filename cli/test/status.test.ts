@@ -24,3 +24,24 @@ test("status sums up the inventory and the latest results", () => {
   expect(s.features).toMatchObject({ total: 3, done: 1, checkpoints: { total: 4, done: 3 } });
   expect(s.tests.ios).toMatchObject({ tests: 15, failures: 1, skipped: 2 });
 });
+
+test("status reads each gate's Result line and names the next checkpoint", () => {
+  const root = mkdtempSync(join(tmpdir(), "nativestep-status-"));
+  mkdirSync(join(root, "spec/evidence/auth-cp1-cp2"), { recursive: true });
+  writeFileSync(join(root, "spec/inventory.json"), JSON.stringify({
+    screens: [{ name: "Login", status: "done" }],
+    features: [
+      { name: "auth", checkpoints: [{ id: "cp1", status: "done" }, { id: "cp2", status: "done" }] },
+      { name: "feed", dependsOn: ["auth", "profile"], checkpoints: [{ id: "cp1" }] },
+      { name: "profile", dependsOn: ["auth"], checkpoints: [{ id: "cp1", title: "Profile shows the name" }] },
+    ],
+  }));
+  writeFileSync(join(root, "spec/evidence/auth-cp1-cp2/README.md"),
+    "# auth\n\n## G0 · Reference\n\nResult: pass\n\n## G3 · UI review\n\nResult: skipped — logic only\n\n## G4 · Architecture review\n\nOne run.\n\n## G5 · Engineer\n\nResult: pending — autonomous\n");
+
+  const s = statusOf(root, "App");
+  expect(s.screens.migrated).toBe(1);
+  expect(s.features.list[0]!.checkpoints![1]!.gates).toEqual({ G0: "pass", G3: "skipped", G4: "unknown", G5: "pending" });
+  expect(s.next).toEqual({ feature: "profile", checkpoint: "cp1", title: "Profile shows the name", status: "planned" });
+  expect(s.attention).toEqual(["auth/cp1 (G4 G5)", "auth/cp2 (G4 G5)"]);
+});

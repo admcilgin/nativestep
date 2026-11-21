@@ -19,7 +19,7 @@ Then, for each checkpoint of the feature in order, set its `status` to `in_progr
 
 ## 1. Tests (G0)
 
-Run step-test for the checkpoint. Its tests go to `spec/tests/<feature>/`, and they pass on the reference before any native code is written. During a migration, a test that cannot pass on the reference is an engineer decision (step-test §4); wait for it.
+Run step-test for the checkpoint. Its tests go to `spec/tests/<feature>/`, and they pass on the reference before any native code is written; without a reference, the engineer approves them against the feature doc (in autonomous mode that approval is pending, and the evidence says so). During a migration, a test that cannot pass on the reference is an engineer decision (step-test §4); wait for it.
 
 A checkpoint whose behavior is already covered by an earlier checkpoint's tests still gets at least one test of its own: the test that would fail if this checkpoint's code were removed.
 
@@ -41,7 +41,7 @@ nativestep lint
 
 ## 4. UI review (G3)
 
-Skip this step only when the checkpoint changes no view; write `G3: skipped, logic only` in the evidence.
+Skip this step only when the checkpoint changes no view; write `Result: skipped — logic only` under G3.
 
 Take screenshots of the states the checkpoint adds, on the reference and on both platforms, with the checkpoint's own tests:
 
@@ -49,17 +49,19 @@ Take screenshots of the states the checkpoint adds, on the reference and on both
 nativestep shot spec/tests/<feature>/<topic>.test.ts --name "<test>" --target flutter,ios,android --out spec/evidence/<feature>-<cp>/shots
 ```
 
+Without a reference, drop `flutter` from `--target`; step-ui-review compares the shots with `docs/design/<feature>/` instead.
+
 A shot shows the state where the test ends. Pick the tests that end in the states this checkpoint adds; a state that no test ends in needs a test of its own, not a shot taken by hand. For a loading state, write a test that ends while the call is in flight (a fixture with `delayMs`) and shoot it with `--no-wait`.
 
 Then run step-ui-review on each set. Blocking differences are fixed in the view (step-screen §5) and the shots are taken again. `INVALID` means the shots do not show the same state; fix the test or the fixture timing and take them again. Do not judge an `INVALID` set.
 
 ## 5. Architecture review (G4)
 
-Run step-arch-review twice, each in an isolated context (a subagent with only the skill, the diff and ARCHITECTURE.md), so that the second run does not see the first one's verdict. If subagents are not available, run it once and write in the evidence that the second run is missing. Both must approve. After a fix, run G1 again, and G3 too if the fix changed a view; then review again.
+Run step-arch-review twice, each in an isolated context (a subagent with only the skill, the diff and ARCHITECTURE.md), so that the second run does not see the first one's verdict. If subagents are not available, run it once and write `Result: pending — second isolated review missing`. Both must approve. After a fix, run G1 again, and G3 too if the fix changed a view; then review again.
 
 ## 6. Evidence and engineer (G5)
 
-Write `spec/evidence/<feature>-<cp>/README.md`:
+Write `spec/evidence/<feature>-<cp>/README.md`. Each gate has its own section, headed `## G<n> · <name>`, whose first line is its result: `Result: pass`, `Result: fail`, `Result: skipped — <why>` or `Result: pending — <why>` (an approval the engineer still owes, a second review that could not run). `nativestep status` reads these lines; a done checkpoint with a gate that is not `pass` or `skipped` shows under `attention`. The sections hold:
 
 - the checkpoint id and title;
 - the tests added and the G0 result;
@@ -69,11 +71,11 @@ Write `spec/evidence/<feature>-<cp>/README.md`:
 
 Copy results; do not summarize them into a pass. Then show the engineer the diff, the evidence and how to run the app. Every piece of feedback that is a decision goes into `spec/memory.md`, and the gates it touches run again.
 
-In autonomous mode G5 is skipped. Write `G5: skipped (autonomous)` in the evidence and go on.
+In autonomous mode G5 is skipped. Write `Result: skipped — autonomous` under G5 (`pending` when G0 also waits for the engineer's approval) and go on.
 
 ## 7. Close the checkpoint
 
-1. Set the checkpoint's `status` to `done`. When the feature's last checkpoint is done, set its screens' `status` to `migrated`.
+1. Set the checkpoint's `status` to `done`. When the feature's last checkpoint is done, set its screens' `status` to `migrated` (`done` in an app started with step-start).
 2. `nativestep status` must show the change.
 3. Commit the checkpoint alone: tests, fixtures, native code, evidence and `inventory.json`. The message names the feature and checkpoint, for example `catalog cp1: product list loads and shows names and prices`.
 
