@@ -48,7 +48,13 @@ Without the `claude` command on `PATH`, the script prints the two commands to ru
 /plugin install nativestep@nativestep
 ```
 
-`nativestep` with no arguments prints every command.
+Then check the machine:
+
+```bash
+nativestep doctor
+```
+
+Every line should say `ok`; a `fail` names the fix. `warn` lines (no booted simulator, no running emulator) matter only for device runs. `nativestep` with no arguments prints every command.
 
 ## 3. Start: migrate a Flutter app
 

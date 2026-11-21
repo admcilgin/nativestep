@@ -91,6 +91,7 @@ export function migrate(args: Args): number {
   }
 
   for (const path of manual) console.log(`check  ${path}: no nativestep binding lines found; remove them by hand if they are there`);
-  if (flutter) console.log(`next:\n  (cd '${flutter}' && flutter pub get && flutter analyze)\n  commit both repos`);
+  // The startup line used kDebugMode; dart fix drops the import only if nothing else in main.dart needs it.
+  if (flutter) console.log(`next:\n  (cd '${flutter}' && flutter pub get && dart fix --apply --code=unused_import lib/main.dart && flutter analyze)\n  commit both repos`);
   return 0;
 }

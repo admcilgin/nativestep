@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import { parseArgs, UsageError } from "./config.ts";
+import { doctor } from "./doctor.ts";
 import { init } from "./init.ts";
 import { kits } from "./kits.ts";
 import { lint } from "./lint.ts";
@@ -10,6 +11,7 @@ import { daemon, doAction, ls, sessionStart, sessionStop } from "./session.ts";
 import { shot, test } from "./test.ts";
 
 const USAGE = `usage:
+  nativestep doctor [--json]
   nativestep init <dir> --app <Name> --ios-bundle-id <id> --android-package <package> [--reference <flutter-path>] [--force]
   nativestep session start --target <t> [--fixtures a,b] [--route <url>] [--device] [--json]
   nativestep session stop [--target <t>]
@@ -38,6 +40,8 @@ async function main(argv: string[]): Promise<number> {
   }
   const args = parseArgs(rest, BOOLEANS);
   switch (command) {
+    case "doctor":
+      return doctor(args);
     case "init":
       return init(args);
     case "kits":
