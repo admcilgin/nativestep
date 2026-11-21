@@ -123,7 +123,7 @@ function addReference(dir: string, reference: string) {
         build: `cd ${path} && flutter build ios --simulator --debug --dart-define=NATIVESTEP=true && xcrun simctl install booted build/ios/iphonesimulator/Runner.app`,
         setup: `xcrun simctl launch --terminate-running-process booted ${bundleId}`,
         connect: "tcp://127.0.0.1:7357",
-        screenshot: "xcrun simctl io booted screenshot {out}",
+        screenshot: "xcrun simctl io booted screenshot {out} 2>/dev/null || xcrun simctl io booted screenshot --display=primary {out}",
       },
     },
     ...config.targets,

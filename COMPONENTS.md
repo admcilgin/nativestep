@@ -43,7 +43,7 @@ It ships as one archive per platform (`darwin-arm64`, `darwin-x64`, `linux-x64`,
 | `nativestep session start --target <t> [--device] [--fixtures a,b] [--route <url>]` · `nativestep session stop [--target <t>]` | Starts a background session on the target, headless or (with `--device`) on the simulator or emulator; `ls` and `do` use this session. On a running session it sends a new `start`. |
 | `nativestep ls [--target <t>]` | The focused node: name, state, actions |
 | `nativestep do <action> [json] [--target <t>] [--no-wait]` | Runs an action and waits until `busy` is `false`; `--no-wait` returns the state right after the action |
-| `nativestep test [filter] [--target a,b] [--device]` | Runs `bun test` under `spec/` for each target and writes the results to `.nativestep/results/` |
+| `nativestep test [filter] [--target a,b] [--device]` | Runs `bun test` under `spec/` for each target. A run without a filter writes its results to `.nativestep/results/<target>.xml` (`<target>-device.xml` with `--device`), which `status` shows |
 | `nativestep lint [--json]` | Checks the rules tagged *lint* in ARCHITECTURE.md (R1, R5, R6, R10, R12, R17, R20) and prints one line per violation: rule, file and line, message |
 | `nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]` | Replays the test on device targets and takes a screenshot at the test's final state |
 | `nativestep status [--screens \| --features] [--json]` | Progress from `inventory.json`, the evidence and the latest test results in `.nativestep/results/`. A feature counts as done when all its checkpoints are done. It names the next checkpoint (the one in progress, else the first planned one whose feature's dependencies are done) and, under `attention`, done checkpoints whose evidence has a gate that is not `pass` or `skipped` (§9). `--features` shows each checkpoint's gates: `✓` pass, `-` skipped, `…` pending, `✗` fail, `?` no `Result:` line. |
@@ -224,7 +224,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
         "build": "cd ../basket-flutter && flutter build ios --simulator --debug --dart-define=NATIVESTEP=true && xcrun simctl install booted build/ios/iphonesimulator/Runner.app",
         "setup": "xcrun simctl launch --terminate-running-process booted com.basket.flutter",
         "connect": "tcp://127.0.0.1:7357",
-        "screenshot": "xcrun simctl io booted screenshot {out}"
+        "screenshot": "xcrun simctl io booted screenshot {out} 2>/dev/null || xcrun simctl io booted screenshot --display=primary {out}"
       }
     },
     "ios": {
@@ -234,7 +234,7 @@ Every piece of project-specific knowledge is in these files. The number of docum
         "build": "cd ios && xcodegen generate --quiet && xcodebuild -project Basket.xcodeproj -scheme Basket -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath build -quiet build && xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/Basket.app",
         "setup": "xcrun simctl launch --terminate-running-process booted com.basket.app",
         "connect": "tcp://127.0.0.1:7358",
-        "screenshot": "xcrun simctl io booted screenshot {out}"
+        "screenshot": "xcrun simctl io booted screenshot {out} 2>/dev/null || xcrun simctl io booted screenshot --display=primary {out}"
       }
     },
     "android": {

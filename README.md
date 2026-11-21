@@ -53,6 +53,8 @@ Two apps were migrated autonomously with the skills: Basket (12/12 checkpoints) 
 curl -fsSL https://admcilgin.github.io/nativestep/install.sh | bash
 ```
 
+For the skills alone, in Claude Code 2.1.275 or later: `/plugin install nativestep --marketplace admcilgin/nativestep`.
+
 [install.sh](install.sh) puts the `nativestep` CLI from the latest [release](https://github.com/admcilgin/nativestep/releases) in `~/.nativestep`, adds it to `PATH`, and installs the skills: the repo is a Claude Code plugin and its own marketplace ([GUIDE.md](GUIDE.md) §2). `bun cli/release.ts <target>` builds the same archive from a checkout. From a checkout, `bun cli/src/main.ts` does the same. Tests still need Bun.
 
 ```bash

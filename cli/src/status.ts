@@ -63,7 +63,7 @@ export function status(args: Args): number {
   if (!runs.length) console.log("  tests     no results yet; run nativestep test");
   for (const [t, r] of runs) {
     const pass = r.tests - r.failures - r.skipped;
-    console.log(`  ${`tests ${t}`.padEnd(18)}${pass}/${r.tests} pass${r.failures ? `, ${r.failures} fail` : ""}  (${r.at})`);
+    console.log(`  ${`tests ${t}`.padEnd(22)}${pass}/${r.tests} pass${r.failures ? `, ${r.failures} fail` : ""}  (${r.at})`);
   }
   return 0;
 }

@@ -85,7 +85,12 @@ export function test(args: Args): number {
       return {
         name,
         mode,
-        bunArgs: [...filters, ...(why ? ["--path-ignore-patterns=**/_sample/**"] : []), "--reporter=junit", `--reporter-outfile=${join(results, `${name}.xml`)}`],
+        // Only a full run speaks for the target in `nativestep status`; a filtered one would show a part as the whole.
+        bunArgs: [
+          ...filters,
+          ...(why ? ["--path-ignore-patterns=**/_sample/**"] : []),
+          ...(filters.length ? [] : ["--reporter=junit", `--reporter-outfile=${join(results, `${name}${mode === "device" ? "-device" : ""}.xml`)}`]),
+        ],
         report: why ? ` (_sample skipped: ${why})` : "",
         skip: why && onlySample ? `only _sample tests, which run here when named: nativestep test _sample` : undefined,
       };

@@ -27,9 +27,9 @@ Work in Core first. It is what the tests drive.
 
 **The first feature** (`foundation`, in a migration or a new app) replaces the template's sample shell. Do not delete it: the conformance tests in `spec/tests/_sample/` still need it.
 
-1. Replace the body of `AppCore` with the app's own shell; leave `Sample/SampleCore` as it is. The host's `hostRoot` already builds `SampleCore` for sessions with the `conformance` flag (COMPONENTS.md §6).
+1. Replace the body of `AppCore` with the app's own shell; leave `Sample/SampleCore` (and the `About` screen it shows) in Core as they are. The host's `hostRoot` already builds `SampleCore` for sessions with the `conformance` flag (COMPONENTS.md §6).
 2. Drop the `sample` service from `Services` and `fixtureCore`; `hostRoot` builds `SampleCore` with its own fixture service.
-3. The app itself never builds `SampleCore`: its debug launcher answers a conformance session with `unsupported`.
+3. The app itself never builds `SampleCore`: its debug launcher answers a conformance session with `unsupported`. So the template's views leave the app: on iOS `App/Sample/`, `App/About/` and `HTTPSampleService`; on Android `app/…/sample/` and `app/…/about/` (`SampleScreen`, `AboutScreen`, `HttpSampleService`). `RootView` / `Root` draw the new shell only. Without this, the release app ships screens nobody can reach.
 
 ## 3. Host
 
