@@ -3,8 +3,8 @@ package __ANDROID_PACKAGE__.about
 import dev.nativestep.kit.IntrospectionNode
 import dev.nativestep.kit.NodeAction
 import dev.nativestep.kit.NodeJson
-import __ANDROID_PACKAGE__.app.Route
-import __ANDROID_PACKAGE__.app.Router
+import __ANDROID_PACKAGE__.sample.SampleRoute
+import __ANDROID_PACKAGE__.sample.SampleRouter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +13,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
 /** The second tab. Opens the license as a modal. */
-class AboutViewModel(private val router: Router) {
+class AboutViewModel(private val router: SampleRouter) {
     @Serializable
     class State
 
@@ -25,7 +25,7 @@ class AboutViewModel(private val router: Router) {
     val state: StateFlow<State> = _state.asStateFlow()
 
     fun send(action: Action) = when (action) {
-        Action.OpenLicense -> router.go(Route.License)
+        Action.OpenLicense -> router.go(SampleRoute.License)
     }
 }
 

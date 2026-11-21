@@ -27,8 +27,8 @@ Work in Core first. It is what the tests drive.
 
 **The first feature of a migration** replaces the template's sample shell. Do not delete it: the conformance tests in `spec/tests/_sample/` still need it.
 
-1. Move the template's `AppCore` to `Sample/SampleCore`, with its routes and router renamed `SampleRoute` and `SampleRouter`.
-2. In the host's `FixtureCore`, `hostRoot` builds `SampleCore` when the fixtures have the `conformance` flag (COMPONENTS.md §6), and the app's `AppCore` otherwise.
+1. Replace the body of `AppCore` with the app's own shell; leave `Sample/SampleCore` as it is. The host's `hostRoot` already builds `SampleCore` for sessions with the `conformance` flag (COMPONENTS.md §6).
+2. Drop the `sample` service from `Services` and `fixtureCore`; `hostRoot` builds `SampleCore` with its own fixture service.
 3. The app itself never builds `SampleCore`: its debug launcher answers a conformance session with `unsupported`.
 
 ## 3. Host

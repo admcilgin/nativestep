@@ -11,9 +11,9 @@ public final class AboutViewModel {
     }
 
     public private(set) var state = State()
-    private unowned let router: any Router
+    private unowned let router: any SampleRouter
 
-    public init(router: any Router) {
+    public init(router: any SampleRouter) {
         self.router = router
     }
 

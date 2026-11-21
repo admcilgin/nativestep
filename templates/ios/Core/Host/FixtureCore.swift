@@ -3,6 +3,18 @@ import Foundation
 import NativeStepHostKit
 import NativeStepKit
 
+/// The headless host's root: the conformance core for `_sample` sessions (COMPONENTS.md §6), the app otherwise.
+/// Until the app has a shell of its own the two are the same tree.
+@MainActor
+public func hostRoot(_ fixtures: FixtureStore, route: String?) throws -> any IntrospectionNodeProviding {
+    guard fixtures.flags["conformance"] == .bool(true) else { return try fixtureCore(fixtures, route: route) }
+    let core = SampleCore(sampleService: FixtureSampleService(fixtures: fixtures))
+    if let route, !(URL(string: route).map(core.open) ?? false) {
+        throw ProtocolError("bad_request", "no screen for route \(route)")
+    }
+    return core
+}
+
 /// Builds Core with fixture services (R3) and opens `route`. Used by the headless host and the debug app.
 @MainActor
 public func fixtureCore(_ fixtures: FixtureStore, route: String?) throws -> AppCore {

@@ -3,8 +3,6 @@ package __ANDROID_PACKAGE__.sample
 import dev.nativestep.kit.AppError
 import dev.nativestep.kit.Effect
 import dev.nativestep.kit.EffectRunner
-import __ANDROID_PACKAGE__.app.Route
-import __ANDROID_PACKAGE__.app.Router
 import java.net.URI
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +13,7 @@ import kotlinx.serialization.Serializable
 /** The conformance screen. Every target implements the same behavior (COMPONENTS.md §6). */
 class SampleViewModel(
     private val sample: SampleService,
-    private val router: Router,
+    private val router: SampleRouter,
     internal val effects: EffectRunner,
 ) {
     @Serializable
@@ -71,7 +69,7 @@ class SampleViewModel(
                     listOf(suspend { Message.Loaded(sample.list(page = 1)) })
                 }
             is Action.OpenDetail -> {
-                router.go(Route.SampleDetail(action.id))
+                router.go(SampleRoute.SampleDetail(action.id))
                 emptyList()
             }
             // Breaks R4 on purpose: a raw request that only the host's network guard can stop.

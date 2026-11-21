@@ -27,16 +27,16 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun Root(cores: StateFlow<AppCore?>) {
     val core = cores.collectAsState().value ?: return
-    val tabs by core.tabs.tabs.collectAsState()
-    val selected by core.tabs.selected.collectAsState()
-    val presented by core.modal.presented.collectAsState()
+    val tabs by core.sample.tabs.tabs.collectAsState()
+    val selected by core.sample.tabs.selected.collectAsState()
+    val presented by core.sample.modal.presented.collectAsState()
     Scaffold(
         bottomBar = {
             NavigationBar {
                 tabs.forEach { (id, _) ->
                     NavigationBarItem(
                         selected = id == selected,
-                        onClick = { core.tabs.select(id) },
+                        onClick = { core.sample.tabs.select(id) },
                         icon = {},
                         label = { Text(if (id == "about") "About" else "Sample") },
                     )
@@ -52,7 +52,7 @@ fun Root(cores: StateFlow<AppCore?>) {
             }
         }
     }
-    (presented as? LicenseNode)?.let { LicenseDialog(it.vm, onDismiss = { core.modal.dismiss() }) }
+    (presented as? LicenseNode)?.let { LicenseDialog(it.vm, onDismiss = { core.sample.modal.dismiss() }) }
 }
 
 @Composable

@@ -7,24 +7,24 @@ struct RootView: View {
     let core: AppCore
 
     private var selectedTab: Binding<String> {
-        Binding(get: { core.tabs.selected }, set: { core.tabs.select($0) })
+        Binding(get: { core.sample.tabs.selected }, set: { core.sample.tabs.select($0) })
     }
 
     private var presented: Binding<Bool> {
-        Binding(get: { core.modal.presented != nil }, set: { if !$0 { core.modal.dismiss() } })
+        Binding(get: { core.sample.modal.presented != nil }, set: { if !$0 { core.sample.modal.dismiss() } })
     }
 
     var body: some View {
         TabView(selection: selectedTab) {
-            ForEach(core.tabs.tabs.indices, id: \.self) { i in
-                let tab = core.tabs.tabs[i]
+            ForEach(core.sample.tabs.tabs.indices, id: \.self) { i in
+                let tab = core.sample.tabs.tabs[i]
                 tabContent(tab.node)
                     .tabItem { tab.id == "about" ? Label("About", systemImage: "info.circle") : Label("Sample", systemImage: "list.bullet") }
                     .tag(tab.id)
             }
         }
         .sheet(isPresented: presented) {
-            if let vm = core.modal.presented as? LicenseViewModel {
+            if let vm = core.sample.modal.presented as? LicenseViewModel {
                 NavigationStack { LicenseView(vm: vm) }
             }
         }
