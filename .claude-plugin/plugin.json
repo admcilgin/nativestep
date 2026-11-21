@@ -1,9 +1,9 @@
 {
   "name": "nativestep",
-  "version": "0.1.0",
-  "description": "Migrate a Flutter app to native iOS (SwiftUI) and Android (Compose) one checkpoint at a time, with behavior tests that run against all three apps.",
+  "version": "0.2.0",
+  "description": "Build native iOS (SwiftUI) and Android (Compose) apps with agents: migrate a Flutter app or start a new one, then develop feature by feature with shared behavior tests and gated checkpoints.",
   "author": { "name": "admcilgin" },
   "homepage": "https://github.com/admcilgin/nativestep",
   "repository": "https://github.com/admcilgin/nativestep",
-  "keywords": ["flutter", "ios", "android", "migration", "swiftui", "compose"]
+  "keywords": ["flutter", "ios", "android", "migration", "swiftui", "compose", "native", "greenfield"]
 }

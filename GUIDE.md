@@ -1,17 +1,17 @@
-# nativestep guide: install and a first migration
+# nativestep guide
 
-From a clean Mac to the first checkpoint of a Flutter app running natively on iOS and Android. Claude Code does the migration with the nativestep skills; you make the decisions they hand you.
+From a clean Mac to the first checkpoint of a native iOS and Android app, either migrated from Flutter (§3) or new (§4), and the daily loop after that (§5–§7). Claude Code does the work with the nativestep skills; you make the decisions they hand you.
 
 ## 1. The machine
 
-A Mac: the reference Flutter app runs on the iOS simulator.
+A Mac: Xcode builds the iOS app, and a Flutter app being migrated runs on the iOS simulator.
 
 | Tool | Why | Check |
 |---|---|---|
 | Xcode, with an iOS simulator runtime | the native iOS app and the reference app | `xcrun simctl list runtimes` |
 | XcodeGen | the iOS project is generated from `project.yml` | `brew install xcodegen` |
 | Android Studio, with an emulator image | the native Android app; its JDK builds Gradle | `emulator -list-avds` |
-| Flutter | the source app, built as the reference | `flutter doctor` |
+| Flutter (migration only) | the source app, built as the reference | `flutter doctor` |
 | Bun 1.4.4 or later | `nativestep test` runs the tests with `bun test` | `bun --version` |
 | Claude Code | runs the skills | `claude --version` |
 
@@ -50,7 +50,7 @@ Without the `claude` command on `PATH`, the script prints the two commands to ru
 
 `nativestep` with no arguments prints every command.
 
-## 3. The migration
+## 3. Start: migrate a Flutter app
 
 Open Claude Code in the Flutter project's parent directory and call the skills in this order. You can name them (`/nativestep:step-adopt`) or ask in words ("start a nativestep migration of `./my_app`").
 
@@ -63,36 +63,75 @@ Open Claude Code in the Flutter project's parent directory and call the skills i
 
 `step-feature` calls the other skills itself: `step-test` writes the tests, `step-screen` builds each platform, `step-ui-review` compares screenshots, `step-arch-review` reviews the code. `step-fix` is for bugs: it captures one as a failing test first.
 
-### The gates
+Then follow §5 for the gates, and §6 when every checkpoint is done.
+
+## 4. Start: a new app
+
+Open Claude Code where the app should live and call the skills in this order (`/nativestep:step-start`, or "start a new nativestep app for …").
+
+| Step | Skill | What you get | What you decide |
+|---|---|---|---|
+| 1 | `step-start` | Both native projects (`nativestep init`), a feature doc per feature in `docs/features/` with screens, service calls and numbered acceptance criteria, and the screen list in `spec/inventory.json` | The app name, bundle id, package and location; what the app is for and what ships first; then approve each doc, the `Decision:` lines first |
+| 2 | `step-plan` | Features, their order and their checkpoints in `spec/inventory.json`, `foundation` first | Approve the plan |
+| 3 | `step-feature` | One feature, checkpoint by checkpoint, through the gates in §5 | Approve the tests against the doc (G0) and each checkpoint (G5) |
+
+The feature docs are the reference. Tests are written from their acceptance criteria, and each test's title starts with the criterion's id (`AC3: …`). Put design exports in `docs/design/<feature>/`, named after the state they show (`step-start` §4); G3 compares the screenshots with them, or the two platforms with each other when there is no design.
+
+## 5. The gates
 
 Every checkpoint passes six gates before it is committed. The pass conditions are in [COMPONENTS.md](COMPONENTS.md) §9.
 
 | Gate | Checks |
 |---|---|
-| G0 | The new behavior tests pass on the Flutter reference |
+| G0 | The new behavior tests pass on the Flutter reference; without one, you approve them against the feature doc |
 | G1 | The same tests pass on iOS and Android |
 | G2 | `nativestep lint` is clean |
-| G3 | Screenshots of the same state on all three apps show no blocking difference |
+| G3 | Screenshots of the same state show no blocking difference from the reference: the Flutter app, or the design in `docs/design/` |
 | G4 | Two independent architecture reviews approve |
 | G5 | You review the code and the running app and approve; your feedback goes to `spec/memory.md` |
 
-The first checkpoint is reached when `nativestep status` shows it `done` and its evidence folder holds the G0–G4 results.
+Each gate's result is a `Result:` line in `spec/evidence/<feature>-<cp>/README.md`. The first checkpoint is reached when `nativestep status` shows it `done`, and `nativestep status --features` shows its gates:
 
-## 4. While you work
+```
+auth  1/2 checkpoints
+  cp1    done         0✓ 1✓ 2✓ 3✓ 4✓ 5✓    Sign in with email and password
+  cp2    in_progress                       Sign-in errors
+```
+
+`✓` pass, `-` skipped, `…` pending (an approval you owe, a review that could not run), `✗` fail. `nativestep status` lists done checkpoints with a pending or failed gate under `attention`, and names the next checkpoint to work on.
+
+## 6. Finish a migration
+
+When every checkpoint is done, retire the Flutter reference:
 
 ```bash
-nativestep status --features
+nativestep migrate finish --dry-run
+```
+
+It lists what it will change: the two marked lines leave the Flutter repo, the `flutter` target and `spec/adapters/flutter/` leave the native project, and `spec/profile.md` moves to `spec/archive/`. Run it without `--dry-run`, then commit both repos. From then on the project works like a new app (§4): new behavior is written into `docs/features/` first, and §7 is the daily loop. Keep the Flutter app around while you still compare older screens with it; the command refuses while a checkpoint is open unless you pass `--force`.
+
+## 7. Daily work
+
+| You want to | Ask Claude Code for | It runs |
+|---|---|---|
+| Add a feature | the feature, with its doc in `docs/features/` (or "write the doc for …" first) | `step-plan` for its checkpoints, then `step-feature` |
+| Change a feature | the new behavior, added to its doc as new acceptance criteria | `step-plan` adds checkpoints; `done` ones are never edited |
+| Fix a bug | the bug, with the steps to reproduce it | `step-fix`: a red test first, then the fix on both platforms |
+| See where things stand | — | `nativestep status`, `nativestep status --features` |
+
+```bash
+nativestep status
 ```
 
 ```bash
-nativestep test --target flutter,ios,android --device
+nativestep test --target ios,android --device
 ```
 
 ```bash
 nativestep session start --target ios --device
 ```
 
-`nativestep ls` then shows the focused screen's state and actions, and `nativestep do <action>` runs one: the same view the tests have. `nativestep shot <test-file> --target flutter,ios,android` takes the screenshots G3 compares.
+`nativestep ls` then shows the focused screen's state and actions, and `nativestep do <action>` runs one: the same view the tests have. `nativestep shot <test-file> --target ios,android` (with `flutter` during a migration) takes the screenshots G3 compares.
 
 ### One app per port
 
@@ -106,7 +145,7 @@ xcrun simctl terminate booted <its bundle id>
 adb shell am force-stop <its package>
 ```
 
-## 5. Keeping the kits current
+### Keeping the kits current
 
 The project holds a copy of the kits; `nativestep.json` records its version. After installing a newer `nativestep`:
 

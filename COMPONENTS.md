@@ -46,7 +46,8 @@ It ships as one archive per platform (`darwin-arm64`, `darwin-x64`, `linux-x64`,
 | `nativestep test [filter] [--target a,b] [--device]` | Runs `bun test` under `spec/` for each target and writes the results to `.nativestep/results/` |
 | `nativestep lint [--json]` | Checks the rules tagged *lint* in ARCHITECTURE.md (R1, R5, R6, R10, R12, R17, R20) and prints one line per violation: rule, file and line, message |
 | `nativestep shot <test-file> [--name <test>] --target a,b [--out <dir>] [--no-wait]` | Replays the test on device targets and takes a screenshot at the test's final state |
-| `nativestep status [--screens \| --features] [--json]` | Progress from `inventory.json` and the latest test results in `.nativestep/results/`. A feature counts as done when all its checkpoints are done. |
+| `nativestep status [--screens \| --features] [--json]` | Progress from `inventory.json`, the evidence and the latest test results in `.nativestep/results/`. A feature counts as done when all its checkpoints are done. It names the next checkpoint (the one in progress, else the first planned one whose feature's dependencies are done) and, under `attention`, done checkpoints whose evidence has a gate that is not `pass` or `skipped` (§9). `--features` shows each checkpoint's gates: `✓` pass, `-` skipped, `…` pending, `✗` fail, `?` no `Result:` line. |
+| `nativestep migrate finish [--dry-run] [--force]` | Ends a migration (§5): removes the two marked binding lines from the Flutter repo, the reference target from `nativestep.json` and `spec/adapters/flutter/`, moves `spec/profile.md` to `spec/archive/`, and notes the date in `spec/memory.md`. Refuses while a checkpoint is not done, unless `--force`. `--dry-run` only prints. |
 
 Shared behavior:
 
@@ -131,7 +132,7 @@ The binding's duties:
 
 The reference runs as a debug app on the iOS simulator (`flutter build ios --simulator --debug --dart-define=NATIVESTEP=true`), so `simctl` takes its screenshots like the iOS target's. `StepServer` listens on port 7357; the binding closes it when the app is hidden and listens again when it is shown (`AppLifecycleListener`).
 
-Only two places change in the Flutter repo: `pubspec.yaml` gets a path dependency on the binding, and `main.dart` gets one startup line that runs only in debug builds with `--dart-define=NATIVESTEP=true`. Both are reverted when the migration is done.
+Only two places change in the Flutter repo: `pubspec.yaml` gets a path dependency on the binding, and `main.dart` gets one startup line that runs only in debug builds with `--dart-define=NATIVESTEP=true`. Both are reverted when the migration is done: `nativestep migrate finish` removes them, with the binding and the reference target.
 
 ## 6. Templates
 
@@ -177,9 +178,10 @@ Writing rules:
 
 | Skill | Phase | Input | Output | Commands used |
 |---|---|---|---|---|
+| `step-start` | new app | The engineer's idea, designs, API spec | `nativestep.json`, `docs/features/`, `screens` in `spec/inventory.json`, native skeleton | `nativestep init`, `nativestep lint`, `nativestep test`, `nativestep status` |
 | `step-adopt` | migration | Flutter repo | `nativestep.json`, `spec/profile.md`, `spec/inventory.json`, native skeleton | `nativestep init`, `nativestep scan`, `nativestep lint`, `nativestep test` |
 | `step-reference` | migration | `profile.md` | `spec/adapters/flutter/nativestep_binding/`, two changes in the Flutter repo | `nativestep ls`, `nativestep do` (flutter) |
-| `step-plan` | always | Reference: Flutter code, or docs and designs | Features, order and checkpoints in `inventory.json` | `nativestep status` |
+| `step-plan` | always | Reference: Flutter code, or `docs/features/` and `docs/design/` | Features, order and checkpoints in `inventory.json` | `nativestep status` |
 | `step-feature` | always | One feature | A commit per checkpoint, and `spec/evidence/` | All; runs the gates |
 | `step-fix` | always | Bug description | A red test, then the fix on both platforms | `nativestep test` |
 | `step-test` | always | Reference | `spec/tests/`, `spec/fixtures/` | `nativestep test`, `nativestep session` |
@@ -187,7 +189,7 @@ Writing rules:
 | `step-ui-review` | always | `nativestep shot` screenshots | List of differences: severity, location, `INVALID` when needed | `nativestep shot` |
 | `step-arch-review` | always | Changed code | Findings with ARCHITECTURE.md rule numbers | — |
 
-`step-adopt` and `step-reference` are not used after the migration. The other seven skills continue in native development.
+A project starts one of two ways: `step-adopt` then `step-reference` for a Flutter app, or `step-start` for a new app. Neither is used again. The other seven skills are the same in both: once a migration is finished (`nativestep migrate finish`), a migrated project and a new one are developed alike, with `docs/features/` as the reference.
 
 ## 8. Project files
 
@@ -197,10 +199,12 @@ Every piece of project-specific knowledge is in these files. The number of docum
 |---|---|---|---|
 | `nativestep.json` | Targets and app identity | `nativestep init`, engineer | Permanent |
 | `spec/inventory.json` | Raw scan summary, screens, features, checkpoints and their status | `nativestep scan`, `step-plan`, `step-feature` | Permanent |
-| `spec/profile.md` | How the source code works; mappings and decisions specific to this project | `step-adopt`; the engineer approves | Moved to `spec/archive/` after migration |
+| `spec/profile.md` | How the source code works; mappings and decisions specific to this project | `step-adopt`; the engineer approves | Moved to `spec/archive/` by `nativestep migrate finish` |
+| `docs/features/<feature>.md` | The reference without a Flutter app: screens and their states, service calls with error codes, numbered acceptance criteria (`skills/step-start/references/feature-doc.md`) | `step-start`, then the engineer or product; the engineer approves (`Status: approved <date>`) | Permanent |
+| `docs/design/<feature>/<stem>.png` | Design exports, named after the shot of the test that ends in that state (§1 `shot`) | Designer | Permanent |
 | `spec/memory.md` | Engineer feedback and project decisions | `step-feature`, `step-plan` | Permanent |
 | `spec/tests/`, `spec/fixtures/` | The behavior contract | `step-test` | Permanent |
-| `spec/evidence/<feature>-<cp>/` | UI reviews, test results, reviewer verdicts | `step-feature` | Permanent |
+| `spec/evidence/<feature>-<cp>/` | UI reviews, test results, reviewer verdicts; one `## G<n> · <name>` section per gate with a `Result:` line (§9) | `step-feature` | Permanent |
 | `kits/` | Kit copies | `nativestep init`, `nativestep kits update` | Permanent |
 | `.nativestep/` | Sessions, results, screenshots, scan output | `nativestep` | Outside git |
 
@@ -281,21 +285,23 @@ Commands run from the directory that contains `nativestep.json`.
 }
 ```
 
-- A screen's `reference` value: `driven` (can be driven over the protocol in Flutter), `read-only` (tests are written by reading the code only) or `none` (added after the migration).
-- A screen's `status` value: `pending`, `in_progress` or `migrated`.
+- A screen's `reference` value: `driven` (can be driven over the protocol in Flutter), `read-only` (tests are written by reading the code only) or `none` (from a feature doc: a new app, or a screen added after the migration). A `none` screen has `doc` instead of `source`: the feature doc it is in.
+- A screen's `status` value: `pending`, `in_progress`, and `migrated` (a migration) or `done` (a new app).
 - A checkpoint's `status` value: `planned`, `in_progress` or `done`.
 
 ## 9. Gates
 
 Gates run in order at every checkpoint. When a gate fails, the agent fixes the problem and runs the gate again; it cannot skip a failed gate.
 
-| Gate | What | Pass condition | After migration |
+| Gate | What | Pass condition | Without a reference (new app, or after `migrate finish`) |
 |---|---|---|---|
-| G0 Reference | New tests run on the Flutter target | All pass. For `read-only` screens, the engineer approves the tests as the spec. | The engineer approves the tests as the spec |
+| G0 Reference | New tests run on the Flutter target | All pass. For `read-only` screens, the engineer approves the tests as the spec. | The engineer approves the tests against the feature doc: every acceptance criterion has a test |
 | G1 Behavior | `nativestep test --target ios,android` | All pass | Same |
 | G2 Lint | `nativestep lint` | 0 violations | Same |
-| G3 UI review | `nativestep shot` and `step-ui-review` | No blocking differences. On `INVALID`, the screenshots are taken again. | Compared against the design |
+| G3 UI review | `nativestep shot` and `step-ui-review` | No blocking differences. On `INVALID`, the screenshots are taken again. | Compared with `docs/design/`; without a design, iOS with Android and both with the doc |
 | G4 Architecture review | Two isolated `step-arch-review` runs | Both approve. After a fix, G1 runs again, and G3 too if the change is visible. | Same |
 | G5 Engineer | The code and the running app | Approval. Feedback is written to `memory.md`. | Same |
+
+Each gate's result goes into the checkpoint's evidence as a `Result:` line (`pass`, `fail`, `skipped — <why>`, `pending — <why>`); `nativestep status` reads them.
 
 G3 is skipped for checkpoints that change only logic. In autonomous mode G5 can be skipped; the other gates always run.
