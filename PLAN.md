@@ -286,6 +286,8 @@ Sıradaki adım: M7'ye geçmeden önce mühendisle M6'yı gözden geçir.
 
 - İlerleme: rehberdeki `nativestep test --target flutter,ios,android --device` göç edilmiş bir uygulamada iOS ve Android'de 15 `_sample` testini düşürüyordu (debug uygulama conformance oturumlarını reddeder, bunlar headless koşar). Artık `--device` koşusu `_sample`'ı adı verilmedikçe atlıyor; movie-tracker'da komut olduğu gibi üç hedefte geçiyor.
 
+- İlerleme: GitHub Pages sitesi. Kök `.nojekyll` ile olduğu gibi sunuluyordu ama `index.html` yoktu, ana sayfa 404 veriyordu. Artık `index.html` (tanıtım, kurulum komutu, iki başlangıç, gate'ler, CLI ve skill'ler) ve `docs.html` var; `docs.html` repodaki Markdown dosyalarını (dokümanlar ve skill'ler) tarayıcıda `marked` ile gösteriyor, `.md` bağlantılarını kendi içinde, diğerlerini GitHub'da açıyor. Canlı `install.sh` boş bir ev dizinine CLI'yi ve plugin'i kurdu.
+
 **Bitti:** temiz bir makinede rehberi izleyen biri, M5'teki ikinci uygulamada ilk checkpoint'e ulaşıyor.
 
 ## M9 · Göçsüz başlangıç ve sürdürme

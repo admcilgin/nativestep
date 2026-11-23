@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docs · nativestep</title>
+<meta name="description" content="nativestep documentation: guide, architecture, protocol, components and skills.">
+<link rel="stylesheet" href="site/style.css">
+<style>
+  .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr) 200px; gap: 40px; max-width: 1280px; margin: 0 auto; padding: 32px 20px 0; }
+  .side, .toc { position: sticky; top: 88px; align-self: start; max-height: calc(100vh - 104px); overflow-y: auto; font-size: 14px; }
+  .side h4, .toc h4 { margin: 18px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .side h4:first-child, .toc h4:first-child { margin-top: 0; }
+  .side a, .toc a { display: block; padding: 4px 10px; border-radius: 6px; color: var(--muted); }
+  .side a:hover, .toc a:hover { color: var(--text); text-decoration: none; background: var(--bg-soft); }
+  .side a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .side a.mono { font-family: var(--mono); font-size: 13px; }
+  .toc a { padding: 3px 10px; border-left: 2px solid var(--line); border-radius: 0; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 200px minmax(0, 1fr); } .toc { display: none; } }
+  @media (max-width: 760px) {
+    .layout { grid-template-columns: 1fr; gap: 16px; padding-top: 16px; }
+    .side { position: static; max-height: none; display: flex; flex-wrap: wrap; gap: 4px; }
+    .side h4 { width: 100%; margin: 8px 0 0; }
+  }
+
+  /* Rendered markdown */
+  .doc { min-width: 0; }
+  .doc h1 { font-size: 34px; letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 20px; }
+  .doc h2 { font-size: 24px; letter-spacing: -0.01em; margin: 44px 0 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .doc h3 { font-size: 19px; margin: 32px 0 10px; }
+  .doc h4 { font-size: 16px; margin: 24px 0 8px; }
+  .doc :is(h1, h2, h3, h4) { scroll-margin-top: 76px; position: relative; }
+  .doc .anchor { position: absolute; left: -1.1em; padding-right: 0.3em; color: var(--muted); opacity: 0; font-weight: 400; }
+  .doc :is(h2, h3, h4):hover .anchor { opacity: 1; text-decoration: none; }
+  .doc p, .doc li { max-width: 78ch; }
+  .doc :not(pre) > code { background: var(--code-bg); padding: 0.12em 0.35em; border-radius: 4px; }
+  .doc pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; line-height: 1.5; }
+  .doc pre code { font-size: 13px; }
+  .doc .table { overflow-x: auto; margin: 16px 0; }
+  .doc table { border-collapse: collapse; font-size: 14px; min-width: 60%; }
+  .doc th, .doc td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+  .doc th { background: var(--bg-soft); }
+  .doc blockquote { margin: 16px 0; padding: 4px 16px; border-left: 3px solid var(--accent); color: var(--muted); }
+  .doc hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+  .doc img { max-width: 100%; }
+  .edit { display: inline-block; margin-top: 40px; font-size: 14px; }
+  .msg { color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap" style="max-width:1280px">
+    <a class="brand" href="./"><span class="brand-mark">ns</span>nativestep</a>
+    <nav>
+      <a href="docs.html?doc=GUIDE">Guide</a>
+      <a href="docs.html" aria-current="page">Docs</a>
+      <a class="wide" href="https://github.com/admcilgin/nativestep/releases">Releases</a>
+      <a href="https://github.com/admcilgin/nativestep">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="side" id="side" aria-label="Documents"></nav>
+  <main class="doc" id="doc"><p class="msg">Loading…</p></main>
+  <aside class="toc" id="toc" aria-label="On this page"></aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script>
+  // Renders the repo's Markdown files, which GitHub Pages serves as-is next to this page.
+  const REPO = "https://github.com/admcilgin/nativestep";
+  const SECTIONS = [
+    ["Documents", [["GUIDE", "Guide"], ["ARCHITECTURE", "Architecture"], ["PROTOCOL", "Protocol"], ["COMPONENTS", "Components"], ["PLAN", "Plan (Turkish)"]]],
+    ["Skills", ["step-start", "step-adopt", "step-reference", "step-plan", "step-feature", "step-test", "step-screen", "step-fix", "step-ui-review", "step-arch-review"].map((s) => [`skills/${s}/SKILL`, s])],
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const raw = params.get("doc") || "GUIDE";
+  // Only repo-relative Markdown paths: no scheme, no "..".
+  const doc = /^[\w-]+(\/[\w.-]+)*$/.test(raw) && !raw.split("/").includes("..") ? raw : "GUIDE";
+  const file = `${doc}.md`;
+
+  const side = document.getElementById("side");
+  for (const [title, items] of SECTIONS) {
+    side.insertAdjacentHTML("beforeend", `<h4>${title}</h4>`);
+    for (const [id, label] of items) {
+      const a = document.createElement("a");
+      a.href = `docs.html?doc=${id}`;
+      a.textContent = label;
+      if (id.startsWith("skills/")) a.className = "mono";
+      if (id === doc) a.setAttribute("aria-current", "page");
+      side.append(a);
+    }
+  }
+
+  function slug(text) {
+    return text.trim().toLowerCase().replace(/[^\p{L}\p{N}\- ]/gu, "").replace(/ /g, "-");
+  }
+
+  // Relative links: other Markdown files open here, everything else on GitHub.
+  function rewrite(href) {
+    if (!href || href.startsWith("#") || /^[a-z][a-z0-9+.-]*:|^\/\//i.test(href)) return href;
+    const url = new URL(href, `https://repo/${file}`);
+    const path = url.pathname.slice(1);
+    if (path.endsWith(".md")) return `docs.html?doc=${path.slice(0, -3)}${url.hash}`;
+    return `${REPO}/${path === "" || path.endsWith("/") ? "tree" : "blob"}/main/${path}${url.hash}`;
+  }
+
+  async function render() {
+    const main = document.getElementById("doc");
+    let text;
+    try {
+      const res = await fetch(file);
+      if (!res.ok) throw new Error(`${res.status}`);
+      text = await res.text();
+    } catch (e) {
+      main.innerHTML = `<h1>Not found</h1><p class="msg">Could not load <code></code>. <a href="${REPO}">Browse the repository on GitHub</a>.</p>`;
+      main.querySelector("code").textContent = file;
+      return;
+    }
+    if (typeof marked === "undefined") {
+      main.innerHTML = `<p class="msg">The Markdown renderer did not load. <a href="${REPO}/blob/main/${file}">Read this page on GitHub</a>.</p>`;
+      return;
+    }
+    text = text.replace(/^---\n[\s\S]*?\n---\n/, ""); // skill front matter
+    main.innerHTML = marked.parse(text, { gfm: true });
+
+    for (const t of main.querySelectorAll("table")) {
+      const box = document.createElement("div");
+      box.className = "table";
+      t.replaceWith(box);
+      box.append(t);
+    }
+    for (const a of main.querySelectorAll("a[href]")) a.setAttribute("href", rewrite(a.getAttribute("href")));
+    for (const img of main.querySelectorAll("img[src]")) {
+      const src = img.getAttribute("src");
+      if (!/^[a-z]+:|^\/\//i.test(src)) img.src = new URL(src, `${location.href.split("?")[0].replace(/[^/]*$/, "")}${file}`).href;
+    }
+
+    const seen = new Map();
+    const toc = document.getElementById("toc");
+    toc.innerHTML = "<h4>On this page</h4>";
+    for (const h of main.querySelectorAll("h1, h2, h3, h4")) {
+      let id = slug(h.textContent);
+      const n = seen.get(id) ?? 0;
+      seen.set(id, n + 1);
+      if (n) id += `-${n}`;
+      h.id = id;
+      if (h.tagName !== "H1") h.insertAdjacentHTML("afterbegin", `<a class="anchor" href="#${id}" aria-hidden="true">#</a>`);
+      if (h.tagName === "H2") {
+        const a = document.createElement("a");
+        a.href = `#${id}`;
+        a.textContent = h.textContent.replace(/^#/, "");
+        toc.append(a);
+      }
+    }
+    if (toc.children.length === 1) toc.innerHTML = "";
+
+    const h1 = main.querySelector("h1");
+    if (h1) document.title = `${h1.textContent} · nativestep`;
+    main.insertAdjacentHTML("beforeend", `<a class="edit" href="${REPO}/blob/main/${file}">View this page on GitHub</a>`);
+    if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+  }
+  render();
+</script>
+</body>
+</html>
