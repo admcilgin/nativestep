@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nativestep · native iOS and Android apps, built by agents</title>
+<meta name="description" content="Build native iOS (SwiftUI) and Android (Compose) apps with agents: migrate a Flutter app or start a new one, then develop feature by feature with shared behavior tests and gated checkpoints.">
+<link rel="stylesheet" href="site/style.css">
+<style>
+  .hero { padding-top: 88px; padding-bottom: 64px; }
+  .eyebrow { display: inline-block; font: 600 13px var(--mono); color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(34px, 5.4vw, 56px); line-height: 1.08; letter-spacing: -0.03em; margin: 0 0 20px; max-width: 16ch; }
+  .lead { font-size: 19px; color: var(--muted); max-width: 60ch; margin: 0 0 32px; }
+  .hero .cmd { max-width: 640px; margin-bottom: 20px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .hero-note { font-size: 14px; color: var(--muted); margin-top: 16px; }
+
+  section { padding: 56px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 32px; max-width: 64ch; }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; }
+  .card h3 { margin: 0 0 8px; font-size: 18px; }
+  .card p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+  .card .skills { font: 13px var(--mono); color: var(--text); background: var(--code-bg); border-radius: 6px; padding: 8px 10px; margin: 0 0 16px; }
+  .card .more { margin-top: auto; font-size: 15px; font-weight: 600; color: var(--accent); }
+  a.card { color: var(--text); }
+  a.card:hover { text-decoration: none; border-color: var(--accent); }
+  .num { font: 600 13px var(--mono); color: var(--accent); margin-bottom: 10px; }
+
+  /* tests once, code twice */
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; }
+  .box { border: 1px solid var(--line); border-radius: 12px; padding: 18px; background: var(--card); }
+  .box h4 { margin: 0 0 6px; font-size: 15px; }
+  .box p { margin: 0; color: var(--muted); font-size: 14px; }
+  .box.shared { border-color: var(--accent); background: var(--accent-soft); }
+  .targets { display: grid; gap: 10px; }
+  .target { display: flex; justify-content: space-between; gap: 12px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--card); font-size: 15px; }
+  .target code { color: var(--muted); }
+  .arrow { color: var(--muted); font: 20px var(--mono); }
+  @media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .arrow { transform: rotate(90deg); justify-self: center; } }
+
+  .gates { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); counter-reset: g; }
+  .gate { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--card); }
+  .gate b { display: block; font: 600 14px var(--mono); color: var(--accent); }
+  .gate span { display: block; font-weight: 600; margin: 2px 0 4px; }
+  .gate small { color: var(--muted); font-size: 13px; line-height: 1.45; display: block; }
+
+  .two { display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td { padding: 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:first-child { white-space: nowrap; padding-right: 16px; }
+  td code { font-size: 13px; }
+  td:last-child { color: var(--muted); }
+
+  .status { font-size: 15px; color: var(--muted); }
+  .status strong { color: var(--text); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="brand-mark">ns</span>nativestep</a>
+    <nav>
+      <a href="docs.html?doc=GUIDE">Guide</a>
+      <a href="docs.html">Docs</a>
+      <a class="wide" href="https://github.com/admcilgin/nativestep/releases">Releases</a>
+      <a href="https://github.com/admcilgin/nativestep">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <span class="eyebrow">SwiftUI · Jetpack Compose · Claude Code</span>
+    <h1>Native iOS and Android apps, built by agents.</h1>
+    <p class="lead">Two separate native codebases that pass the same behavior tests. Migrate a Flutter app screen by screen, or start a new app from feature docs. Then develop feature by feature in small checkpoints, each through the same six gates.</p>
+    <div class="cmd"><code id="install">curl -fsSL https://admcilgin.github.io/nativestep/install.sh | bash</code><button class="copy" data-copy="install">Copy</button></div>
+    <div class="hero-actions">
+      <a class="btn primary" href="docs.html?doc=GUIDE">Read the guide</a>
+      <a class="btn" href="https://github.com/admcilgin/nativestep">View on GitHub</a>
+    </div>
+    <p class="hero-note">Installs the <code>nativestep</code> CLI into <code>~/.nativestep</code> and the skills plugin into Claude Code. macOS or Linux, arm64 or x64. Then run <code>nativestep doctor</code>.</p>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>Two ways in, one way of working</h2>
+      <p class="sub">A project starts once, from an existing app or from nothing. After that, every project is developed the same way. You ask Claude Code in words or call the skills by name; you make the decisions they hand you.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="num">Start · migrate</div>
+          <h3>Migrate a Flutter app</h3>
+          <p>The Flutter app becomes the test reference. Screens move to native one checkpoint at a time, and every test must pass on Flutter first.</p>
+          <div class="skills">step-adopt → step-reference → step-plan → step-feature</div>
+          <a class="more" href="docs.html?doc=GUIDE#3-start-migrate-a-flutter-app">Migration guide →</a>
+        </div>
+        <div class="card">
+          <div class="num">Start · new app</div>
+          <h3>Start a new app</h3>
+          <p>Your idea becomes feature docs with screens, service calls and numbered acceptance criteria. The docs are the reference the tests are written from.</p>
+          <div class="skills">step-start → step-plan → step-feature</div>
+          <a class="more" href="docs.html?doc=GUIDE#4-start-a-new-app">New app guide →</a>
+        </div>
+        <div class="card">
+          <div class="num">Then · every day</div>
+          <h3>Develop feature by feature</h3>
+          <p>Add or change a feature through its doc, fix bugs with a failing test first, and see progress and gate results in <code>nativestep status</code>.</p>
+          <div class="skills">step-plan · step-feature · step-fix</div>
+          <a class="more" href="docs.html?doc=GUIDE#7-daily-work">Daily work →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Tests once, code twice</h2>
+      <p class="sub">iOS and Android share no code. They share the behavior contract: one JSON protocol, one set of tests and fixtures. The same test drives every target through the protocol, headless or on a simulator and emulator.</p>
+      <div class="flow">
+        <div class="box shared">
+          <h4>spec/ · written once</h4>
+          <p>Behavior tests in TypeScript (<code>@nativestep/test</code>) and the fixtures that stand in for the network.</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="targets">
+          <div class="target"><span>Flutter reference <small>(migration only)</small></span><code>:7357</code></div>
+          <div class="target"><span>iOS · SwiftUI · NativeStepKit</span><code>:7358</code></div>
+          <div class="target"><span>Android · Compose · nativestep-kit</span><code>:7359</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Six gates at every checkpoint</h2>
+      <p class="sub">Agents work in small checkpoints. Each one passes the gates in order before it is committed, and each result is written to the checkpoint's evidence, where <code>nativestep status</code> reads it.</p>
+      <div class="gates">
+        <div class="gate"><b>G0</b><span>Reference</span><small>Tests pass on the Flutter app, or you approve them against the feature doc.</small></div>
+        <div class="gate"><b>G1</b><span>Behavior</span><small>The same tests pass on iOS and Android.</small></div>
+        <div class="gate"><b>G2</b><span>Lint</span><small><code>nativestep lint</code> finds no architecture violation.</small></div>
+        <div class="gate"><b>G3</b><span>UI review</span><small>Screenshots match the reference or the design.</small></div>
+        <div class="gate"><b>G4</b><span>Architecture</span><small>Two isolated reviews approve.</small></div>
+        <div class="gate"><b>G5</b><span>Engineer</span><small>You review the code and the running app.</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap two">
+      <div>
+        <h2>The CLI</h2>
+        <p class="sub">The mechanical work. Plain text for people, <code>--json</code> for machines.</p>
+        <table>
+          <tr><td><code>init</code></td><td>Both native projects from the templates, with the kits</td></tr>
+          <tr><td><code>doctor</code></td><td>Checks the machine and the project</td></tr>
+          <tr><td><code>test</code></td><td>Runs the behavior tests on each target</td></tr>
+          <tr><td><code>session</code> · <code>ls</code> · <code>do</code></td><td>Drives a running app the way the tests do</td></tr>
+          <tr><td><code>lint</code></td><td>Checks the architecture rules</td></tr>
+          <tr><td><code>shot</code></td><td>Screenshots of a test's final state</td></tr>
+          <tr><td><code>status</code></td><td>Progress, gate results and the next checkpoint</td></tr>
+          <tr><td><code>scan</code> · <code>migrate finish</code></td><td>Reads a Flutter app; retires it when the migration is done</td></tr>
+          <tr><td><code>kits update</code></td><td>Keeps a project's kits current</td></tr>
+        </table>
+      </div>
+      <div>
+        <h2>The skills</h2>
+        <p class="sub">The work that needs judgment, as a Claude Code plugin.</p>
+        <table>
+          <tr><td><code>step-start</code></td><td>A new app: feature docs and both projects</td></tr>
+          <tr><td><code>step-adopt</code> · <code>step-reference</code></td><td>A Flutter app: profile, screens, test binding</td></tr>
+          <tr><td><code>step-plan</code></td><td>Features, order and checkpoints</td></tr>
+          <tr><td><code>step-feature</code></td><td>One feature, checkpoint by checkpoint, through the gates</td></tr>
+          <tr><td><code>step-test</code> · <code>step-screen</code></td><td>The tests, then each platform's screens</td></tr>
+          <tr><td><code>step-ui-review</code> · <code>step-arch-review</code></td><td>The G3 and G4 reviews</td></tr>
+          <tr><td><code>step-fix</code></td><td>A bug: a red test first, then the fix on both platforms</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Documentation</h2>
+      <p class="sub">Few documents: the contract itself. Templates that compile and tests that must pass describe the rest.</p>
+      <div class="grid">
+        <a class="card" href="docs.html?doc=GUIDE"><h3>Guide</h3><p>Install, a first migration or a new app to its first checkpoint, the gates, and daily work. Start here.</p><span class="more">Read →</span></a>
+        <a class="card" href="docs.html?doc=ARCHITECTURE"><h3>Architecture</h3><p>The target native architecture and its numbered rules, R1 to R20, that lint and the reviews report against.</p><span class="more">Read →</span></a>
+        <a class="card" href="docs.html?doc=PROTOCOL"><h3>Protocol</h3><p>The JSON protocol every target speaks, and the fixture format.</p><span class="more">Read →</span></a>
+        <a class="card" href="docs.html?doc=COMPONENTS"><h3>Components</h3><p>The CLI, test SDK, kits, Flutter adapter, templates, skills, project files and gates.</p><span class="more">Read →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap status">
+      <p><strong>Status.</strong> Two Flutter apps were migrated autonomously with the skills: Basket (12/12 checkpoints) and a movie tracker (13/13), each passing the same tests on Flutter, iOS and Android. New apps start with <code>step-start</code>. Latest release: <a href="https://github.com/admcilgin/nativestep/releases/latest">GitHub releases</a>.</p>
+      <p>Adapted from Shopify's <a href="https://shopify.engineering/reflex">Reflex</a> and <a href="https://shopify.engineering/helix">Helix</a> posts.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>nativestep</span>
+    <a href="docs.html">Docs</a>
+    <a href="https://github.com/admcilgin/nativestep">GitHub</a>
+    <a href="https://github.com/admcilgin/nativestep/releases">Releases</a>
+    <a href="install.sh">install.sh</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll(".copy").forEach((b) => b.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent);
+      b.textContent = "Copied";
+    } catch { b.textContent = "Select and copy"; }
+    setTimeout(() => (b.textContent = "Copy"), 1600);
+  }));
+</script>
+</body>
+</html>
