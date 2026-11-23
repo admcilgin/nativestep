@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · nativestep</title>
+<meta name="description" content="An animated walkthrough of nativestep: migrating a Flutter app, starting a new app, and developing a feature checkpoint by checkpoint through the six gates.">
+<link rel="stylesheet" href="site/style.css">
+<style>
+  :root { --ok: #2f8a4f; --ok-soft: #e3f3e8; --bad: #c2412d; --bad-soft: #fbe7e3; --warn: #a86a00; --warn-soft: #fbf0d9; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ok: #6fd08f; --ok-soft: #18291e; --bad: #f08672; --bad-soft: #301c18; --warn: #e9b44c; --warn-soft: #2e2615; }
+  }
+
+  .intro { padding: 56px 0 24px; }
+  .intro h1 { font-size: clamp(30px, 4.6vw, 44px); letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 14px; }
+  .intro p { color: var(--muted); font-size: 18px; max-width: 64ch; margin: 0; }
+
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 28px 0 8px; }
+  .tab { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 8px 16px; font: 600 15px var(--sans); cursor: pointer; }
+  .tab:hover { border-color: var(--muted); }
+  .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .scenario-intro { color: var(--muted); margin: 12px 0 24px; max-width: 72ch; }
+
+  .player { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
+
+  /* Step list */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; position: sticky; top: 76px; }
+  .steps button { width: 100%; text-align: left; border: 1px solid transparent; background: none; color: var(--muted); border-radius: 10px; padding: 10px 12px; cursor: pointer; font: 15px/1.35 var(--sans); display: grid; grid-template-columns: 22px 1fr; gap: 2px 10px; }
+  .steps button:hover { background: var(--bg-soft); }
+  .steps .n { grid-row: span 2; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font: 600 12px var(--mono); }
+  .steps .sk { font: 600 13px var(--mono); color: var(--text); }
+  .steps .t { font-size: 14px; }
+  .steps .done .n { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .steps [aria-current="step"] { background: var(--card); border-color: var(--accent); color: var(--text); }
+  .steps [aria-current="step"] .n { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  /* Stage */
+  .stage { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; min-width: 0; }
+  .stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 6px; }
+  .chip { font: 600 13px var(--mono); color: var(--accent); background: var(--accent-soft); padding: 3px 9px; border-radius: 999px; }
+  .stage-head h2 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  .stage-text { color: var(--muted); margin: 0 0 16px; }
+  .say { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
+  .say .who { flex: none; font: 600 12px var(--mono); color: var(--muted); background: var(--bg-soft); border-radius: 6px; padding: 3px 8px; margin-top: 2px; }
+  .say .bubble { background: var(--bg-soft); border-radius: 4px 12px 12px 12px; padding: 8px 12px; font-size: 15px; }
+
+  .panes { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+  .term { background: var(--term-bg); color: var(--term-text); border-radius: 10px; padding: 12px 14px; font: 13px/1.6 var(--mono); height: 300px; overflow: auto; }
+  .term .bar { display: flex; gap: 6px; margin-bottom: 8px; }
+  .term .bar i { width: 10px; height: 10px; border-radius: 50%; background: #3a3e44; }
+  .term div.l { white-space: pre-wrap; word-break: break-word; }
+  .term .cmd-l::before { content: "$ "; color: #7d8187; }
+  .term .note { color: #9aa0a8; font-style: italic; }
+  .term .note::before { content: "› "; font-style: normal; }
+  .term .ok { color: #7fd69b; }
+  .term .bad { color: #f39a88; }
+  .term .warn { color: #f0c56b; }
+  .term .cursor { display: inline-block; width: 7px; height: 14px; background: var(--term-text); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .side { display: grid; gap: 16px; align-content: start; min-width: 0; }
+  .box-h { font: 600 12px var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 8px; }
+  .tree { position: relative; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: 13px/1.7 var(--mono); max-height: 300px; overflow: auto; }
+  .tree .row { display: flex; gap: 8px; white-space: nowrap; border-radius: 4px; padding: 0 4px; transition: background .4s; }
+  .tree .name { overflow: hidden; text-overflow: ellipsis; }
+  .tree .dir .name { color: var(--muted); }
+  .tree .note { margin-left: auto; color: var(--muted); font-family: var(--sans); font-size: 12px; padding-left: 8px; }
+  .tree .new { background: var(--ok-soft); }
+  .tree .new .name { color: var(--ok); }
+  .tree .new .name::before { content: "+ "; }
+  .tree .mod { background: var(--warn-soft); }
+  .tree .mod .name { color: var(--warn); }
+  .tree .mod .name::before { content: "~ "; }
+  .tree .rm { background: var(--bad-soft); }
+  .tree .rm .name { color: var(--bad); text-decoration: line-through; }
+  .tree .empty { color: var(--muted); font-family: var(--sans); }
+
+  .targets { display: grid; gap: 6px; }
+  .tg { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: 14px; transition: border-color .3s, background .3s, opacity .3s; }
+  .tg code { margin-left: auto; color: var(--muted); font-size: 12px; }
+  .tg .st { font: 600 11px var(--mono); text-transform: uppercase; color: var(--muted); min-width: 44px; text-align: right; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none; }
+  .tg[data-s="off"] { opacity: .45; border-style: dashed; }
+  .tg[data-s="run"] .dot, .gate[data-s="run"] { animation: pulse 0.9s ease-in-out infinite; }
+  .tg[data-s="run"] .dot { background: var(--accent); }
+  .tg[data-s="pass"] { border-color: var(--ok); background: var(--ok-soft); }
+  .tg[data-s="pass"] .dot { background: var(--ok); }
+  .tg[data-s="pass"] .st { color: var(--ok); }
+  .tg[data-s="fail"] { border-color: var(--bad); background: var(--bad-soft); }
+  .tg[data-s="fail"] .dot { background: var(--bad); }
+  .tg[data-s="fail"] .st { color: var(--bad); }
+  @keyframes pulse { 50% { opacity: .35; } }
+
+  .gates { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+  .gate { border: 1px solid var(--line); border-radius: 8px; padding: 6px 4px; text-align: center; transition: border-color .3s, background .3s; }
+  .gate b { display: block; font: 600 13px var(--mono); }
+  .gate small { display: block; font-size: 11px; color: var(--muted); line-height: 1.3; }
+  .gate[data-s="run"] { border-color: var(--accent); }
+  .gate[data-s="pass"] { border-color: var(--ok); background: var(--ok-soft); }
+  .gate[data-s="pass"] b { color: var(--ok); }
+  .gate[data-s="pend"] { border-color: var(--warn); background: var(--warn-soft); }
+  .gate[data-s="pend"] b { color: var(--warn); }
+  .gate[data-s="fail"] { border-color: var(--bad); background: var(--bad-soft); }
+  .gate[data-s="fail"] b { color: var(--bad); }
+
+  .preview { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .preview .ph { font: 600 12px var(--mono); color: var(--muted); background: var(--bg-soft); padding: 6px 12px; border-bottom: 1px solid var(--line); }
+  .preview pre { margin: 0; padding: 12px; overflow-x: auto; font-size: 12.5px; line-height: 1.55; background: var(--code-bg); }
+  .fade { animation: fade .5s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } }
+
+  .decide { margin-top: 16px; display: flex; gap: 10px; align-items: flex-start; border-left: 3px solid var(--warn); background: var(--warn-soft); border-radius: 0 8px 8px 0; padding: 10px 12px; font-size: 15px; }
+  .decide b { flex: none; color: var(--warn); }
+
+  .controls { display: flex; align-items: center; gap: 8px; margin-top: 18px; }
+  .controls button { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 8px; padding: 7px 14px; font: 600 14px var(--sans); cursor: pointer; }
+  .controls button:hover:not(:disabled) { border-color: var(--muted); }
+  .controls button:disabled { opacity: .4; cursor: default; }
+  .controls #play { background: var(--accent); border-color: var(--accent); color: var(--bg); min-width: 92px; }
+  .progress { flex: 1; height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .4s; }
+  .controls .count { font: 13px var(--mono); color: var(--muted); }
+
+  .footnote { color: var(--muted); font-size: 14px; margin-top: 20px; }
+
+  @media (max-width: 900px) {
+    .player { grid-template-columns: minmax(0, 1fr); }
+    .steps { position: static; display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+    .steps li { flex: none; }
+    .steps button { width: auto; grid-template-columns: 22px auto; }
+    .steps .t { display: none; }
+    .panes { grid-template-columns: minmax(0, 1fr); }
+    .term { height: 260px; }
+  }
+  @media (max-width: 560px) {
+    .stage { padding: 16px; }
+    .gates { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fade, .cursor, .tg[data-s="run"] .dot, .gate[data-s="run"] { animation: none; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><span class="brand-mark">ns</span>nativestep</a>
+    <nav>
+      <a href="how.html" aria-current="page">How it works</a>
+      <a href="docs.html?doc=GUIDE">Guide</a>
+      <a href="docs.html">Docs</a>
+      <a class="wide" href="https://github.com/admcilgin/nativestep">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>How nativestep works</h1>
+    <p>Three walkthroughs: migrating a Flutter app, starting a new app, and building one feature through the six gates. Each step shows what you ask, what the agent runs, which files change, and what you decide.</p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Walkthrough">
+    <button class="tab" role="tab" data-s="migrate">Migrate a Flutter app</button>
+    <button class="tab" role="tab" data-s="new">Start a new app</button>
+    <button class="tab" role="tab" data-s="feature">Build a feature</button>
+  </div>
+  <p class="scenario-intro" id="sintro"></p>
+
+  <div class="player">
+    <ol class="steps" id="steps"></ol>
+    <div class="stage" role="tabpanel" aria-live="polite">
+      <div class="stage-head"><span class="chip" id="skill"></span><h2 id="stitle"></h2></div>
+      <p class="stage-text" id="stext"></p>
+      <div class="say" id="say"><span class="who">you</span><span class="bubble" id="saytext"></span></div>
+      <div class="panes">
+        <div>
+          <div class="term" id="term" aria-label="Terminal"></div>
+          <div id="preview"></div>
+        </div>
+        <div class="side">
+          <div>
+            <p class="box-h">Targets</p>
+            <div class="targets" id="targets"></div>
+          </div>
+          <div>
+            <p class="box-h">Checkpoint gates</p>
+            <div class="gates" id="gates"></div>
+          </div>
+          <div>
+            <p class="box-h">Files</p>
+            <div class="tree" id="tree"></div>
+          </div>
+        </div>
+      </div>
+      <div class="decide" id="decide"><b>You decide</b><span id="decidetext"></span></div>
+      <div class="controls">
+        <button id="prev" aria-label="Previous step">←</button>
+        <button id="play">Pause</button>
+        <button id="next" aria-label="Next step">→</button>
+        <div class="progress"><i id="bar"></i></div>
+        <span class="count" id="count"></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="footnote">Command output is shortened for the walkthrough. The full flows are in the <a href="docs.html?doc=GUIDE">guide</a>: <a href="docs.html?doc=GUIDE#3-start-migrate-a-flutter-app">migration</a>, <a href="docs.html?doc=GUIDE#4-start-a-new-app">new app</a>, <a href="docs.html?doc=GUIDE#5-the-gates">gates</a> and <a href="docs.html?doc=GUIDE#7-daily-work">daily work</a>.</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>nativestep</span>
+    <a href="docs.html">Docs</a>
+    <a href="https://github.com/admcilgin/nativestep">GitHub</a>
+    <a href="https://github.com/admcilgin/nativestep/releases">Releases</a>
+  </div>
+</footer>
+
+<script>
+// Each line is [text, fx]. Text prefixes: "$ " command, "# " agent note, "✓"/"✗"/"…" result.
+// fx: add/mod/rm file paths (a trailing "/" is a folder; [path, note] adds a note), t: target states, g: gate states.
+const GATES = [["G0", "reference"], ["G1", "behavior"], ["G2", "lint"], ["G3", "UI"], ["G4", "arch"], ["G5", "you"]];
+const TARGETS = [["flutter", "Flutter reference", ":7357"], ["ios", "iOS · SwiftUI", ":7358"], ["android", "Android · Compose", ":7359"]];
+const idle = { 0: "idle", 1: "idle", 2: "idle", 3: "idle", 4: "idle", 5: "idle" };
+
+const checkpointLines = (feature, test, ref) => [
+  ["# step-test writes the tests and fixtures", { add: [[`spec/tests/${feature}/${test}.test.ts`, "tests"], [`spec/fixtures/${feature}/`, "fixtures"]] }],
+  ...(ref
+    ? [[`$ nativestep test ${feature}/ --target flutter`, { t: { flutter: "run" }, g: { 0: "run" } }],
+       ["✓ flutter   4 pass", { t: { flutter: "pass" }, g: { 0: "pass" } }]]
+    : [["# G0: you check every AC has a test", { g: { 0: "pend" } }],
+       ["✓ tests approved against the doc", { g: { 0: "pass" } }]]),
+  ["# step-screen builds iOS, then Android", { add: [[`ios/Core/Sources/${cap(feature)}/`, "Swift"], [`android/core/…/${feature}/`, "Kotlin"]] }],
+  [`$ nativestep test ${feature}/ --target ios,android`, { t: { ios: "run", android: "run" }, g: { 1: "run" } }],
+  ["✓ ios       4 pass", { t: { ios: "pass" } }],
+  ["✓ android   4 pass", { t: { android: "pass" }, g: { 1: "pass" } }],
+  ["$ nativestep lint", { g: { 2: "run" } }],
+  ["✓ no violations", { g: { 2: "pass" } }],
+  [`$ nativestep shot ${feature}/${test}.test.ts --target ${ref ? "flutter," : ""}ios,android`, { g: { 3: "run" } }],
+  [`✓ step-ui-review: no blocking difference from the ${ref ? "Flutter app" : "design"}`, { g: { 3: "pass" } }],
+  ["# step-arch-review: two isolated reviews", { g: { 4: "run" } }],
+  ["✓ 2 of 2 approve", { g: { 4: "pass" } }],
+  ["… waiting for your approval (G5)", { g: { 5: "pend" } }],
+  ["✓ approved, committed", { g: { 5: "pass" }, add: [[`spec/evidence/${feature}-cp1/`, "gate results"]] }],
+];
+function cap(s) { return s[0].toUpperCase() + s.slice(1); }
+
+const SCENARIOS = {
+  migrate: {
+    intro: "The Flutter app stays and becomes the test reference. Every behavior test passes on Flutter first, then on iOS and Android. When the last checkpoint is done, the reference is retired.",
+    start: { files: [["my_app/", "Flutter app"], "my_app/lib/", "my_app/pubspec.yaml"], t: { flutter: "idle", ios: "off", android: "off" } },
+    steps: [
+      {
+        skill: "step-adopt", title: "Adopt the Flutter app",
+        text: "Creates the native project next to the Flutter one, scans the Flutter code, and writes the profile and the screen list.",
+        say: "Start a nativestep migration of ./my_app",
+        decide: "The app name, bundle id, package and location, asked up front. Then you approve the profile, its Decision: lines first.",
+        lines: [
+          ["$ nativestep init ../my_app_native --app MyApp --ios-bundle-id com.example.myapp --android-package com.example.myapp", { add: [["my_app_native/", "native project"], ["my_app_native/ios/", "SwiftUI"], ["my_app_native/android/", "Compose"], "my_app_native/spec/"], t: { ios: "idle", android: "idle" } }],
+          ["✓ both projects created from the templates, with the kits"],
+          ["$ nativestep scan ../my_app"],
+          ["# reads screens, routes and service calls"],
+          ["# writes the profile: screens, services, error codes, decisions", { add: [["my_app_native/spec/profile.md", "profile"]] }],
+          ["# writes the screen list", { add: [["my_app_native/spec/inventory.json", "screens"]] }],
+          ["… waiting for your approval of the profile"],
+        ],
+      },
+      {
+        skill: "step-reference", title: "Make Flutter a test target",
+        text: "A binding exposes each Flutter screen's state and actions over the same protocol the native apps speak. The Flutter repo gets two marked lines.",
+        say: "Continue with the reference",
+        decide: "Nothing, unless the binding needs more than those two lines.",
+        lines: [
+          ["# adds the binding", { add: [["my_app_native/spec/adapters/flutter/", "binding"]] }],
+          ["# two marked lines start the protocol server in debug", { mod: [["my_app/lib/main.dart", "+2 marked lines"]] }],
+          ["$ nativestep session --target flutter", { t: { flutter: "run" } }],
+          ["$ nativestep ls", { t: { flutter: "pass" } }],
+          ["Login  { email: \"\", password: \"\", error: null }"],
+          ["  actions: signIn(email, password), openSignUp"],
+          ["$ nativestep do signIn '{\"email\":\"ada@example.com\",\"password\":\"secret\"}'"],
+          ["ProductList  { loading: false, items: 4 }"],
+          ["✓ the Flutter app answers like the tests will"],
+        ],
+      },
+      {
+        skill: "step-plan", title: "Plan features and checkpoints",
+        text: "Groups the screens into features, orders them, and cuts each feature into small checkpoints.",
+        say: "Plan the migration",
+        decide: "Approve the plan.",
+        lines: [
+          ["# writes features, order and checkpoints", { mod: [["my_app_native/spec/inventory.json", "features + checkpoints"]] }],
+          ["$ nativestep status"],
+          ["foundation  0/1 checkpoints"],
+          ["auth        0/2 checkpoints"],
+          ["catalog     0/3 checkpoints"],
+          ["basket      0/4 checkpoints"],
+          ["next: foundation cp1"],
+        ],
+      },
+      {
+        skill: "step-feature", title: "One checkpoint through the gates",
+        text: "Every checkpoint goes the same way: tests first, on the Flutter reference; then both native apps; then lint, screenshots, reviews, and your approval.",
+        say: "Build the next checkpoint",
+        decide: "Approve each checkpoint (G5): you look at the code and the running app. Your feedback goes to spec/memory.md.",
+        reset: true,
+        lines: checkpointLines("auth", "sign-in", true).map(([t, fx]) => [t, fx && fx.add ? { ...fx, add: fx.add.map(([p, n]) => ["my_app_native/" + p, n]) } : fx]),
+      },
+      {
+        skill: "nativestep", title: "Finish the migration",
+        text: "When every checkpoint is done, the Flutter reference is retired. From then on the project works like a new app: new behavior starts in a feature doc.",
+        say: "Every checkpoint is done. Finish the migration",
+        decide: "Commit both repos. Keep the Flutter app around while you still compare older screens with it.",
+        lines: [
+          ["$ nativestep status"],
+          ["✓ 10/10 checkpoints done"],
+          ["$ nativestep migrate finish --dry-run"],
+          ["# lists what will change"],
+          ["$ nativestep migrate finish", { mod: [["my_app/lib/main.dart", "−2 marked lines"]], rm: ["my_app_native/spec/adapters/flutter/", "my_app_native/spec/profile.md"], add: [["my_app_native/spec/archive/profile.md", "archived"]], t: { flutter: "off" } }],
+          ["✓ the flutter target is removed"],
+          ["# new behavior now starts in docs/features/", { add: [["my_app_native/docs/features/", "from now on"]] }],
+        ],
+      },
+    ],
+  },
+
+  new: {
+    intro: "Without a Flutter app, the feature docs are the reference. Their numbered acceptance criteria become the tests, and you approve the tests against the doc.",
+    start: { files: [], t: { flutter: "off", ios: "off", android: "off" } },
+    steps: [
+      {
+        skill: "step-start", title: "Describe the app",
+        text: "Asks what the app is for and what ships first, creates both native projects, and writes one feature doc per feature: screens, service calls and numbered acceptance criteria.",
+        say: "Start a new nativestep app for a habit tracker",
+        decide: "The app name, bundle id, package and location; what the app is for and what ships first. Then approve each doc, its Decision: lines first.",
+        preview: ["docs/features/habits.md", `## Acceptance criteria
+
+- AC1: The list shows today's habits; done ones are checked.
+- AC2: Tapping a habit marks it done for today.
+- AC3: With no habits, the list shows an empty state
+       with an "Add habit" action.
+- AC4: When loading fails, the list shows the error
+       and a retry; retry loads the list again.`],
+        lines: [
+          ["$ nativestep init ./habits --app Habits --ios-bundle-id com.example.habits --android-package com.example.habits", { add: [["habits/", "new app"], ["habits/ios/", "SwiftUI"], ["habits/android/", "Compose"], "habits/spec/"], t: { ios: "idle", android: "idle" } }],
+          ["✓ both projects created from the templates, with the kits"],
+          ["# one doc per feature", { add: [["habits/docs/features/foundation.md", "shell, tabs"], ["habits/docs/features/habits.md", "AC1–AC4"], ["habits/docs/features/reminders.md", "later"]] }],
+          ["# optional: your design exports, named by state", { add: [["habits/docs/design/habits/", "G3 compares"]] }],
+          ["# the screen list", { add: [["habits/spec/inventory.json", "screens"]] }],
+          ["… waiting for your approval of each doc"],
+        ],
+      },
+      {
+        skill: "step-plan", title: "Plan the checkpoints",
+        text: "Orders the features, foundation first, and cuts each one into checkpoints small enough to review.",
+        say: "Plan it",
+        decide: "Approve the plan.",
+        lines: [
+          ["# writes features, order and checkpoints", { mod: [["habits/spec/inventory.json", "features + checkpoints"]] }],
+          ["$ nativestep status"],
+          ["foundation  0/1 checkpoints"],
+          ["habits      0/2 checkpoints"],
+          ["reminders   0/2 checkpoints"],
+          ["next: foundation cp1"],
+        ],
+      },
+      {
+        skill: "step-feature", title: "One checkpoint through the gates",
+        text: "Tests are written from the acceptance criteria. There is no reference to run them on, so G0 is you approving them against the doc. Then both native apps must pass them.",
+        say: "Build habits cp1",
+        decide: "Approve the tests against the doc (G0) and the checkpoint (G5).",
+        reset: true,
+        lines: checkpointLines("habits", "list", false).map(([t, fx]) => [t, fx && fx.add ? { ...fx, add: fx.add.map(([p, n]) => ["habits/" + p, n]) } : fx]),
+      },
+      {
+        skill: "nativestep status", title: "See where things stand",
+        text: "Each gate's result is written to the checkpoint's evidence. status reads it and names the next checkpoint.",
+        say: "Where are we?",
+        decide: "Nothing. Pending approvals and failed gates show up under attention.",
+        lines: [
+          ["$ nativestep status --features"],
+          ["foundation  1/1 checkpoints"],
+          ["  cp1    done         0✓ 1✓ 2✓ 3✓ 4✓ 5✓    App shell and tabs"],
+          ["habits      1/2 checkpoints"],
+          ["  cp1    done         0✓ 1✓ 2✓ 3✓ 4✓ 5✓    Today's list"],
+          ["  cp2    pending                           Empty and error states"],
+          ["next: habits cp2"],
+        ],
+      },
+    ],
+  },
+
+  feature: {
+    intro: "The daily loop, the same for every project. A change starts in the feature doc, becomes red tests, and turns green on both platforms. Bugs start as a failing test.",
+    start: {
+      files: [["shop/", "existing app"], "shop/docs/features/", "shop/docs/features/catalog.md", "shop/ios/", "shop/android/", "shop/spec/", "shop/spec/tests/", "shop/spec/fixtures/"],
+      t: { flutter: "off", ios: "idle", android: "idle" },
+    },
+    steps: [
+      {
+        skill: "feature doc", title: "Write the behavior down",
+        text: "New behavior goes into a feature doc first, as numbered acceptance criteria. Ask Claude Code to write the doc with you.",
+        say: "Add search to the product list",
+        decide: "Approve the doc. A behavior the doc leaves open is a question for you, and the answer goes into the doc.",
+        preview: ["docs/features/search.md", `## Acceptance criteria
+
+- AC1: Searching shows the products whose name contains
+       the text, ignoring case and surrounding spaces.
+- AC2: An empty search shows every product.
+- AC3: No result shows "No products match".
+- AC4: Searching makes no server call.`],
+        lines: [
+          ["# reads catalog.md and the Services in Core"],
+          ["# writes the new doc", { add: [["shop/docs/features/search.md", "AC1–AC4"]] }],
+          ["… waiting for your approval of the doc"],
+        ],
+      },
+      {
+        skill: "step-plan", title: "Add the checkpoints",
+        text: "The new feature gets its own checkpoints. Checkpoints that are already done are never edited.",
+        say: "Plan search",
+        decide: "Approve the plan.",
+        lines: [
+          ["# adds search cp1 and cp2", { mod: [["shop/spec/inventory.json", "+ search"]] }],
+          ["$ nativestep status"],
+          ["catalog  3/3 checkpoints"],
+          ["search   0/2 checkpoints"],
+          ["next: search cp1"],
+        ],
+      },
+      {
+        skill: "step-test", title: "Tests first, written once",
+        text: "One test per behavior, each title starting with its AC id. The fixtures stand in for the network. On the native apps the tests are red: the code does not exist yet.",
+        say: "Build search cp1",
+        decide: "G0: every acceptance criterion has a test, and no test asserts what the doc does not say.",
+        reset: true,
+        preview: ["spec/tests/search/search.test.ts", `test("AC1: search matches names, ignoring case and spaces", async () => {
+  const app = await session({ fixtures: ["auth/user", "search/catalog"] });
+  await signIn(app);
+  const s = await app.do("search", { query: "  TEA " });
+  expect(ids(s.results)).toEqual(["tea", "green", "pot"]);
+});`],
+        lines: [
+          ["# one test per behavior", { add: [["shop/spec/tests/search/search.test.ts", "AC1–AC4"]] }],
+          ["# AC4 holds because the fixtures have no search method", { add: [["shop/spec/fixtures/search/catalog.json", "fixtures"]] }],
+          ["✓ G0: tests approved against the doc", { g: { 0: "pass" } }],
+          ["$ nativestep test search/ --target ios,android", { t: { ios: "run", android: "run" } }],
+          ["✗ ios       4 fail   no action \"search\" on ProductList", { t: { ios: "fail" } }],
+          ["✗ android   4 fail   no action \"search\" on ProductList", { t: { android: "fail" } }],
+          ["# red is expected: the native code comes next"],
+        ],
+      },
+      {
+        skill: "step-screen", title: "Code twice: iOS, then Android",
+        text: "Each platform gets its own ViewModel, node and screen, built on its kit. They share no code, only the tests. The CLI can drive the running app the way the tests do.",
+        say: "Continue",
+        decide: "Nothing yet. The gates decide whether it is done.",
+        lines: [
+          ["# iOS: ViewModel, node, SwiftUI view", { add: [["shop/ios/Core/Sources/Catalog/", "Swift"]], t: { ios: "run" } }],
+          ["$ nativestep session --target ios"],
+          ["$ nativestep do search '{\"query\":\"tea\"}'"],
+          ["ProductList  { query: \"tea\", results: 3 }"],
+          ["# Android: ViewModel, node, Compose screen", { add: [["shop/android/core/…/catalog/", "Kotlin"]], t: { android: "run" } }],
+          ["$ nativestep test search/ --target ios,android", { g: { 1: "run" } }],
+          ["✓ ios       4 pass", { t: { ios: "pass" } }],
+          ["✓ android   4 pass", { t: { android: "pass" }, g: { 1: "pass" } }],
+        ],
+      },
+      {
+        skill: "reviews", title: "Lint, screenshots, architecture",
+        text: "Lint checks the architecture rules. Screenshots of the same state are compared with the design, or the two platforms with each other. Two isolated reviews read the code.",
+        say: "Continue",
+        decide: "Nothing. A failed gate goes back to the step that owns it.",
+        lines: [
+          ["$ nativestep lint", { g: { 2: "run" } }],
+          ["✓ no violations", { g: { 2: "pass" } }],
+          ["$ nativestep shot search/search.test.ts --target ios,android", { g: { 3: "run" } }],
+          ["# step-ui-review compares the screenshots"],
+          ["✓ no blocking difference", { g: { 3: "pass" } }],
+          ["# step-arch-review: two reviews, no shared context", { g: { 4: "run" } }],
+          ["✓ 2 of 2 approve", { g: { 4: "pass" } }],
+        ],
+      },
+      {
+        skill: "G5", title: "You approve, it is committed",
+        text: "You review the code and the running app. The gate results go to the checkpoint's evidence, and the checkpoint is committed.",
+        say: "Looks good, approve",
+        decide: "Approve, or say what to change. Your feedback goes to spec/memory.md and applies to later checkpoints.",
+        lines: [
+          ["… waiting for your approval (G5)", { g: { 5: "pend" } }],
+          ["✓ approved", { g: { 5: "pass" }, add: [["shop/spec/evidence/search-cp1/", "gate results"]] }],
+          ["# commits the checkpoint"],
+          ["$ nativestep status --features"],
+          ["search  1/2 checkpoints"],
+          ["  cp1    done         0✓ 1✓ 2✓ 3✓ 4✓ 5✓    Search by name"],
+          ["next: search cp2"],
+        ],
+      },
+      {
+        skill: "step-fix", title: "A bug: red test first",
+        text: "A bug becomes a failing test before any fix. Then the fix goes into both platforms, and the same gates run.",
+        say: "Searching \"tea \" with a trailing space shows nothing on Android",
+        decide: "Approve the fix, like any checkpoint.",
+        reset: true,
+        lines: [
+          ["# captures the bug as a test", { add: [["shop/spec/tests/search/trim.test.ts", "the bug"]] }],
+          ["$ nativestep test search/trim.test.ts --target ios,android", { t: { ios: "run", android: "run" } }],
+          ["✓ ios       1 pass", { t: { ios: "pass" } }],
+          ["✗ android   1 fail   expected [\"tea\",\"green\",\"pot\"], got []", { t: { android: "fail" } }],
+          ["# fixes the query trim in Android", { mod: [["shop/android/core/…/catalog/", "fix"]] }],
+          ["$ nativestep test search/ --target ios,android", { t: { android: "run" }, g: { 0: "pass", 1: "run" } }],
+          ["✓ ios       5 pass", { t: { ios: "pass" } }],
+          ["✓ android   5 pass", { t: { android: "pass" }, g: { 1: "pass" } }],
+          ["# then lint, review and your approval, as before", { g: { 2: "pass", 3: "pass", 4: "pass", 5: "pend" } }],
+        ],
+      },
+    ],
+  },
+};
+
+const $ = (id) => document.getElementById(id);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let scenario = "migrate", index = 0, playing = !reduce, run = 0, timer = null;
+
+function initialState(sc) {
+  const files = new Map();
+  for (const f of sc.start.files) { const [p, n] = Array.isArray(f) ? f : [f, ""]; files.set(p, { note: n, mark: "" }); }
+  return { files, t: { ...sc.start.t }, g: { ...idle } };
+}
+
+function apply(st, fx) {
+  if (!fx) return;
+  for (const f of fx.add || []) { const [p, n] = Array.isArray(f) ? f : [f, ""]; st.files.set(p, { note: n, mark: "new" }); }
+  for (const [p, n] of fx.mod || []) st.files.set(p, { note: n, mark: "mod" });
+  for (const p of fx.rm || []) for (const k of st.files.keys()) if (k === p || k.startsWith(p)) st.files.get(k).mark = "rm";
+  Object.assign(st.t, fx.t || {});
+  Object.assign(st.g, fx.g || {});
+}
+
+function settle(st) {
+  for (const [k, v] of [...st.files]) { if (v.mark === "rm") st.files.delete(k); else v.mark = ""; }
+  for (const k in st.t) if (st.t[k] === "run") st.t[k] = "idle";
+}
+
+// The state at the start of step i: every earlier step applied in full.
+function stateAt(sc, i) {
+  const st = initialState(sc);
+  sc.steps.slice(0, i + 1).forEach((step, j) => {
+    if (step.reset) st.g = { ...idle };
+    if (j < i) { step.lines.forEach(([, fx]) => apply(st, fx)); settle(st); }
+  });
+  return st;
+}
+
+function renderTree(st) {
+  const root = { kids: new Map() };
+  for (const [path, info] of st.files) {
+    const parts = path.replace(/\/$/, "").split("/");
+    let node = root;
+    parts.forEach((name, i) => {
+      if (!node.kids.has(name)) node.kids.set(name, { kids: new Map(), dir: i < parts.length - 1 });
+      node = node.kids.get(name);
+    });
+    node.info = info;
+    if (path.endsWith("/")) node.dir = true;
+  }
+  const rows = [];
+  (function walk(node, depth) {
+    for (const [name, n] of node.kids) {
+      const dir = n.dir || n.kids.size > 0;
+      const cls = ["row", dir ? "dir" : "", n.info?.mark || ""].join(" ");
+      rows.push(`<div class="${cls}" style="padding-left:${depth * 14 + 4}px"><span class="name">${esc(name)}${dir ? "/" : ""}</span>${n.info?.note ? `<span class="note">${esc(n.info.note)}</span>` : ""}</div>`);
+      walk(n, depth + 1);
+    }
+  })(root, 0);
+  $("tree").innerHTML = rows.join("") || `<div class="empty">An empty folder.</div>`;
+  const marks = $("tree").querySelectorAll(".new, .mod, .rm");
+  if (marks.length) $("tree").scrollTop = marks[marks.length - 1].offsetTop - $("tree").clientHeight / 2;
+}
+
+function renderRig(st) {
+  const label = { off: "not used", idle: "", run: "running", pass: "pass", fail: "fail" };
+  $("targets").innerHTML = TARGETS.map(([k, name, port]) =>
+    `<div class="tg" data-s="${st.t[k]}"><span class="dot"></span><span>${name}</span><code>${port}</code><span class="st">${label[st.t[k]]}</span></div>`).join("");
+  $("gates").innerHTML = GATES.map(([g, name], i) =>
+    `<div class="gate" data-s="${st.g[i]}" title="${g}: ${name}"><b>${g}</b><small>${name}</small></div>`).join("");
+}
+
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]); }
+
+function lineEl(text) {
+  const el = document.createElement("div");
+  el.className = "l";
+  if (text.startsWith("$ ")) { el.classList.add("cmd-l"); text = text.slice(2); }
+  else if (text.startsWith("# ")) { el.classList.add("note"); text = text.slice(2); }
+  else if (text.startsWith("✓")) el.classList.add("ok");
+  else if (text.startsWith("✗")) el.classList.add("bad");
+  else if (text.startsWith("…")) el.classList.add("warn");
+  return [el, text];
+}
+
+const wait = (ms, id) => new Promise((res) => setTimeout(() => res(id === run), ms));
+
+async function show(i, animate) {
+  const id = ++run;
+  clearTimeout(timer);
+  const sc = SCENARIOS[scenario], step = sc.steps[index = i];
+  const st = stateAt(sc, i);
+
+  [...$("steps").children].forEach((li, j) => {
+    const b = li.firstChild;
+    b.classList.toggle("done", j < i);
+    if (j === i) { b.setAttribute("aria-current", "step"); $("steps").scrollLeft = li.offsetLeft - 16; }
+    else b.removeAttribute("aria-current");
+  });
+  $("skill").textContent = step.skill;
+  $("stitle").textContent = step.title;
+  $("stext").textContent = step.text;
+  $("saytext").textContent = step.say;
+  $("decidetext").textContent = step.decide;
+  $("decide").style.visibility = animate ? "hidden" : "visible";
+  $("preview").innerHTML = "";
+  $("count").textContent = `${i + 1} / ${sc.steps.length}`;
+  $("bar").style.width = `${((i + 1) / sc.steps.length) * 100}%`;
+  $("prev").disabled = i === 0;
+  $("next").disabled = i === sc.steps.length - 1;
+  renderTree(st); renderRig(st);
+
+  const term = $("term");
+  term.innerHTML = `<div class="bar"><i></i><i></i><i></i></div>`;
+  const showPreview = () => { if (step.preview) $("preview").innerHTML = `<div class="preview fade"><div class="ph">${esc(step.preview[0])}</div><pre><code>${esc(step.preview[1])}</code></pre></div>`; };
+  if (!animate) showPreview();
+
+  for (const [n, [raw, fx]] of step.lines.entries()) {
+    const [el, text] = lineEl(raw);
+    term.appendChild(el);
+    if (animate) {
+      if (el.classList.contains("cmd-l")) {
+        const cur = document.createElement("span"); cur.className = "cursor";
+        for (let c = 1; c <= text.length; c += 3) { el.textContent = text.slice(0, c); el.appendChild(cur); term.scrollTop = term.scrollHeight; if (!(await wait(16, id))) return; }
+        el.textContent = text;
+        if (!(await wait(320, id))) return;
+      } else {
+        el.textContent = text; el.classList.add("fade");
+        if (!(await wait(n === 0 ? 300 : 520, id))) return;
+      }
+      if (n === 1) showPreview();
+    } else el.textContent = text;
+    apply(st, fx);
+    term.scrollTop = term.scrollHeight;
+    if (animate && fx) { renderTree(st); renderRig(st); }
+  }
+  if (!animate) { renderTree(st); renderRig(st); }
+  showPreview();
+  $("decide").style.visibility = "visible";
+  if (animate) $("decide").classList.add("fade");
+
+  if (playing && id === run) {
+    if (i < sc.steps.length - 1) timer = setTimeout(() => show(i + 1, true), 2800);
+    else setPlaying(false, true);
+  }
+}
+
+function setPlaying(p, ended) {
+  playing = p;
+  $("play").textContent = p ? "Pause" : ended ? "Replay" : "Play";
+}
+
+function pick(name, fromHash) {
+  scenario = SCENARIOS[name] ? name : "migrate";
+  document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", t.dataset.s === scenario));
+  $("sintro").textContent = SCENARIOS[scenario].intro;
+  $("steps").innerHTML = SCENARIOS[scenario].steps.map((s, i) =>
+    `<li><button data-i="${i}"><span class="n">${i + 1}</span><span class="sk">${esc(s.skill)}</span><span class="t">${esc(s.title)}</span></button></li>`).join("");
+  if (!fromHash) history.replaceState(null, "", "#" + scenario);
+  setPlaying(!reduce);
+  show(0, playing);
+}
+
+document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => pick(t.dataset.s)));
+$("steps").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  setPlaying(false); show(+b.dataset.i, !reduce);
+});
+$("prev").addEventListener("click", () => { setPlaying(false); show(Math.max(0, index - 1), false); });
+$("next").addEventListener("click", () => { setPlaying(false); show(Math.min(SCENARIOS[scenario].steps.length - 1, index + 1), !reduce); });
+$("play").addEventListener("click", () => {
+  const last = index === SCENARIOS[scenario].steps.length - 1;
+  if (playing) { setPlaying(false); clearTimeout(timer); return; }
+  setPlaying(true);
+  show(last ? 0 : index + 1, true);
+});
+addEventListener("hashchange", () => pick(location.hash.slice(1), true));
+pick(location.hash.slice(1), true);
+</script>
+</body>
+</html>
